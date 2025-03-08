@@ -1,4 +1,4 @@
-# SylQ-SV - A Software-Style Symbolic Execution Engine for Verilog
+# SylQ-SV - A Symbolic Execution Engine for SystemVerilog
 
 ## Setup
 
