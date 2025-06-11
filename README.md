@@ -25,3 +25,8 @@ Requirements
 - PLY 3.4 or later: run `python3 -m pip install ply`
 - networkx: run `python3 -m pip install networkx`
 - matplotlib: run `python3 -m pip install matplotlib`
+
+## How To Cite
+Please cite our ASPLOS paper when using SylQ-SV!
+
+@inproceedings{Ryan2025Sylq, author = {Ryan, Kaki and Sturton, Cynthia}, title = {SylQ-SV: Scaling Symbolic Execution of Hardware Designs with Query Caching}, year = {2025}, publisher = {ACM}, booktitle = {Proceedings of the ACM International Conference on Architectural Support for Programming Languages and Operating Systems}, series = {ASPLOS} }
