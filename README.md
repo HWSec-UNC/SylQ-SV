@@ -33,4 +33,11 @@ of paths and branch points visited. The number of paths and branch points explor
 ## How To Cite
 Please cite our ASPLOS paper when using SylQ-SV!
 
-@inproceedings{Ryan2025Sylq, author = {Ryan, Kaki and Sturton, Cynthia}, title = {SylQ-SV: Scaling Symbolic Execution of Hardware Designs with Query Caching}, year = {2025}, publisher = {ACM}, booktitle = {Proceedings of the ACM International Conference on Architectural Support for Programming Languages and Operating Systems}, series = {ASPLOS} }
+@inproceedings{Ryan2025Sylq,
+author = {Ryan, Kaki and Sturton, Cynthia},
+title = {{SylQ-SV}: Scaling Symbolic Execution of Hardware Designs with Query Caching},
+year = {2025},
+publisher = {ACM},
+booktitle = {Proceedings of the International Conference on Architectural Support for Programming Languages and Operating Systems (ASPLOS)},
+doi={10.1145/3676642.3736123}
+}
