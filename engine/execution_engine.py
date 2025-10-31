@@ -795,37 +795,8 @@ class ExecutionEngine:
             single_paths_by_module[module_name] = list(product(*mapped_paths[module_name].values()))
             total_paths_by_module[module_name] = list(tuple(product(single_paths_by_module[module_name], repeat=int(num_cycles))))
         # {total_paths_by_module}")
-<<<<<<< HEAD
         #print(f"single paths by module: {total_paths_by_module}")
         if not total_paths_by_module:
-=======
-        print(f"total paths by module: {total_paths_by_module}")
-
-        # Build a list of combinations where each entry is a dict mapping module_name -> chosen multi-cycle paths
-        keys = list(total_paths_by_module.keys())
-        print(keys)
-        values = []
-        for key in keys:
-            module_paths = total_paths_by_module[key]
-            print(f"Module {key} paths: {module_paths}")
-            if not module_paths:
-            # represent "no path" as a single empty multi-cycle tuple so product() still works
-                module_paths = [tuple(() for _ in range(int(num_cycles)))]
-                values.append(module_paths)
-            else: 
-                values.append(module_paths)
-
-        total_paths = []
-        for path_combo in product(*values):
-            # path_combo is a tuple with one element per module; each element is a multi-cycle path (a tuple)
-            # Convert to dict keyed by module name. Convert each selected entry to a list to match later iteration.
-            total_paths.append({k: list(p) for k, p in zip(keys, path_combo)})
-
-        print(f"total combinations: {len(total_paths)}")
-        print(f"total_paths: {total_paths}")
-        
-        """if not total_paths_by_module:
->>>>>>> 360e6c1 (debugging outdated  pyslang construct and API usage)
             total_paths = []
         else:
             keys = list(total_paths_by_module.keys())
@@ -842,7 +813,7 @@ class ExecutionEngine:
             total_paths = []
             for path_combo in product(*values):
                 # ensure each module value is a list (so iteration like `for complete_single_cycle_path in curr_path[module_name]` works)
-                total_paths.append({k: list(p) for k, p in zip(keys, path_combo)})"""
+                total_paths.append({k: list(p) for k, p in zip(keys, path_combo)})
         
         #single_paths = list(product(*mapped_paths[manager.curr_module].values()))
         #total_paths = list(tuple(product(single_paths, repeat=int(num_cycles))))
