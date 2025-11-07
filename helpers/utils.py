@@ -1,4 +1,4 @@
-"""More general utility functions."""
+"""General utility functions used across the codebase"""
 import random
 import string
 

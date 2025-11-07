@@ -1,4 +1,4 @@
-"""Utilities to parse the rvalues of pyverilog, which are specified in prefix notation, evaluate them,
+"""Utilities to parse the rvalues of PySlang expressions, which are specified in prefix notation, evaluate them,
 and update our symbolic state. This may not be exhaustive and needs to be updated as we hit more 
 cases in the designs we evaluate. Please open a Github issue if you run into a design with an 
 rvalue not handled by this."""
@@ -11,7 +11,7 @@ from engine.execution_manager import ExecutionManager
 from engine.symbolic_state import SymbolicState
 from z3 import If, BitVec, IntVal, Int2BV, BitVecVal
 
-# Mapping from PyVerilog Operands to Z3 approximations (for later)
+# Mapping from SystemVerilog operators to Z3 approximations
 BINARY_OPS = ("Plus", "Minus", "Power", "Times", "Divide", "Mod", "Sll", "Srl", "Sla", "Sra", "LessThan",
 "GreaterThan", "LessEq", "GreaterEq", "Eq", "NotEq", "Eql", "NotEql", "And", "Xor",
 "Xnor", "Or", "Land", "Lor")
@@ -169,21 +169,21 @@ def tokenize(rvalue, s: SymbolicState, m: ExecutionManager):
     return tokens
 
 def parse_tokens(tokens):
+    """Parses tokens into expression tree"""
     if len(tokens) == 1 and tokens[0].isalpha():
         return tokens
     l = []
     iterat = iter(tokens)
     next(iterat) 
     while True:
-	    l += (parser_helper(iterat),)
-	    if (next(iterat, None) == None):
-		    break
+        l += (parser_helper(iterat),)
+        if (next(iterat, None) == None):
+            break
     return l
 
 def parser_helper(token):
     tup = ()
     for char in token:
-        #print(char)
         if char == "(":
             tup += ( parser_helper(token), )
         elif char.isdigit():
@@ -196,9 +196,8 @@ def parser_helper(token):
             tup += (char,)
 
 def evaluate(parsedList, s: SymbolicState, m: ExecutionManager):
-    #print(parsedList)
     for i in parsedList:
-	    res = eval_rvalue(i, s, m)
+        res = eval_rvalue(i, s, m)
     return res
 
 def evaluate_unary_op(expr, op, s: SymbolicState, m: ExecutionManager) -> str:
@@ -653,41 +652,6 @@ def str_to_bool(symbolic_exp: str, s: SymbolicState, m: ExecutionManager, reg_wi
     except Exception:
         return None
 
-def resolve_dependency(cond, true_value, false_value, s: SymbolicState, m: ExecutionManager) -> str:
-    if isinstance(cond, Operator):
-        return true_value
-    else:
-        # TODO: make sure this works
-        if isinstance(cond, Pointer):
-            return cond.var.name
-        return cond.name
-
-def cond_options(cond, true_value, false_value, s: SymbolicState, m: ExecutionManager, res):
-    """Returns a mapping from conditionals and their resultant values."""
-    if isinstance(false_value, Cond):
-        res[str(cond)] = true_value
-        return cond_options(false_value, false_value.true_value, false_value.false_value, s, m, res)
-    elif isinstance(cond, Operator):
-        res[str(cond)] = true_value
-        res["default"] = false_value
-    else: 
-        if isinstance(cond, Pointer):
-            res[cond.var.name] = true_value
-        else:
-            res[cond.name] = true_value
-        res["default"] = false_value
-    return res
-
-def count_nested_cond(cond, true_value, false_value, s: SymbolicState, m: ExecutionManager) -> str:
-    """Calculating the number of branches represented within a conditoinal expression."""
-    if isinstance(true_value, Cond):
-        return 1 + count_nested_cond(true_value, true_value.true_value, true_value.false_value, s, m)
-
-    elif isinstance(false_value, Cond):
-        return 1 + count_nested_cond(false_value, false_value.true_value, false_value.false_value, s, m)
-
-    else:
-        return 1
 
 
 

@@ -1,5 +1,7 @@
 """The main class that controls the flow of execution. Most of the bookkeeping happens here, and 
 a lot of this information will probably be useful when working in a specific search strategy."""
+# Central coordinator that tracks all execution metadata, paths explored, modules processed, and optimization state.
+
 from __future__ import annotations
 from .symbolic_state import SymbolicState
 from helpers.utils import init_symbol
@@ -19,6 +21,8 @@ CONDITIONALS = (
 )
 
 class ExecutionManager:
+    """The ExecutionManager class is responsible for managing the execution of the symbolic execution engine.
+    It is responsible for counting the number of paths, merging states, and other bookkeeping tasks."""
     num_paths: int = 1
     curr_level: int = 0
     path_code: str = "0" * 12
@@ -95,7 +99,7 @@ class ExecutionManager:
                             state.store[key][key2] = store[key][key2]
 
     def init_run(self, m: ExecutionManager, module: ps.ModuleDeclarationSyntax) -> None:
-        """Initalize run."""
+        """Initalize run for a module"""
         m.init_run_flag = True
         self.count_conditionals(m, module.members)
         # these are for the COI opt
@@ -104,10 +108,11 @@ class ExecutionManager:
         m.init_run_flag = False
 
     def count_conditionals(self, m: "ExecutionManager", items):
-        """Recursively count all conditional statements in the AST."""
+        """Recursively count all conditional statements in the AST (pyslang version)"""
         stmts = items
         if isinstance(items, ps.BlockStatementSyntax):
-            stmts = items.statements
+            # PySlang uses .items, not .statements for BlockStatementSyntax
+            stmts = getattr(items, 'items', getattr(items, 'statements', items))
         # If stmts is iterable, traverse each statement
         if hasattr(stmts, '__iter__'):
             for item in stmts:
@@ -122,36 +127,42 @@ class ExecutionManager:
             elif isinstance(items, ps.CaseStatementSyntax):
                 m.num_paths += 1
                 for case in items.items:
-                    self.count_conditionals(m, case.statements)
+                    # Case items may have .statements or .statement attribute
+                    case_body = getattr(case, 'statements', getattr(case, 'statement', None))
+                    self.count_conditionals(m, case_body)
             elif isinstance(items, ps.ForLoopStatementSyntax):
                 m.num_paths += 1
                 self.count_conditionals(m, items.body)
             elif hasattr(ps, "ForeachLoopStatementSyntax") and isinstance(items, ps.ForeachLoopStatementSyntax):
                 m.num_paths += 1
                 self.count_conditionals(m, items.body)
-            elif isinstance(items, ps.WhileLoopStatementSyntax):
+            elif hasattr(ps, "WhileLoopStatementSyntax") and isinstance(items, ps.WhileLoopStatementSyntax):
                 m.num_paths += 1
                 self.count_conditionals(m, items.body)
-            elif isinstance(items, ps.DoWhileLoopStatementSyntax):
+            elif hasattr(ps, "DoWhileLoopStatementSyntax") and isinstance(items, ps.DoWhileLoopStatementSyntax):
                 m.num_paths += 1
                 self.count_conditionals(m, items.body)
-            elif isinstance(items, ps.RepeatLoopStatementSyntax):
+            elif hasattr(ps, "RepeatLoopStatementSyntax") and isinstance(items, ps.RepeatLoopStatementSyntax):
                 m.num_paths += 1
                 self.count_conditionals(m, items.body)
             elif isinstance(items, ps.BlockStatementSyntax):
-                self.count_conditionals(m, items.statements)
+                # PySlang uses .items, not .statements for BlockStatementSyntax
+                self.count_conditionals(m, items.items)
             elif hasattr(ps, "AlwaysConstructSyntax") and isinstance(items, ps.AlwaysConstructSyntax):
                 self.count_conditionals(m, items.statement)
             elif hasattr(ps, "InitialConstructSyntax") and isinstance(items, ps.InitialConstructSyntax):
                 self.count_conditionals(m, items.statement)
             elif hasattr(ps, "CaseItemSyntax") and isinstance(items, ps.CaseItemSyntax):
-                self.count_conditionals(m, items.statements)
+                # CaseItemSyntax may have .statements or .statement attribute
+                case_body = getattr(items, 'statements', getattr(items, 'statement', None))
+                self.count_conditionals(m, case_body)
 
     def count_conditionals_2(self, m:ExecutionManager, items) -> int:
-        """Rewrite to actually return an int."""
+        """(Alternative conditional counter) Rewrite to actually return an int"""
         stmts = items
         if isinstance(items, ps.BlockStatementSyntax):
-            stmts = items.statements
+            # PySlang uses .items, not .statements for BlockStatementSyntax
+            stmts = items.items
             # items.cname = "Block"
 
         if hasattr(stmts, '__iter__'):
@@ -180,7 +191,7 @@ class ExecutionManager:
         """Checks if we've seen all the cases for this index in the bit string.
         We know there are no more nested conditionals within the block, just want to check 
         that we have seen the path where this bit was turned on but the thing to the left of it
-        could vary."""
+        could vary """
         # first check if things less than me have been added.
         # so index 29 shouldnt be completed before 30
         for i in range(bit_index + 1, 32):

@@ -1,4 +1,4 @@
-"""Extracting the CFG from the AST."""
+"""Converts PySlang AST (representing SystemVerilog) into executable CFG structure that enables path exploration"""
 from math import comb
 from operator import indexOf
 import z3
@@ -14,7 +14,6 @@ import gc
 from itertools import product, permutations, combinations
 import logging
 from helpers.utils import to_binary
-from strategies.dfs import DepthFirst
 import sys
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -22,7 +21,7 @@ import pyslang as ps
 from pyslang import ConditionalStatementSyntax, DataDeclarationSyntax
 
 class CFG:
-    """CFG of Verilog RTL."""
+    """Represents the control flow graph of a module/always block"""
     def __init__(self):
         # basic blocks. A list made up of slices of all_nodes determined by partition_points.
         self.basic_block_list = []
@@ -112,15 +111,10 @@ class CFG:
 
 
     def get_always_sv(self, m: ExecutionManager, s: SymbolicState, ast):
-        """Populate the always block list for a SV design."""
-        #if ast.__class__.__name__ == "ProceduralBlockSyntax":
-            #print("hey")
-            #ast = ast.members
-
+        """Extracts always blocks from PySlang AST"""
         if (ast != None and isinstance(ast, ps.DefinitionSymbol)):
-                #print("10")
-                self.get_always_sv(m, s, ast.syntax)
-                return
+            self.get_always_sv(m, s, ast.syntax)
+            return
 
         if isinstance(ast, ps.ModuleDeclarationSyntax):
             for mem in ast.members:
@@ -128,60 +122,39 @@ class CFG:
             return
 
         if hasattr(ast, '__iter__'):
-            #print(ast.__class__.__name__)
             if ast.__class__.__name__ == "ProceduralBlockSyntax":
-                #print("procedural")
                 self.always_blocks.append(ast)
             elif ast.__class__.__name__ == "ConditionalStatementSyntax":
-                    #print("found if statement")
-                    print(dir(ast))
-                    self.get_always_sv(m, s, ast.statement) 
-                    self.get_always_sv(m, s, ast.elseClause)
+                self.get_always_sv(m, s, ast.statement) 
+                self.get_always_sv(m, s, ast.elseClause)
             elif ast.__class__.__name__ == "CaseStatementSyntax":
-                    return self.get_always_sv(m, s, ast.items)
-                    self.get_always_sv(m, s, ast.items)
+                return self.get_always_sv(m, s, ast.items)
             elif ast.__class__.__name__ == "ForLoopStatementSyntax":
-                    return self.get_always_sv(m, s, ast.statement)
-                    self.get_always_sv(m, s, ast.statement)
+                return self.get_always_sv(m, s, ast.statement)
             elif ast.__class__.__name__ == "BlockStatementSyntax":
-                    self.get_always_sv(m, s, ast.items)
+                self.get_always_sv(m, s, ast.items)
             else:
-                    if isinstance(ast, ps.ConditionalStatementSyntax):
-                        #print("2")
-                        #self.get_always(m, s, ast.ifTrue) 
-                        #self.get_always(m, s, ast.ifFalse)
-                        then_body = getattr(ast, "ifTrue", getattr(ast, "statement", None))
-                        else_clause = getattr(ast, "elseClause", None)
-                        else_body = getattr(else_clause, "statement", None) if else_clause is not None else None
-                        self.get_always_sv(m, s, then_body)
-                        self.get_always_sv(m, s, else_body)
-                    elif isinstance(ast, ps.CaseStatementSyntax):
-                        #print("3")
-                        self.get_always(m, s, ast.caseStatements)
-                    elif isinstance(ast, ps.ForLoopStatementSyntax):
-                        #print("4")
-                        #self.get_always(m, s, ast.body)
-                        self.get_always_sv(m, s, ast.statement)
-                    elif isinstance(ast, ps.BlockStatementSyntax):
-                        #print("5")
-                        #self.get_always(m, s, ast.statements)
-                        self.get_always_sv(m, s, ast.items)
-                    elif isinstance(ast, ps.ProceduralBlockSyntax):
-                        #print("6")
-                        #print("found procedural/always block")
-                        self.always_blocks.append(ast)
-                    # elif isinstance(ast, ps.InitialConstructSyntax):
-                    #     self.get_always(m, s, ast.statement)
-                    elif isinstance(ast, ps.StatementSyntax):
-                        #print("7")
-                        self.get_always_sv(m, s, ast.statement)
-                    else:
-                        if isinstance(ast, ps.DataDeclarationSyntax):
-                            #print("8")
-                            self.decls.append(ast)
-                        elif isinstance(ast, ps.ContinuousAssignSyntax):
-                            #print("9")
-                            self.comb.append(ast)
+                if isinstance(ast, ps.ConditionalStatementSyntax):
+                    then_body = getattr(ast, "ifTrue", getattr(ast, "statement", None))
+                    else_clause = getattr(ast, "elseClause", None)
+                    else_body = getattr(else_clause, "statement", None) if else_clause is not None else None
+                    self.get_always_sv(m, s, then_body)
+                    self.get_always_sv(m, s, else_body)
+                elif isinstance(ast, ps.CaseStatementSyntax):
+                    self.get_always_sv(m, s, ast.items)
+                elif isinstance(ast, ps.ForLoopStatementSyntax):
+                    self.get_always_sv(m, s, ast.statement)
+                elif isinstance(ast, ps.BlockStatementSyntax):
+                    self.get_always_sv(m, s, ast.items)
+                elif isinstance(ast, ps.ProceduralBlockSyntax):
+                    self.always_blocks.append(ast)
+                elif isinstance(ast, ps.StatementSyntax):
+                    self.get_always_sv(m, s, ast.statement)
+                else:
+                    if isinstance(ast, ps.DataDeclarationSyntax):
+                        self.decls.append(ast)
+                    elif isinstance(ast, ps.ContinuousAssignSyntax):
+                        self.comb.append(ast)
                     ...
         elif ast != None:
             # print(f"ast ! {ast.definitionKind} {dir(ast)}")
@@ -190,8 +163,11 @@ class CFG:
             # print(type(ast))
             if isinstance(ast, ps.ConditionalStatementSyntax):
                 #print("11")
-                self.get_always(m, s, ast.ifTrue) 
-                self.get_always(m, s, ast.ifFalse)
+                then_body = getattr(ast, "ifTrue", getattr(ast, "statement", None))
+                else_clause = getattr(ast, "elseClause", None)
+                else_body = getattr(else_clause, "statement", None) if else_clause is not None else None
+                self.get_always_sv(m, s, then_body)
+                self.get_always_sv(m, s, else_body)
             elif isinstance(ast, ps.CaseStatementSyntax):
                 #print("12")
                 #self.get_always(m, s, ast.caseStatements)
@@ -202,10 +178,10 @@ class CFG:
                 self.get_always_sv(m, s, body)
             elif isinstance(ast, ps.ForLoopStatementSyntax):
                 #print("14")
-                self.get_always(m, s, ast.body)
+                self.get_always_sv(m, s, ast.statement)
             elif isinstance(ast, ps.BlockStatementSyntax):
                 #print("15")
-                self.get_always(m, s, ast.statements)
+                self.get_always_sv(m, s, ast.items)
             elif isinstance(ast, ps.ProceduralBlockSyntax):
                 #print("16")
                 self.always_blocks.append(ast)          
@@ -213,7 +189,7 @@ class CFG:
             #     self.get_always(m, s, ast.statement)
             elif isinstance(ast, ps.StatementSyntax):
                 #print("17")
-                self.get_always(m, s, ast.statement)
+                self.get_always_sv(m, s, ast.statement)
             else:
                 #print("18")
                 if isinstance(ast, ps.DataDeclarationSyntax):
@@ -224,200 +200,12 @@ class CFG:
                 #     print("FOUND SUBModule!")
                 ...
 
-
-        """
-        if hasattr(ast, '__iter__'):
-            for item in ast:
-
-                #TODO
-                #There's 28 procedual blocks counted, but there's only 11 always block in or1200-alu.v
-
-                #print(item)
-                #print(f"item ! {item.kind} {dir(item)}")
-                # print(f"kind of item !! {item.kind}")
-                #print((item.__class__.__name__))
-                
-                #if ast.__class__.__name__ == "ConditionalStatementSyntax":
-                if item.__class__.__name__ == "ConditionalStatementSyntax":
-                    print("found if statement")
-                    #never enter
-                    print(dir(item))
-                    self.get_always_sv(m, s, item.statement) 
-                    self.get_always_sv(m, s, item.elseClause)
-                #elif ast.__class__.__name__ == "CaseStatementSyntax":
-                elif item.__class__.__name__ == "CaseStatementSyntax":
-                    #return self.get_always_sv(m, s, item.items)
-                    #never enter
-                    self.get_always_sv(m, s, item.items)
-                elif item.__class__.__name__ == "ForLoopStatementSyntax":
-                    #return self.get_always_sv(m, s, item.statement)
-                    #never enter
-                    self.get_always_sv(m, s, item.statement)
-                elif item.__class__.__name__ == "ProceduralBlockSyntax":
-                    print("procedural")
-                    #TODO: here prints 28 procedural blocks -> num of always block
-                    self.always_blocks.append(item)
-                elif item.__class__.__name__ == "BlockStatementSyntax":
-                    #never enter
-                    self.get_always_sv(m, s, item.items)
-                # elif isinstance(item, Initial):
-                #     self.get_always(m, s, item.statement)
-                # elif isinstance(item, SingleStatement):
-                #     self.get_always(m, s, item.statement)
-                else:
-                    #only enters "1" 4 times
-                    if isinstance(ast, ps.ModuleDeclarationSyntax):
-                        print("1")
-                        self.get_always_sv(m, s, ast.members)
-                    if isinstance(ast, ps.ConditionalStatementSyntax):
-                        print("2")
-                        #self.get_always(m, s, ast.ifTrue) 
-                        #self.get_always(m, s, ast.ifFalse)
-                        then_body = getattr(ast, "ifTrue", getattr(ast, "statement", None))
-                        else_clause = getattr(ast, "elseClause", None)
-                        else_body = getattr(else_clause, "statement", None) if else_clause is not None else None
-                        self.get_always_sv(m, s, then_body)
-                        self.get_always_sv(m, s, else_body)
-                    elif isinstance(ast, ps.CaseStatementSyntax):
-                        print("3")
-                        self.get_always(m, s, ast.caseStatements)
-                    elif isinstance(ast, ps.ForLoopStatementSyntax):
-                        print("4")
-                        #self.get_always(m, s, ast.body)
-                        self.get_always_sv(m, s, ast.statement)
-                    elif isinstance(ast, ps.BlockStatementSyntax):
-                        print("5")
-                        #self.get_always(m, s, ast.statements)
-                        self.get_always_sv(m, s, ast.items)
-                    elif isinstance(ast, ps.ProceduralBlockSyntax):
-                        print("6")
-                        #print("found procedural/always block")
-                        self.always_blocks.append(ast)
-                    # elif isinstance(ast, ps.InitialConstructSyntax):
-                    #     self.get_always(m, s, ast.statement)
-                    elif isinstance(ast, ps.StatementSyntax):
-                        print("7")
-                        self.get_always_sv(m, s, ast.statement)
-                    else:
-                        if isinstance(ast, ps.DataDeclarationSyntax):
-                            print("8")
-                            self.decls.append(ast)
-                        elif isinstance(ast, ps.ContinuousAssignSyntax):
-                            print("9")
-                            self.comb.append(ast)
-                    ...
-        elif ast != None:
-            # print(f"ast ! {ast.definitionKind} {dir(ast)}")
-            # print(type(ps.DefinitionSymbol))
-            # print(type(ast) == type(ps.DefinitionSymbol))
-            # print(type(ast))
-            if isinstance(ast, ps.DefinitionSymbol):
-            #     # TODO: This is not working anymore
-                # print("module kind")
-                # print(dir(ast))
-                print("10")
-                self.get_always_sv(m, s, ast.syntax)
-            if isinstance(ast, ps.ConditionalStatementSyntax):
-                print("11")
-                self.get_always(m, s, ast.ifTrue) 
-                self.get_always(m, s, ast.ifFalse)
-            elif isinstance(ast, ps.CaseStatementSyntax):
-                print("12")
-                #self.get_always(m, s, ast.caseStatements)
-                self.get_always_sv(m, s, ast.items)
-            elif isinstance(ast, ps.CaseItemSyntax):
-                print("13")
-                body = getattr(ast, "statements", getattr(ast, "statement", None))
-                self.get_always_sv(m, s, body)
-
-            elif isinstance(ast, ps.ForLoopStatementSyntax):
-                print("14")
-                self.get_always(m, s, ast.body)
-            elif isinstance(ast, ps.BlockStatementSyntax):
-                print("15")
-                self.get_always(m, s, ast.statements)
-            elif isinstance(ast, ps.ProceduralBlockSyntax):
-                print("16")
-                self.always_blocks.append(ast)          
-            # elif isinstance(ast, ps.InitialConstructSyntax):
-            #     self.get_always(m, s, ast.statement)
-            elif isinstance(ast, ps.StatementSyntax):
-                print("17")
-                self.get_always(m, s, ast.statement)
-            else:
-                print("18")
-                if isinstance(ast, ps.DataDeclarationSyntax):
-                    self.decls.append(ast)
-                elif isinstance(ast, ps.ContinuousAssignSyntax):
-                    self.comb.append(ast)
-                # elif isinstance(ast, ps.HierarchicalReference):
-                #     print("FOUND SUBModule!")
-                ...
-    """
-    def get_always(self, m: ExecutionManager, s: SymbolicState, ast):
-        """Populate the always block list."""
-        if isinstance(ast, Block):
-            ast = ast.statements
-
-        if hasattr(ast, '__iter__'):
-            for item in ast:
-                if isinstance(item, IfStatement):
-                    self.get_always(m, s, item.true_statement) 
-                    self.get_always(m, s, item.false_statement)
-                elif isinstance(ast, CaseStatement):
-                    return self.get_always(m, s, ast.caselist) 
-                elif isinstance(ast, ForStatement):
-                    return self.get_always(m, s, ast.statement) 
-                elif isinstance(item, Block):
-                    self.get_always(m, s, item.items)
-                elif isinstance(item, Always):
-                    self.always_blocks.append(item)           
-                elif isinstance(item, Initial):
-                    self.get_always(m, s, item.statement)
-                elif isinstance(item, SingleStatement):
-                    self.get_always(m, s, item.statement)
-                else:
-                    if isinstance(item, Decl):
-                        self.decls.append(item)
-                    elif isinstance(item, Assign):
-                        self.comb.append(item)
-                    elif isinstance(item, InstanceList):
-                        print("FOUND SUBModule!")
-                        print(item.module)
-                        self.submodules.append(item)
-                    ...
-        elif ast != None:
-            if isinstance(ast, IfStatement):
-                self.get_always(m, s, ast.true_statement) 
-                self.get_always(m, s, ast.false_statement)
-            elif isinstance(ast, CaseStatement):
-                self.get_always(m, s, ast.caselist)
-            elif isinstance(ast, ForStatement):
-                self.get_always(m, s, ast.statement)
-            elif isinstance(ast, Block):
-                self.get_always(m, s, ast.items)
-            elif isinstance(ast, Always):
-                self.always_blocks.append(ast)          
-            elif isinstance(ast, Initial):
-                self.get_always(m, s, ast.statement)
-            elif isinstance(ast, SingleStatement):
-                self.get_always(m, s, ast.statement)
-            else:
-                if isinstance(ast, Decl):
-                    self.decls.append(ast)
-                elif isinstance(ast, Assign):
-                    self.comb.append(ast)
-                elif isinstance(ast, InstanceList):
-                    print("FOUND SUBModule!")
-                ...
-
     def basic_blocks_sv(self, m:ExecutionManager, s: SymbolicState, ast):
         """We want to get a list of AST nodes partitioned into basic blocks.
         Need to keep track of children/parent indices of each block in the list."""
         if hasattr(ast, '__iter__'):
             for item in ast:
-                if self.block_smt[self.block_stmt_depth] and (isinstance(item, ps.ConditionalStatementSyntax) or isinstance(item, ps.CaseStatementSyntax)
-                or isinstance(item, ps.ForLoopStatementSyntax)):
+                if self.block_smt[self.block_stmt_depth] and (isinstance(item, ps.ConditionalStatementSyntax) or isinstance(item, ps.CaseStatementSyntax) or isinstance(item, ps.ForLoopStatementSyntax)):
                     if not self.block_stmt_depth in self.ind_branch_points:
                         self.ind_branch_points[self.block_stmt_depth] = set()
 
@@ -432,12 +220,9 @@ class CFG:
                     else_clause = getattr(item, "elseClause", None)
                     else_body = getattr(else_clause, "statement", None) if else_clause is not None else None
 
-                    #self.basic_blocks(m, s, item.true_statement)
                     self.basic_blocks_sv(m, s, then_body)
                     edge_1 = (parent_idx, self.curr_idx)
                     self.partition_points.add(self.curr_idx)
-
-                    #self.basic_blocks(m, s, item.false_statement)
                     self.basic_blocks_sv(m, s, else_body)
                     edge_2 = (parent_idx, self.curr_idx)
                     self.partition_points.add(self.curr_idx)
@@ -491,12 +276,10 @@ class CFG:
                 edge_1 = (parent_idx, self.curr_idx)
                 self.partition_points.add(self.curr_idx)
 
-                #self.basic_blocks(m, s, ast.true_statement) 
                 self.basic_blocks_sv(m, s, then_body)
 
                 edge_2 = (parent_idx, self.curr_idx)
                 self.partition_points.add(self.curr_idx)
-                #self.basic_blocks(m, s, ast.false_statement)
                 self.basic_blocks_sv(m, s, else_body)
                 self.edgelist.append(edge_1)
                 self.edgelist.append(edge_2)
@@ -504,7 +287,6 @@ class CFG:
                 self.all_nodes.append(ast)
                 self.partition_points.add(self.curr_idx)
                 self.curr_idx += 1
-                #self.basic_blocks_sv(m, s, ast.caselist)
                 self.basic_blocks_sv(m, s, ast.items)
             elif isinstance(ast, ps.CaseItemSyntax):
                 body = getattr(ast, "statements", getattr(ast, "statement", None))
@@ -517,8 +299,6 @@ class CFG:
             elif isinstance(ast, ps.BlockStatementSyntax):
                 self.block_stmt_depth += 1
                 self.block_smt.append(True)
-                #print("found other block statement")
-                #self.basic_blocks(m, s, ast.statements)
                 self.basic_blocks_sv(m, s, ast.items)
                 if self.block_stmt_depth in self.ind_branch_points:
                     self.resolve_independent_branch_pts(self.block_stmt_depth)
@@ -527,106 +307,7 @@ class CFG:
             elif isinstance(ast, ps.ProceduralBlockSyntax):
                 self.all_nodes.append(ast)
                 self.curr_idx += 1
-                self.basic_blocks_sv(m, s, ast.statement)             
-            # elif isinstance(ast, ps.InitialConstructSyntax):
-            #     self.all_nodes.append(ast)
-            #     self.curr_idx += 1
-            #     self.basic_blocks(m, s, ast.statement)
-            else:
-                self.all_nodes.append(ast)
-                self.curr_idx += 1
-
-    def basic_blocks(self, m:ExecutionManager, s: SymbolicState, ast):
-        """We want to get a list of AST nodes partitioned into basic blocks.
-        Need to keep track of children/parent indices of each block in the list."""
-        if hasattr(ast, '__iter__'):
-            for item in ast:
-                if self.block_smt[self.block_stmt_depth] and (isinstance(item, IfStatement) or isinstance(item, CaseStatement)
-                or isinstance(item, ForStatement)):
-                    if not self.block_stmt_depth in self.ind_branch_points:
-                        self.ind_branch_points[self.block_stmt_depth] = set()
-
-                    self.ind_branch_points[self.block_stmt_depth].add(self.curr_idx)
-
-                if isinstance(item, IfStatement):
-                    self.all_nodes.append(item)
-                    self.partition_points.add(self.curr_idx)
-                    parent_idx = self.curr_idx
-                    self.basic_blocks(m, s, item.true_statement) 
-                    edge_1 = (parent_idx, self.curr_idx)
-                    self.partition_points.add(self.curr_idx)
-                    self.basic_blocks(m, s, item.false_statement)
-                    edge_2 = (parent_idx, self.curr_idx)
-                    self.partition_points.add(self.curr_idx)
-                    self.curr_idx += 1
-                    self.edgelist.append(edge_1)
-                    self.edgelist.append(edge_2)
-                elif isinstance(item, CaseStatement):
-                    self.all_nodes.append(ast)
-                    self.partition_points.add(self.curr_idx)
-                    self.curr_idx += 1
-                    self.basic_blocks(m, s, item.caselist) 
-                elif isinstance(item, ForStatement):
-                    self.all_nodes.append(ast)
-                    self.partition_points.add(self.curr_idx)
-                    self.curr_idx += 1
-                    self.basic_blocks(m, s, item.statement) 
-                elif isinstance(item, Block):
-                    print("found block stmt")
-                    self.basic_blocks(m, s, item.items)
-                elif isinstance(item, Always):
-                    self.all_nodes.append(item)
-                    self.curr_idx += 1
-                    self.basic_blocks(m, s, item.statement)             
-                elif isinstance(item, Initial):
-                    self.all_nodes.append(item)
-                    self.curr_idx += 1
-                    self.basic_blocks(m, s, item.statement)
-                else:
-                    self.all_nodes.append(item)
-                    self.curr_idx += 1
-
-        elif ast != None:
-            if isinstance(ast, IfStatement):
-                self.partition_points.add(self.curr_idx)
-                self.all_nodes.append(ast)
-                parent_idx = self.curr_idx
-                self.curr_idx += 1
-                edge_1 = (parent_idx, self.curr_idx)
-                self.partition_points.add(self.curr_idx)
-                self.basic_blocks(m, s, ast.true_statement) 
-                edge_2 = (parent_idx, self.curr_idx)
-                self.partition_points.add(self.curr_idx)
-                self.basic_blocks(m, s, ast.false_statement)
-                self.edgelist.append(edge_1)
-                self.edgelist.append(edge_2)
-            elif isinstance(ast, CaseStatement):
-                self.all_nodes.append(ast)
-                self.partition_points.add(self.curr_idx)
-                self.curr_idx += 1
-                self.basic_blocks(m, s, ast.caselist)
-            elif isinstance(ast, ForStatement):
-                self.all_nodes.append(ast)
-                self.partition_points.add(self.curr_idx)
-                self.curr_idx += 1
-                self.basic_blocks(m, s, ast.statement) 
-            elif isinstance(ast, Block):
-                self.block_stmt_depth += 1
-                self.block_smt.append(True)
-                #print("found other block statement")
-                self.basic_blocks(m, s, ast.statements)
-                if self.block_stmt_depth in self.ind_branch_points:
-                    self.resolve_independent_branch_pts(self.block_stmt_depth)
-                self.block_smt.pop()
-                self.block_stmt_depth -= 1
-            elif isinstance(ast, Always):
-                self.all_nodes.append(ast)
-                self.curr_idx += 1
-                self.basic_blocks(m, s, ast.statement)             
-            elif isinstance(ast, Initial):
-                self.all_nodes.append(ast)
-                self.curr_idx += 1
-                self.basic_blocks(m, s, ast.statement)
+                self.basic_blocks_sv(m, s, ast.statement)
             else:
                 self.all_nodes.append(ast)
                 self.curr_idx += 1
@@ -636,7 +317,7 @@ class CFG:
         return self.paths
 
     def partition(self):
-        """Slices up the list of all nodes into the actual basic blocks"""
+        """Partitions all_nodes into basic blocks based on partition_points"""
         self.partition_points.add(len(self.all_nodes)-1)
         partition_list = list(self.partition_points)
         for i in range(len(partition_list)-1):
