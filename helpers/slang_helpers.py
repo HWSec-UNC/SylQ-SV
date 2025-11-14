@@ -168,34 +168,111 @@ class SlangSymbolVisitor:
                     self.visit_expr(e.value)
                 else:
                     self.visit_expr(e)
-
+    def _recurse_if_present(self, symbol, *attr_names):
+        """Helper: for given attribute names, if present on symbol recurse into them."""
+        for a in attr_names:
+            if hasattr(symbol, a):
+                val = getattr(symbol, a)
+                if val is None:
+                    continue
+                if isinstance(val, (list, tuple, set)):
+                    for item in val:
+                        if hasattr(item, "kind"):
+                            self.visit(item)
+                else:
+                    if hasattr(val, "kind") or isinstance(val, ps.Symbol):
+                        self.visit(val)
+    
     def visit(self, symbol):
         """Main entry point for visiting symbols"""
-        # incomplete implementation
-        if not isinstance(symbol, ps.Symbol):
+        if isinstance(symbol, (list, tuple, set)):
+            for s in symbol:
+                self.visit(s)
             return
-        if symbol.kind == ps.SymbolKind.Unknown:
-            # unknown symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.Root:
-            # root symbol
-            ...
+
+        if not isinstance(symbol, ps.Symbol):
+            # Not every AST node in Slang is a ps.Symbol, so therefore I added a traversal here which traveres through their .members attribute because they might contian Statements there such as Compilation root, Definition objects, etc.
+            if hasattr(symbol, "members"):
+                for m in getattr(symbol, "members"):
+                    self.visit(m)
+            return
+        
+        # if symbol.kind == ps.SymbolKind.Unknown:
+        #     # unknown symbol
+        #     ...
+        # elif symbol.kind == ps.SymbolKind.Root:
+        #     # root symbol
+        #     ...
+        # Root / Compilation unit: recurse into members
+        if symbol.kind in (ps.SymbolKind.Root, ps.SymbolKind.CompilationUnit):
+            self._recurse_if_present(symbol, "members", "items", "declarations")
+            return
+        
         elif symbol.kind == ps.SymbolKind.Definition:
-            # definition symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.CompilationUnit:
-            # compilationunit symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.DeferredMember:
-            # deferredmember symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.TransparentMember:
-            # transparentmember symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.EmptyMember:
-            # emptymember symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.PredefinedIntegerType:
+            # definitions can contain members, etc.
+            self._recurse_if_present(symbol, "members", "declarations", "items", "body", "syntax")
+            return
+        
+        # Procedural block: count branches by delegating to visit_stmt
+        if symbol.kind == ps.SymbolKind.ProceduralBlock:
+            # some procedural blocks expose `.body` or `.statement`
+            body = getattr(symbol, "body", getattr(symbol, "statement", None))
+            if body is not None:
+                try:
+                    self.visit_stmt(body)
+                except Exception:
+                    # fall back to recursing members if visit_stmt fails
+                    self._recurse_if_present(symbol, "members", "body")
+            else:
+                self._recurse_if_present(symbol, "members")
+            return
+        
+        elif symbol.kind == ps.SymbolKind.ContinuousAssign:
+            try:
+                assign = getattr(symbol, "assignment", None)
+                if assign is not None:
+                    self.visit_expr(assign)
+            except Exception:
+                pass
+            self._recurse_if_present(symbol, "members", "children")
+            return
+        
+        elif symbol.kind == ps.SymbolKind.Instance:
+            # instance.name is a common attribute
+            try:
+                instance_name = getattr(symbol, "name", None)
+            except Exception:
+                instance_name = None
+            self._recurse_if_present(symbol, "instanceBody", "parentInstance", "members", "children")
+            return
+        
+        # Instance Body / Instance Array: recurse into members/statements
+        elif symbol.kind in (ps.SymbolKind.InstanceBody, ps.SymbolKind.InstanceArray):
+            self._recurse_if_present(symbol, "members", "statements", "items")
+            return
+        
+
+        elif symbol.kind in (ps.SymbolKind.Port, ps.SymbolKind.Variable, ps.SymbolKind.Net, ps.SymbolKind.Parameter):
+            # If there is an initializer or assignment expression, visit it
+            init_expr = getattr(symbol, "initializer", None) or getattr(symbol, "assignment", None)
+            if init_expr is not None:
+                try:
+                    self.visit_expr(init_expr)
+                except Exception:
+                    self._recurse_if_present(init_expr, "members", "elements", "expressions")
+            # recurse into members to catch nested declarations
+            self._recurse_if_present(symbol, "members", "declarations", "children")
+            return
+        
+        # Cases where the symbol was not contributing to the RTL executable code, I have implemented a transversion mechanism to register the symbol in the internal maps and advance symbol_id.:
+        # Attempt to recurse known container-like attributes (members/body/statements/children)
+        self._recurse_if_present(symbol,
+                                "members", "body", "statement", "statements",
+                                "items", "declarations", "children", "syntax")
+        return
+    if False: #left the other symbol kinds for reference
+        #Types (Only provide structure information. They don't produce any RTL executable code)
+        if symbol.kind == ps.SymbolKind.PredefinedIntegerType:
             # predefinedintegertype symbol
             ...
         elif symbol.kind == ps.SymbolKind.ScalarType:
@@ -240,264 +317,208 @@ class SlangSymbolVisitor:
         elif symbol.kind == ps.SymbolKind.UnpackedUnionType:
             # unpackeduniontype symbol
             ...
-        elif symbol.kind == ps.SymbolKind.ClassType:
+    elif False:
+        # ********* These are not RTL executable code *********
+            if symbol.kind == ps.SymbolKind.ClassType:
             # classtype symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.CovergroupType:
-            # covergrouptype symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.VoidType:
-            # voidtype symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.NullType:
-            # nulltype symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.CHandleType:
-            # chandletype symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.StringType:
-            # stringtype symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.EventType:
-            # eventtype symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.UnboundedType:
-            # unboundedtype symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.TypeRefType:
-            # typereftype symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.UntypedType:
-            # untypedtype symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.SequenceType:
-            # sequencetype symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.PropertyType:
-            # propertytype symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.VirtualInterfaceType:
-            # virtualinterfacetype symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.TypeAlias:
-            # typealias symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.ErrorType:
-            # errortype symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.ForwardingTypedef:
-            # forwardingtypedef symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.NetType:
-            # nettype symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.Parameter:
-            # parameter symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.TypeParameter:
-            # typeparameter symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.Port:
-            # port symbol: {symbol.name}
-            ...
-        elif symbol.kind == ps.SymbolKind.MultiPort:
-            # multiport symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.InterfacePort:
-            # interfaceport symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.Modport:
-            # modport symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.ModportPort:
-            # modportport symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.ModportClocking:
-            # modportclocking symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.Instance:
-            # instance symbol
-            ...
-            instance_name = symbol.name
-        elif symbol.kind == ps.SymbolKind.InstanceBody:
-            # instancebody symbol
-            ...
-            parent_instance = symbol.parentInstance
-        elif symbol.kind == ps.SymbolKind.InstanceArray:
-            # instancearray symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.Package:
-            # package symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.ExplicitImport:
-            # explicitimport symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.WildcardImport:
-            # wildcardimport symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.Attribute:
-            # attribute symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.Genvar:
-            # genvar symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.GenerateBlock:
-            # generateblock symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.GenerateBlockArray:
-            # generateblockarray symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.ProceduralBlock:
-            # procedural block
-            ...
-            self.visit_stmt(symbol.body)
-        elif symbol.kind == ps.SymbolKind.StatementBlock:
-            # statementblock symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.Net:
-            # net symbol: {symbol.name}
-            ...
-        elif symbol.kind == ps.SymbolKind.Variable:
-            # variable symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.FormalArgument:
-            # formalargument symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.Field:
-            # field symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.ClassProperty:
-            # classproperty symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.Subroutine:
-            # subroutine symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.ContinuousAssign:
-            # continuousassign symbol
-            ...
-            assignment_expr = symbol.assignment
-            self.visit_expr(assignment_expr)
-        elif symbol.kind == ps.SymbolKind.ElabSystemTask:
-            # elabsystemtask symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.GenericClassDef:
-            # genericclassdef symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.MethodPrototype:
-            # methodprototype symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.UninstantiatedDef:
-            # uninstantiateddef symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.Iterator:
-            # iterator symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.PatternVar:
-            # patternvar symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.ConstraintBlock:
-            # constraintblock symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.DefParam:
-            # defparam symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.Specparam:
-            # specparam symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.Primitive:
-            # primitive symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.PrimitivePort:
-            # primitiveport symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.PrimitiveInstance:
-            # primitiveinstance symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.SpecifyBlock:
-            # specifyblock symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.Sequence:
-            # sequence symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.Property:
-            # property symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.AssertionPort:
-            # assertionport symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.ClockingBlock:
-            # clockingblock symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.ClockVar:
-            # clockvar symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.LocalAssertionVar:
-            # localassertionvar symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.LetDecl:
-            # letdecl symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.Checker:
-            # checker symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.CheckerInstance:
-            # checkerinstance symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.CheckerInstanceBody:
-            # checkerinstancebody symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.RandSeqProduction:
-            # randseqproduction symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.CovergroupBody:
-            # covergroupbody symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.Coverpoint:
-            # coverpoint symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.CoverCross:
-            # covercross symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.CoverCrossBody:
-            # covercrossbody symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.CoverageBin:
-            # coveragebin symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.TimingPath:
-            # timingpath symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.PulseStyle:
-            # pulsestyle symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.SystemTimingCheck:
-            # systemtimingcheck symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.AnonymousProgram:
-            # anonymousprogram symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.NetAlias:
-            # netalias symbol
-            ...
-        elif symbol.kind == ps.SymbolKind.ConfigBlock:
-            # configblock symbol
-            ...
-        self.symbol_id_to_symbol[self.symbol_id] = symbol
-
-        try:
-            self.kind_to_symbol_id[symbol.kind].append(self.symbol_id)
-        except KeyError:
-            self.kind_to_symbol_id[symbol.kind] = [self.symbol_id]
-
-        try:
-            hashable_sourceRange = (symbol.syntax.sourceRange.start, symbol.syntax.sourceRange.end)
-            try:
-                self.sourceRange_to_symbol_id[hashable_sourceRange].append(self.symbol_id)
-            except KeyError:
-                self.sourceRange_to_symbol_id[hashable_sourceRange] = [self.symbol_id]
-        except AttributeError:
-            pass
-        self.symbol_id += 1
+                ...
+            elif symbol.kind == ps.SymbolKind.CovergroupType:
+                # covergrouptype symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.VoidType:
+                # voidtype symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.NullType:
+                # nulltype symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.CHandleType:
+                # chandletype symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.StringType:
+                # stringtype symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.UnboundedType:
+                # unboundedtype symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.TypeRefType:
+                # typereftype symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.UntypedType:
+                # untypedtype symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.SequenceType:
+                # sequencetype symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.PropertyType:
+                # propertytype symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.VirtualInterfaceType:
+                # virtualinterfacetype symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.TypeAlias:
+                # typealias symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.ErrorType:
+                # errortype symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.ForwardingTypedef:
+                # forwardingtypedef symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.NetType:
+                # nettype symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.TypeParameter:
+                # typeparameter symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.MultiPort:
+                # multiport symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.InterfacePort:
+                # interfaceport symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.Modport:
+                # modport symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.ModportPort:
+                # modportport symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.ModportClocking:
+                # modportclocking symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.Package:
+                # package symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.ExplicitImport:
+                # explicitimport symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.WildcardImport:
+                # wildcardimport symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.Attribute:
+                # attribute symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.Genvar:
+                # genvar symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.GenerateBlock:
+                # generateblock symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.GenerateBlockArray:
+                # generateblockarray symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.StatementBlock:
+                # statementblock symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.FormalArgument:
+                # formalargument symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.Field:
+                # field symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.ClassProperty:
+                # classproperty symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.Subroutine:
+                # subroutine symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.ElabSystemTask:
+                # elabsystemtask symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.GenericClassDef:
+                # genericclassdef symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.MethodPrototype:
+                # methodprototype symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.UninstantiatedDef:
+                # uninstantiateddef symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.Iterator:
+                # iterator symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.PatternVar:
+                # patternvar symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.ConstraintBlock:
+                # constraintblock symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.DefParam:
+                # defparam symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.Primitive:
+                # primitive symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.PrimitivePort:
+                # primitiveport symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.PrimitiveInstance:
+                # primitiveinstance symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.SpecifyBlock:
+                # specifyblock symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.Sequence:
+                # sequence symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.Property:
+                # property symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.AssertionPort:
+                # assertionport symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.ClockingBlock:
+                # clockingblock symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.ClockVar:
+                # clockvar symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.LocalAssertionVar:
+                # localassertionvar symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.LetDecl:
+                # letdecl symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.Checker:
+                # checker symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.CheckerInstance:
+                # checkerinstance symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.CheckerInstanceBody:
+                # checkerinstancebody symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.RandSeqProduction:
+                # randseqproduction symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.CovergroupBody:
+                # covergroupbody symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.Coverpoint:
+                # coverpoint symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.CoverCross:
+                # covercross symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.CoverCrossBody:
+                # covercrossbody symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.CoverageBin:
+                # coveragebin symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.TimingPath:
+                # timingpath symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.PulseStyle:
+                # pulsestyle symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.SystemTimingCheck:
+                # systemtimingcheck symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.AnonymousProgram:
+                # anonymousprogram symbol
+                ...
+            elif symbol.kind == ps.SymbolKind.ConfigBlock:
+                ...
 
 class SymbolicDFS:
     """DFS visitor for PySlang symbols, updating symbolic store and path condition."""
@@ -962,7 +983,6 @@ class ExpressionSymbolCollector:
     def collect(self, expr):
         self.visit(expr)
         return list(self.parameters), list(self.ports)
-
 
 
 # Commented out this slangNodeVisitor - unused dead code (~1200 lines)
