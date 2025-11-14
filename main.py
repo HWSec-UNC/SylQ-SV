@@ -141,7 +141,7 @@ def main():
             #delegate method from z3Visitor
             my_visitor_for_symbol.expr_to_z3 = lambda m, s, e: parse_expr_to_Z3(e, s, m)
 
-            symbol_visitor = SlangSymbolVisitor(num_cycles)
+            symbol_visitor = SlangSymbolVisitor() #Post processor visitor -> doesn't depend on the num_cycles
             engine.execute_sv(my_visitor_for_symbol, modules, None, num_cycles)
             symbol_visitor.visit(modules)
             print(symbol_visitor.branch_points)

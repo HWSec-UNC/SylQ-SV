@@ -40,7 +40,7 @@ def get_module_name(module) -> str:
 class SlangSymbolVisitor:
     """Visits a Slang AST by each Symbol, counting branches and paths"""
 
-    def __init__(self, cycles):
+    def __init__(self): #Post processor visitor -> doesn't depend on the num_cycles
         self.symbol_id_to_symbol = dict()
         self.sourceRange_to_symbol_id = dict()
         self.kind_to_symbol_id = dict()
