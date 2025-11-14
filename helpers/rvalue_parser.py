@@ -39,13 +39,9 @@ def conjunction_with_pointers(rvalue, s: SymbolicState, m: ExecutionManager) -> 
         else:
             times = evaluate(parse_tokens(tokenize(conjunction_with_pointers(rvalue.count, s, m), s, m)), s, m)
             times_int = int(str_to_int(times, s, m))
-        accumulate = "("
-        val = conjunction_with_pointers(rvalue.value, s, m) 
-        for i in range(times_int):
-            accumulate += str(val) + " "
-        accumulate = accumulate.rstrip()
-        accumulate += ")"
-        return accumulate
+        val = conjunction_with_pointers(rvalue.value, s, m)
+        parts = [str(val)] * times_int
+        return "(" + " ".join(parts) + ")"
     elif isinstance(rvalue, ps.ConditionalExpressionSyntax):
         if isinstance(rvalue.ifTrue, ps.ElementSelectExpressionSyntax) and isinstance(rvalue.ifFalse, ps.ElementSelectExpressionSyntax):
             if isinstance(rvalue.ifFalse.selector, ps.BinaryExpressionSyntax):
@@ -139,11 +135,8 @@ def conjunction_with_pointers(rvalue, s: SymbolicState, m: ExecutionManager) -> 
             return f"{rvalue.value}[ {expr_in_brackets} ]"
         return f"{rvalue.value}[{rvalue.selector}]"
     elif isinstance(rvalue, ps.ConcatenationExpressionSyntax):
-        accumulate = "("
-        for sub_item in rvalue.expressions:
-            accumulate += str(conjunction_with_pointers(sub_item, s, m)) + " "
-        accumulate = accumulate.rstrip()
-        return accumulate + ")"
+        parts = [str(conjunction_with_pointers(sub_item, s, m)) for sub_item in rvalue.expressions]
+        return "(" + " ".join(parts) + ")"
     #elif isinstance(rvalue, ps.RangeSelectExpressionSyntax):
     elif rvalue.__class__.__name__ in ("RangeSelectExpressionSyntax", "RangeSelectSyntax", "PartSelectExpressionSyntax"):
         return f"{rvalue.value.name}[{rvalue.left}:{rvalue.right}]"
@@ -366,14 +359,13 @@ def evaluate_cond_expr(cond, true_expr, false_expr, s: SymbolicState, m: Executi
             else:
                 accumulate = ""
                 if len(false_expr) >= 2 and false_expr[0] != "Cond":
-                    accumulate = "("
+                    parts = []
                     for sub_item in false_expr:
                         if isinstance(sub_item, tuple) and sub_item[0] in BINARY_OPS:
-                            accumulate += "(" + evaluate_binary_op(sub_item[1], sub_item[2], op_map[sub_item[0]], s, m) + ")"
+                            parts.append("(" + evaluate_binary_op(sub_item[1], sub_item[2], op_map[sub_item[0]], s, m) + ")")
                         else:
-                            accumulate += str(conjunction_with_pointers(sub_item, s, m)) + " "
-                    accumulate = accumulate.rstrip()
-                    accumulate += ")"
+                            parts.append(str(conjunction_with_pointers(sub_item, s, m)))
+                    accumulate = "(" + " ".join(parts) + ")"
                 new_cond = None
                 if cond[0] in BINARY_OPS:
                     new_cond = evaluate_binary_op(cond[1], cond[2], op_map[cond[0]], s, m)
@@ -481,18 +473,12 @@ def eval_rvalue(rvalue, s: SymbolicState, m: ExecutionManager) -> str:
             
             return result
         elif str(rvalue).startswith("(("):
-            tokens = []
-            for elt in rvalue:
-                tokens.append(elt)
-            results = []
-            for token in tokens:
-                results.append(eval_rvalue(token, s, m))
+            tokens = list(rvalue)
+            results = [eval_rvalue(token, s, m) for token in tokens]
             return results
         else:
             if isinstance(rvalue, tuple) and len(rvalue) > 2:
-                results = []
-                for elt in rvalue:
-                    results.append(eval_rvalue(elt, s, m))
+                results = [eval_rvalue(elt, s, m) for elt in rvalue]
                 return results
             else:
                 if (len(rvalue) == 1 and isinstance(rvalue, tuple)):
@@ -520,21 +506,14 @@ def eval_rvalue(rvalue, s: SymbolicState, m: ExecutionManager) -> str:
                     else:
                         new = str(rvalue).replace("(","").replace(")","").replace("  ","").replace('"',"").replace(" ", "")
                         tokens = new.split(",")
-                        symbols = "("
-                        for i  in range(len(tokens)):
-                            if i == len(tokens) -1:
-                                if str(eval_rvalue(tokens[i], s, m)).isdigit():
-                                    symbols += str(eval_rvalue(tokens[i], s, m)) + ", "
-                                else:
-                                    symbols += s.store[m.curr_module][tokens[i].replace("'", "")] 
+                        parts = []
+                        for token in tokens:
+                            token_result = eval_rvalue(token, s, m)
+                            if str(token_result).isdigit():
+                                parts.append(str(token_result))
                             else:
-                                if str(eval_rvalue(tokens[i], s, m)).isdigit():
-                                    symbols += str(eval_rvalue(tokens[i], s, m)) + ", "
-                                else:
-                                    symbols += s.store[m.curr_module][tokens[i].replace("'", "")] + ", "
-                        symbols.rstrip()
-                        symbols += ")"
-                        return symbols
+                                parts.append(s.store[m.curr_module][token.replace("'", "")])
+                        return "(" + ", ".join(parts) + ")"
                     return s.store[m.curr_module][str(rvalue)]
 
         
