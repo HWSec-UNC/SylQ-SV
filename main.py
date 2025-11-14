@@ -130,10 +130,10 @@ def main():
         modules =  compilation.getDefinitions()
 
         # IF using pyslang 7.0.0, uncomment the following line and comment out the other successful_compilation
-        successful_compilation = driver.reportCompilation(compilation, False)
+        # successful_compilation = driver.reportCompilation(compilation, False)
 
         #IF using pyslang 9.0.0/9.1.0, use this version of successful_compilation
-        #successful_compilation = driver.runFullCompilation(False)
+        successful_compilation = driver.runFullCompilation(False)
         
         if successful_compilation:
             #print(driver.reportMacros())
