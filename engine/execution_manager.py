@@ -27,7 +27,6 @@ class ExecutionManager:
     curr_level: int = 0
     path_code: str = "0" * 12
     ast_str: str = ""
-    debugging: bool = False
     abandon: bool = False
     assertion_violation: bool = False
     in_always: bool = False
@@ -60,7 +59,6 @@ class ExecutionManager:
     blocks_of_interest = []
     init_run_flag: bool = False
     ignore = False
-    inital_state = {}
     branch: bool = False
     cond_assigns = {}
     cond_updates = []

@@ -595,11 +595,8 @@ class SymbolicDFS:
                 print(expr.right.kind)
                 if expr.right.kind == ps.SyntaxKind.ConcatenationExpression:
                     # Handle concatenation on RHS
-                    concat_value = ""
-                    for operand in expr.right.expressions:
-                        if hasattr(operand, "value"):
-                            concat_value += str(operand.value)
-                    s.store[m.curr_module][expr.left.identifier.value] = concat_value
+                    parts = [str(operand.value) for operand in expr.right.expressions if hasattr(operand, "value")]
+                    s.store[m.curr_module][expr.left.identifier.value] = "".join(parts)
                 else:
                     s.store[m.curr_module][expr.left.identifier.value] = str(expr.right.value.value)
             else:

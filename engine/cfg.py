@@ -200,6 +200,45 @@ class CFG:
                 #     print("FOUND SUBModule!")
                 ...
 
+    def _process_conditional_sv(self, m: ExecutionManager, s: SymbolicState, parent_idx: int, node) -> None:
+        """Handle ConditionalStatementSyntax nodes, including nested else-if chains."""
+        then_body = getattr(node, "ifTrue", getattr(node, "statement", None))
+        else_clause = getattr(node, "elseClause", None)
+        else_body = None
+        if else_clause is not None:
+            else_body = getattr(else_clause, "statement", getattr(else_clause, "clause", None))
+
+        # Process the true branch
+        then_start_idx = self.curr_idx
+        self.partition_points.add(self.curr_idx)
+        self.basic_blocks_sv(m, s, then_body)
+        if self.curr_idx == then_start_idx:
+            # Empty branch: allocate a dummy node so the edge has a destination
+            self.all_nodes.append(None)
+            self.curr_idx += 1
+        self.edgelist.append((parent_idx, then_start_idx))
+
+        if else_body is None:
+            return
+
+        if isinstance(else_body, ps.ConditionalStatementSyntax):
+            # Nested else-if: treat the nested conditional as its own node
+            nested_parent_idx = self.curr_idx
+            self.all_nodes.append(else_body)
+            self.partition_points.add(self.curr_idx)
+            self.curr_idx += 1
+            self.edgelist.append((parent_idx, nested_parent_idx))
+            self._process_conditional_sv(m, s, nested_parent_idx, else_body)
+        else:
+            else_start_idx = self.curr_idx
+            self.partition_points.add(self.curr_idx)
+            self.basic_blocks_sv(m, s, else_body)
+            if self.curr_idx == else_start_idx:
+                # Empty else branch: allocate a dummy node to terminate this path
+                self.all_nodes.append(None)
+                self.curr_idx += 1
+            self.edgelist.append((parent_idx, else_start_idx))
+
     def basic_blocks_sv(self, m:ExecutionManager, s: SymbolicState, ast):
         """We want to get a list of AST nodes partitioned into basic blocks.
         Need to keep track of children/parent indices of each block in the list."""
@@ -215,20 +254,9 @@ class CFG:
                     self.all_nodes.append(item)
                     self.partition_points.add(self.curr_idx)
                     parent_idx = self.curr_idx
-
-                    then_body = getattr(item, "ifTrue", getattr(item, "statement", None))
-                    else_clause = getattr(item, "elseClause", None)
-                    else_body = getattr(else_clause, "statement", None) if else_clause is not None else None
-
-                    self.basic_blocks_sv(m, s, then_body)
-                    edge_1 = (parent_idx, self.curr_idx)
-                    self.partition_points.add(self.curr_idx)
-                    self.basic_blocks_sv(m, s, else_body)
-                    edge_2 = (parent_idx, self.curr_idx)
-                    self.partition_points.add(self.curr_idx)
                     self.curr_idx += 1
-                    self.edgelist.append(edge_1)
-                    self.edgelist.append(edge_2)
+
+                    self._process_conditional_sv(m, s, parent_idx, item)
                 
                 elif isinstance(item, ps.CaseStatementSyntax):
                     #self.all_nodes.append(ast)
@@ -269,20 +297,7 @@ class CFG:
                 parent_idx = self.curr_idx
                 self.curr_idx += 1
 
-                then_body = getattr(ast, "ifTrue", getattr(ast, "statement", None))
-                else_clause = getattr(ast, "elseClause", None)
-                else_body = getattr(else_clause, "statement", None) if else_clause is not None else None
-
-                edge_1 = (parent_idx, self.curr_idx)
-                self.partition_points.add(self.curr_idx)
-
-                self.basic_blocks_sv(m, s, then_body)
-
-                edge_2 = (parent_idx, self.curr_idx)
-                self.partition_points.add(self.curr_idx)
-                self.basic_blocks_sv(m, s, else_body)
-                self.edgelist.append(edge_1)
-                self.edgelist.append(edge_2)
+                self._process_conditional_sv(m, s, parent_idx, ast)
             elif isinstance(ast, ps.CaseStatementSyntax):
                 self.all_nodes.append(ast)
                 self.partition_points.add(self.curr_idx)

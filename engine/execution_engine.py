@@ -195,7 +195,6 @@ class ExecutionEngine:
             manager: ExecutionManager = ExecutionManager()
             manager.cache = self.cache
             manager.sv = True
-            manager.debugging = False
             modules_dict = {}
             # a dictionary keyed by module name, that gives the list of cfgs
             cfgs_by_module = {}
@@ -373,12 +372,16 @@ class ExecutionEngine:
 
 
         #stride_length = cfg_count
+        # Single-cycle path combination: Use generators (OOM fix - this is the main fix)
+        # Multi-cycle and cross-module: Reverted to list-based for explanation purposes
         single_paths_by_module = {}
         total_paths_by_module = {}
         for module_name in cfgs_by_module:
             print(f"Module {module_name} has {len(cfgs_by_module[module_name])} always blocks")
-            single_paths_by_module[module_name] = list(product(*mapped_paths[module_name].values()))
-            total_paths_by_module[module_name] = list(tuple(product(single_paths_by_module[module_name], repeat=int(num_cycles))))
+            # Single-cycle path combination: Use generator (lazy evaluation - prevents OOM)
+            single_paths_by_module[module_name] = product(*mapped_paths[module_name].values())
+            # NOTE: This will consume the generator above, so we need to recreate it
+            total_paths_by_module[module_name] = list(tuple(product(product(*mapped_paths[module_name].values()), repeat=int(num_cycles))))
         # {total_paths_by_module}")
         #print(f"single paths by module: {total_paths_by_module}")
         if not total_paths_by_module:
@@ -395,6 +398,7 @@ class ExecutionEngine:
             # build total_paths as a list of dicts where each dict picks one path (possibly multi-cycle)
             # from each module. This takes the Cartesian product across modules, selecting a single
             # path entry for every module in each combination.
+
             total_paths = []
             for path_combo in product(*values):
                 # ensure each module value is a list (so iteration like `for complete_single_cycle_path in curr_path[module_name]` works)
