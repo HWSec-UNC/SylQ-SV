@@ -654,16 +654,18 @@ class SymbolicDFS:
             self.visit_expr(m, s, expr.typ)
             self.visit_expr(m, s, expr.max)
 
-        elif kind in [ps.TokenKind.IntegerLiteral, ps.SyntaxKind.IntegerVectorExpression, 
-                      ps.SyntaxKind.ConcatenationExpression, ps.SyntaxKind.IdentifierName,
-                      ps.SyntaxKind.IdentifierSelectName, ps.TokenKind.Comma, ps.SyntaxKind.IntegerLiteralExpression]:
-            pass
 
         # Ignore literals and null
         elif kind in [ps.ExpressionKind.IntegerLiteral, ps.ExpressionKind.RealLiteral,
                     ps.ExpressionKind.TimeLiteral, ps.ExpressionKind.NullLiteral,
                     ps.ExpressionKind.StringLiteral, ps.ExpressionKind.UnbasedUnsizedIntegerLiteral,
                     ps.UnboundedLiteral]:
+            pass
+
+        # Ignore misc. nodes in syntax tree 
+        elif kind in [ps.TokenKind.IntegerLiteral, ps.SyntaxKind.IntegerVectorExpression, 
+                      ps.SyntaxKind.ConcatenationExpression, ps.SyntaxKind.IdentifierName,
+                      ps.SyntaxKind.IdentifierSelectName, ps.TokenKind.Comma, ps.SyntaxKind.IntegerLiteralExpression]:
             pass
 
         else:
