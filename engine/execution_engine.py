@@ -1,21 +1,14 @@
 # Main execution engine that orchestrates symbolic execution of SystemVerilog designs
 
-import z3
-from z3 import Solver, Int, BitVec, Context, BitVecSort, ExprRef, BitVecRef, If, BitVecVal, And
+from z3 import Solver, ExprRef
 from .execution_manager import ExecutionManager
 from .symbolic_state import SymbolicState
 from .cfg import CFG
-import re
-import os
-from optparse import OptionParser
 from typing import Optional
-import random, string
 import time
 import gc
 from itertools import product
-import logging
 from helpers.utils import to_binary
-import sys
 from copy import deepcopy
 import pyslang as ps
 from helpers.slang_helpers import get_module_name, init_state
@@ -191,33 +184,29 @@ class ExecutionEngine:
         print(f"Executing for {num_cycles} clock cycles")
         self.module_depth += 1
         state: SymbolicState = SymbolicState()
+        
         if manager is None:
             manager: ExecutionManager = ExecutionManager()
-            manager.cache = self.cache
+            if hasattr(self, "cache"):
+                manager.cache = self.cache
             manager.sv = True
+
             modules_dict = {}
             # a dictionary keyed by module name, that gives the list of cfgs
             cfgs_by_module = {}
-            cfg_count_by_module = {}
             for module in modules:
                 sv_module_name = get_module_name(module)
-                #print(sv_module_name)
-                #modules_dict[sv_module_name] = sv_module_name
                 modules_dict[sv_module_name] = module
                 always_blocks_by_module = {sv_module_name: []}
                 manager.seen_mod[sv_module_name] = {}
                 cfgs_by_module[sv_module_name] = []
-                sub_manager = ExecutionManager()
-                # If module is DefinitionSymbol, get the syntax tree
-                module_syntax = module.syntax if isinstance(module, ps.DefinitionSymbol) else module
-                sub_manager.init_run(sub_manager, module_syntax)
+
                 self.module_count_sv(manager, module) 
                 if sv_module_name in manager.instance_count:
                     print(f"Module {sv_module_name} has {manager.instance_count[sv_module_name]} instances")
                     manager.instances_seen[sv_module_name] = 0
                     manager.instances_loc[sv_module_name] = ""
                     num_instances = manager.instance_count[sv_module_name]
-                    #cfgs_by_module.pop(sv_module_name, None)
                     cfgs_by_module.pop(sv_module_name, None)
                     for i in range(num_instances):
                         instance_name = f"{sv_module_name}_{i}"
@@ -292,8 +281,6 @@ class ExecutionEngine:
 
                     print(f"Module {sv_module_name} single instance")
                     manager.names_list.append(sv_module_name)
-                    modules_dict[sv_module_name] = module                 # store AST
-                    
 
                     # discover always blocks once
                     probe = CFG()
@@ -317,9 +304,9 @@ class ExecutionEngine:
                     manager.dependencies[sv_module_name] = {}
                     manager.intermodule_dependencies[sv_module_name] = {}
                     manager.cond_assigns[sv_module_name] = {}
-            total_paths = 1
-            for x in manager.child_num_paths.values():
-                total_paths *= x
+            # total_paths = 1
+            # for x in manager.child_num_paths.values():
+            #     total_paths *= x
 
             # have do do things piece wise
             manager.debug = self.debug
@@ -379,9 +366,11 @@ class ExecutionEngine:
         for module_name in cfgs_by_module:
             print(f"Module {module_name} has {len(cfgs_by_module[module_name])} always blocks")
             # Single-cycle path combination: Use generator (lazy evaluation - prevents OOM)
+            # single-cycle paths
             single_paths_by_module[module_name] = product(*mapped_paths[module_name].values())
             # NOTE: This will consume the generator above, so we need to recreate it
-            total_paths_by_module[module_name] = list(tuple(product(product(*mapped_paths[module_name].values()), repeat=int(num_cycles))))
+            # multi-cycle paths
+            total_paths_by_module[module_name] = list(product(product(*mapped_paths[module_name].values()), repeat=int(num_cycles)))
         # {total_paths_by_module}")
         #print(f"single paths by module: {total_paths_by_module}")
         if not total_paths_by_module:

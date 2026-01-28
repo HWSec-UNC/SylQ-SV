@@ -1,24 +1,15 @@
 """This file is the entrypoint of the execution."""
 from __future__ import absolute_import
 from __future__ import print_function
-import z3
-from z3 import Solver, Int, BitVec, Context, BitVecSort, ExprRef, BitVecRef, If, BitVecVal, And
 import sys
 import os
 from optparse import OptionParser
-from typing import Optional
-import random, string
 import time
-from itertools import product
 import logging
 import gc
-from engine.execution_manager import ExecutionManager
-from engine.symbolic_state import SymbolicState
-from helpers.rvalue_parser import tokenize, parse_tokens, evaluate
 from engine.execution_engine import ExecutionEngine
 import pyslang as ps
 from helpers.slang_helpers import SlangSymbolVisitor, SymbolicDFS
-# SlangNodeVisitor removed 
 import redis
 import threading
 import time
@@ -101,7 +92,6 @@ def main():
 
     if options.showdebug:
         engine.debug = True
-
 
     for f in filelist:
         if not os.path.exists(f):
