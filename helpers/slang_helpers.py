@@ -8,10 +8,8 @@ from z3 import Not, is_bool, BoolVal, ExprRef, BitVecRef, BitVecVal
 
 def init_state(s: SymbolicState, prev_store, ast, symbol_visitor):
     """give fresh symbols and merge register values in."""
-    global_module_to_port_to_direction = dict()
     expr_symbol_visitor = ExpressionSymbolCollector()
     symbol_visitor.dfs(ast)
-    params = expr_symbol_visitor.parameters
     port_list = expr_symbol_visitor.ports
     for i, token in enumerate(port_list):
         port = extract_kinds_from_descendants(token, desired_kinds=[ps.SyntaxKind.ImplicitAnsiPort])
