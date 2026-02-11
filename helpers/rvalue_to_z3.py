@@ -65,24 +65,23 @@ class Z3Visitor():
 
     def handle_integer_vector_expression(self, node):
         """Handle integer vector expressions."""
-        print(f"Handling IntegerVectorExpression: {node}")
-        
-        print("Attributes of the node:", dir(node))
+        # if debug: print(f"Handling IntegerVectorExpression: {node}")
+        # if debug: print("Attributes of the node:", dir(node))
 
         if hasattr(node, 'value'):
             value = node.value  
-            print(f"Value of the IntegerVectorExpression: {value}")
+            # if debug: print(f"Value of the IntegerVectorExpression: {value}")
             return BitVecVal(int(str(value)), 32)  #
 
         elif hasattr(node, 'size'):
             size = node.size 
-            print(f"Size of the IntegerVectorExpression: {size}")
+            # if debug: print(f"Size of the IntegerVectorExpression: {size}")
             return BitVecVal(int(str(size)), 32)  
         return None   
 
     def handle_identifier(self, node):
         """Handle identifiers."""
-        print(f"Handling identifier: {str(node.identifier)}")
+        # if debug: print(f"Handling identifier: {str(node.identifier)}")
         variable = str(node.identifier)
         return BitVec(variable, 32)
     
@@ -347,17 +346,27 @@ def parse_expr_to_Z3(e: ps.ExpressionSyntax, s: SymbolicState, m: ExecutionManag
             return s
     return s
 
+_solve_pc_count = 0
+# Z3 timeout in ms so a single check doesn't hang (e.g. on large OR1200 path conditions)
+SOLVE_PC_TIMEOUT_MS = 10000
+
 def solve_pc(s: Solver) -> bool:
-    """Solve path condition."""
+    """Solve path condition. Returns True iff sat; False for unsat or timeout (unknown)."""
+    global _solve_pc_count
+    _solve_pc_count += 1
+    # Optional progress heartbeat removed; keep solve_pc lightweight.
+    try:
+        s.set("timeout", SOLVE_PC_TIMEOUT_MS)
+    except Exception:
+        pass
     result = str(s.check())
-    if str(result) == "sat":
-        model = s.model()
+    if result == "sat":
         return True
-    else:
-        print("unsat")
-        print(s)
-        print(s.unsat_core())
+    if result == "unknown":
+        # Timeout or resource limit; treat as infeasible so we don't hang
         return False
+    # unsat
+    return False
 
 def evaluate_expr(parsedList, s: SymbolicState, m: ExecutionManager):
     for i in parsedList:

@@ -45,11 +45,15 @@ class CFG:
         # indices of basic blocks that need to connect to dummy exit node
         self.leaves = set()
 
-        #paths... list of paths with start and end being the dummy nodes
-        self.paths = []
+        # Paths: streamed via get_paths(); count cached via get_path_count()
+        self._paths_graph = None  # set in build_cfg
+        self._path_count = None   # cached count (computed on first get_path_count())
 
         # name corresponding to the module. there could be multiple always blocks (or CFGS) per module
         self.module_name = ""
+
+        # Whether this CFG represents an always_comb block (Paper §4.4)
+        self.is_combinational = False
 
         # Decl nodes outside the always block to be executed once up front for all paths
         self.decls = []
@@ -59,6 +63,8 @@ class CFG:
 
         # the nodes in the AST that correspond to always blocks
         self.always_blocks = []
+        # Separate lists for always_comb blocks (Paper §4.4)
+        self.always_comb_blocks = []
 
         # branch-point set
         # for each basic statement, there may be some indpendent branching points
@@ -84,7 +90,8 @@ class CFG:
         self.edgelist = []
         self.cfg_edges = []
         self.leaves = set()
-        self.paths = []
+        self._paths_graph = None
+        self._path_count = None
         self.always_blocks = []
         self.ind_branch_points = {1: set()}
         self.block_smt = [False]
@@ -110,8 +117,31 @@ class CFG:
         self.edgelist += res 
 
 
+    def _is_always_comb(self, ast):
+        """Check if a ProceduralBlockSyntax represents an always_comb block."""
+        if ast is None:
+            return False
+        # Check the SyntaxKind
+        kind = getattr(ast, 'kind', None)
+        if kind is not None:
+            kind_name = str(kind)
+            if 'AlwaysComb' in kind_name:
+                return True
+        # Check keyword text
+        keyword = getattr(ast, 'keyword', None)
+        if keyword is not None:
+            kw_str = str(keyword).strip().lower()
+            if 'always_comb' in kw_str:
+                return True
+        # Check string representation
+        ast_str = str(getattr(ast, 'toString', lambda: '')() if callable(getattr(ast, 'toString', None)) else '')
+        if 'always_comb' in ast_str.lower():
+            return True
+        return False
+
     def get_always_sv(self, m: ExecutionManager, s: SymbolicState, ast):
-        """Extracts always blocks from PySlang AST"""
+        """Extracts always blocks from PySlang AST.
+        Distinguishes always_comb blocks for piecewise optimization (Paper §4.4)."""
         if (ast != None and isinstance(ast, ps.DefinitionSymbol)):
             self.get_always_sv(m, s, ast.syntax)
             return
@@ -123,7 +153,10 @@ class CFG:
 
         if hasattr(ast, '__iter__'):
             if ast.__class__.__name__ == "ProceduralBlockSyntax":
-                self.always_blocks.append(ast)
+                if self._is_always_comb(ast):
+                    self.always_comb_blocks.append(ast)
+                else:
+                    self.always_blocks.append(ast)
             elif ast.__class__.__name__ == "ConditionalStatementSyntax":
                 self.get_always_sv(m, s, ast.statement) 
                 self.get_always_sv(m, s, ast.elseClause)
@@ -147,7 +180,10 @@ class CFG:
                 elif isinstance(ast, ps.BlockStatementSyntax):
                     self.get_always_sv(m, s, ast.items)
                 elif isinstance(ast, ps.ProceduralBlockSyntax):
-                    self.always_blocks.append(ast)
+                    if self._is_always_comb(ast):
+                        self.always_comb_blocks.append(ast)
+                    else:
+                        self.always_blocks.append(ast)
                 elif isinstance(ast, ps.StatementSyntax):
                     self.get_always_sv(m, s, ast.statement)
                 else:
@@ -184,7 +220,10 @@ class CFG:
                 self.get_always_sv(m, s, ast.items)
             elif isinstance(ast, ps.ProceduralBlockSyntax):
                 #print("16")
-                self.always_blocks.append(ast)          
+                if self._is_always_comb(ast):
+                    self.always_comb_blocks.append(ast)
+                else:
+                    self.always_blocks.append(ast)
             # elif isinstance(ast, ps.InitialConstructSyntax):
             #     self.get_always(m, s, ast.statement)
             elif isinstance(ast, ps.StatementSyntax):
@@ -327,9 +366,21 @@ class CFG:
                 self.all_nodes.append(ast)
                 self.curr_idx += 1
 
+    def get_paths(self):
+        """Return a fresh generator over all simple paths (start -> end). Streams paths; no materialization."""
+        if self._paths_graph is None:
+            return iter(())
+        return nx.all_simple_paths(self._paths_graph, source=-1, target=-2)
+
+    def get_path_count(self):
+        """Return number of paths. Caches count on first call (one pass over path generator)."""
+        if self._path_count is None:
+            self._path_count = sum(1 for _ in self.get_paths())
+        return self._path_count
+
     def map_to_path(self):
-        """Just return the paths"""
-        return self.paths
+        """Return a fresh generator over paths (same as get_paths)."""
+        return self.get_paths()
 
     def partition(self):
         """Partitions all_nodes into basic blocks based on partition_points"""
@@ -411,6 +462,4 @@ class CFG:
         #self.display_cfg(G)
 
         #traversed = nx.edge_dfs(G, source=-1)
-        self.paths = list(nx.all_simple_paths(G, source=-1, target=-2))
-        #print(list(traversed))
-        #print(list(self.paths))
+        self._paths_graph = G  # stream paths via get_paths(); no materialization

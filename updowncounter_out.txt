@@ -1,0 +1,39 @@
+Top level design units:
+    updowncounter
+
+Build succeeded: 0 errors, 0 warnings
+Executing for 1 clock cycles
+Module updowncounter single instance
+Here
+Branch points explored: 0
+Module updowncounter has 1 always blocks
+Module updowncounter paths: [(([-1, 0, 1, -2],),), (([-1, 0, 2, 3, -2],),), (([-1, 0, 2, 4, -2],),)]
+[{'updowncounter': [([-1, 0, 1, -2],)]}, {'updowncounter': [([-1, 0, 2, 3, -2],)]}, {'updowncounter': [([-1, 0, 2, 4, -2],)]}]
+visit: SyntaxNode SyntaxList
+visit: EventControlWithExpressionSyntax EventControlWithExpression
+visit: ConditionalStatementSyntax ConditionalStatement
+visit: SyntaxNode SyntaxList
+visit: SyntaxNode SyntaxList
+visit: EventControlWithExpressionSyntax EventControlWithExpression
+visit: ConditionalStatementSyntax ConditionalStatement
+visit: Token BeginKeyword
+visit: SyntaxNode SyntaxList
+visit: Token EndKeyword
+visit: ConditionalStatementSyntax ConditionalStatement
+visit: SyntaxNode SyntaxList
+visit: SyntaxNode SyntaxList
+visit: EventControlWithExpressionSyntax EventControlWithExpression
+visit: ConditionalStatementSyntax ConditionalStatement
+visit: Token BeginKeyword
+visit: SyntaxNode SyntaxList
+visit: Token EndKeyword
+visit: ConditionalStatementSyntax ConditionalStatement
+visit: Token BeginKeyword
+visit: SyntaxNode SyntaxList
+visit: Token EndKeyword
+visit: SyntaxNode SyntaxList
+Branch points explored: 5
+Paths explored: 3
+0
+0
+Elapsed time 0.04121457900000003

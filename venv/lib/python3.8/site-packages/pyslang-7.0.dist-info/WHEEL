@@ -1,0 +1,6 @@
+Wheel-Version: 1.0
+Generator: scikit-build-core 0.10.7
+Root-Is-Purelib: false
+Tag: cp38-cp38-manylinux_2_27_x86_64
+Tag: cp38-cp38-manylinux_2_28_x86_64
+

@@ -43,3 +43,14 @@ class SymbolicState:
             if sym.isalnum():
                 res.append(sym)
         return res
+
+    def snapshot(self, module_name: str):
+        """Return a lightweight copy of the store for one module."""
+        return dict(self.store.get(module_name, {}))
+
+    def fresh_for_block(self, module_name: str, base_store: dict):
+        """Create a fresh SymbolicState pre-loaded with base_store for one module."""
+        s = SymbolicState()
+        s.store = {module_name: dict(base_store)}
+        s.pc = Solver()
+        return s

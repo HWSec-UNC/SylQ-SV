@@ -50,6 +50,7 @@ class ExecutionManager:
     opt_1: bool = False
     curr_module: str = ""
     piece_wise: bool = False
+    # Piecewise composition is the sole execution mode 
     child_range: range = None
     always_writes = {}
     curr_always = None
@@ -70,6 +71,7 @@ class ExecutionManager:
     reg_widths = {}
     curr_case = None
     debug: bool = False
+    visit_count: int = 0  # for progress indicator when not debug
     initial_store = {}
     instances_seen = {}
     instances_loc = {}
@@ -78,6 +80,10 @@ class ExecutionManager:
     cache = None
     path_count = 0
     branch_count = 0
+    # Quick-Union for query slicing (Paper §4.2.2)
+    # Initialized lazily; separate instances for path exploration and merge
+    qu_path = None   # QuickUnion for path-exploration queries
+    qu_merge = None  # QuickUnion for merge queries (separate per §4.3)
 
     def merge_states(self, state: SymbolicState, store, flag, module_name=""):
         """Merges two states. The flag is for when we are just merging a particular module"""

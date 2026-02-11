@@ -1,10 +1,60 @@
 """A library of helper functions for working with the PySlang AST."""
+import sys
 import pyslang as ps
 from helpers.utils import init_symbol
 from engine.execution_manager import ExecutionManager
 from engine.symbolic_state import SymbolicState
 from helpers.rvalue_to_z3 import solve_pc
 from z3 import Not, is_bool, BoolVal, ExprRef, BitVecRef, BitVecVal
+from engine.query_slicing import slice_query, get_vars_from_expr
+from engine.query_normalization import normalize_query
+
+
+def _cache_key(manager, cond_z3, negate=False):
+    """Compute the cache key for a branch condition using the
+    slice -> normalize -> key pipeline (Paper §4.2.2-4.2.4).
+
+    If the cache is not enabled, returns a simple string key.
+    """
+    if cond_z3 is None:
+        return str(cond_z3)
+    expr = Not(cond_z3) if negate else cond_z3
+    # If query slicing is available, slice first
+    if manager.qu_path is not None:
+        try:
+            branch_vars = get_vars_from_expr(expr)
+            all_constraints = []
+            try:
+                all_constraints = list(manager._pc_ref.assertions()) if hasattr(manager, '_pc_ref') else []
+            except Exception:
+                pass
+            if all_constraints and branch_vars:
+                sliced = slice_query(manager.qu_path, all_constraints, branch_vars)
+                # Include the branch condition itself for a unique key
+                sliced.append(expr)
+                # Normalize the sliced query
+                from engine.query_normalization import normalize_query_list
+                return normalize_query_list(sliced)
+        except Exception:
+            pass
+    # Fallback: normalize just the condition
+    return normalize_query(expr)
+
+
+def _cache_lookup(manager, key):
+    """Look up a key in the cache. Returns the decoded value or None."""
+    if manager.cache and manager.cache.exists(key):
+        raw = manager.cache.get(key)
+        if raw is None:
+            return None
+        return raw.decode() if isinstance(raw, bytes) else str(raw)
+    return None
+
+
+def _cache_store(manager, key, value):
+    """Store a key-value pair in the cache."""
+    if manager.cache:
+        manager.cache.set(key, str(value))
 
 def init_state(s: SymbolicState, prev_store, ast, symbol_visitor):
     """give fresh symbols and merge register values in."""
@@ -583,7 +633,8 @@ class SymbolicDFS:
 
     def visit_expr(self, m: ExecutionManager, s: SymbolicState, expr):
         """Visits expressions"""
-        print(expr.__class__.__name__, dir(expr))
+        if getattr(m, "debug", False):
+            print(expr.__class__.__name__, dir(expr))
         if expr is None:
             return
 
@@ -611,7 +662,8 @@ class SymbolicDFS:
             elif hasattr(expr.left, "identifier"):
                 # Only LHS has an identifier attribute
                 #  RHS is likely a literal
-                print(expr.right.kind)
+                if getattr(m, "debug", False):
+                    print(expr.right.kind)
                 if expr.right.kind == ps.SyntaxKind.ConcatenationExpression:
                     # Handle concatenation on RHS
                     parts = [str(operand.value) for operand in expr.right.expressions if hasattr(operand, "value")]
@@ -688,12 +740,122 @@ class SymbolicDFS:
             pass
 
         else:
-            print(f"Unsupported Expression: {expr} of kind {kind}")
+            if getattr(m, "debug", False):
+                print(f"Unsupported Expression: {expr} of kind {kind}")
 
+    def _visit_case_stmt(self, m: ExecutionManager, s: SymbolicState, stmt, modules=None, direction=None):
+        """Case statement handling; called by visit_stmt without reading stmt.kind."""
+        if getattr(m, "debug", False):
+            print("_visit_case_stmt")
+            print("case")
+        m.branch_count += 1
+        # Avoid reading stmt.expr if it can hang; use getattr with None default.
+        case_expr = getattr(stmt, "expr", None)
+        if case_expr is None:
+            return
+        self.visit_expr(m, s, case_expr)
+
+        cond_z3 = self.expr_to_z3(m, s, case_expr)
+
+        for case in getattr(stmt, "items", getattr(stmt, "case_items", [])):
+            exprs = getattr(case, "expressions", getattr(case, "exprs", []))
+            for e in exprs:
+                self.visit_expr(m, s, e)
+                s.pc.push()
+                s.assertion_counter += 1
+                case_z3 = self.expr_to_z3(m, s, e)
+
+                cond_expr = cond_z3 if isinstance(cond_z3, ExprRef) else None
+                case_expr = case_z3 if isinstance(case_z3, ExprRef) else None
+
+                if cond_expr is not None:
+                    if is_bool(cond_expr):
+                        match_guard = cond_expr
+                        mismatch_guard = Not(cond_expr)
+                    elif case_expr is not None:
+                        match_guard = cond_expr == case_expr
+                        mismatch_guard = cond_expr != case_expr
+                    elif isinstance(cond_expr, BitVecRef):
+                        zero = BitVecVal(0, cond_expr.size())
+                        match_guard = cond_expr != zero
+                        mismatch_guard = cond_expr == zero
+                    else:
+                        match_guard = BoolVal(True)
+                        mismatch_guard = BoolVal(True)
+                else:
+                    match_guard = BoolVal(True)
+                    mismatch_guard = BoolVal(True)
+
+                guard = match_guard if direction else mismatch_guard
+                if not isinstance(guard, ExprRef) or not is_bool(guard):
+                    guard = BoolVal(True)
+
+                # --- Query slicing (Paper §4.2.2) ---
+                if m.qu_path is not None and isinstance(guard, ExprRef):
+                    m.qu_path.register_constraint(guard)
+
+                key = _cache_key(m, guard, negate=False)
+                self.branch = bool(direction)
+                cached = _cache_lookup(m, key)
+                if cached is not None:
+                    result = cached
+                else:
+                    result = str(solve_pc(s.pc))
+                    _cache_store(m, key, result)
+                s.pc.assert_and_track(guard, f"p{s.assertion_counter}")
+                if not solve_pc(s.pc):
+                    s.pc.pop()
+                    _cache_store(m, key, False)
+                    m.abandon = True
+                    m.ignore = True
+                    return
+
+                case_body = getattr(case, "statement", getattr(case, "stmt", None))
+                if case_body is None and hasattr(case, "statements"):
+                    case_body = case.statements
+
+                if case_body is None:
+                    s.pc.pop()
+                    continue
+
+                if isinstance(case_body, (list, tuple)):
+                    body_iter = case_body
+                elif hasattr(case_body, "__iter__") and not isinstance(case_body, ps.StatementSyntax):
+                    body_iter = list(case_body)
+                else:
+                    body_iter = [case_body]
+
+                for stmt_node in body_iter:
+                    if stmt_node is None:
+                        continue
+                    self.visit_stmt(m, s, stmt_node, modules, direction)
+
+                s.pc.pop()
 
     def visit_stmt(self, m: ExecutionManager, s: SymbolicState, stmt, modules=None, direction=None):
         """Visits statements"""
-        print("visit:", stmt.__class__.__name__, getattr(getattr(stmt, "kind", None), "name", getattr(stmt, "kind", None)))
+        # Progress indicator: every 10k statements print one line.
+        m.visit_count = getattr(m, "visit_count", 0) + 1
+        if m.visit_count % 10000 == 0:
+            msg = "... {} statements visited".format(m.visit_count)
+            print(msg, flush=True)
+
+        cls_name = stmt.__class__.__name__
+        # Handle case/binary by class name first - never read m.ignore or stmt.kind for these.
+        if "CaseStatement" in cls_name:
+            if getattr(m, "debug", False):
+                print("visit:", cls_name)
+            self._visit_case_stmt(m, s, stmt, modules, direction)
+            return
+        if cls_name == "BinaryExpressionSyntax":
+            if getattr(m, "debug", False):
+                print("visit:", cls_name)
+            self.visit_expr(m, s, stmt)
+            return
+
+        # For other nodes, print with kind then check ignore (only when debug).
+        if getattr(m, "debug", False):
+            print("visit:", cls_name, getattr(getattr(stmt, "kind", None), "name", getattr(stmt, "kind", None)))
         if stmt is None or m.ignore:
             return
 
@@ -716,26 +878,32 @@ class SymbolicDFS:
                 s.pc.push()
                 s.assertion_counter += 1
                 cond_z3 = self.expr_to_z3(m, s, cond_expr)
+                # --- Query slicing (Paper §4.2.2) ---
+                if m.qu_path is not None and cond_z3 is not None:
+                    m.qu_path.register_constraint(cond_z3)
                 if direction:
-                    key = str(cond_z3)
+                    key = _cache_key(m, cond_z3, negate=False)
                     self.branch = True
-                    if m.cache.exists(key):
-                        result = m.cache.get(key).decode()
+                    cached = _cache_lookup(m, key)
+                    if cached is not None:
+                        result = cached
                     else:
                         result = str(solve_pc(s.pc))
-                        m.cache.set(str(cond_z3), str(solve_pc(s.pc)))
+                        _cache_store(m, key, result)
                     s.pc.assert_and_track(cond_z3, f"p{s.assertion_counter}")
                 else:
                     self.branch = False
-                    key = f"~{cond_z3}"
-                    if m.cache.exists(key):
-                        result = m.cache.get(key).decode()
+                    key = _cache_key(m, cond_z3, negate=True)
+                    cached = _cache_lookup(m, key)
+                    if cached is not None:
+                        result = cached
                     else:
                         result = str(solve_pc(s.pc))
-                        m.cache.set(f"~{cond_z3}", str(solve_pc(s.pc)))
+                        _cache_store(m, key, result)
                     s.pc.assert_and_track(cond_z3, f"p{s.assertion_counter}")
                 if not solve_pc(s.pc):
-                    m.cache.set(f"~{str(cond_z3)}", False)
+                    neg_key = _cache_key(m, cond_z3, negate=True)
+                    _cache_store(m, neg_key, False)
                     s.pc.pop()
                     m.abandon = True
                     m.ignore = True
@@ -774,27 +942,33 @@ class SymbolicDFS:
                 s.pc.push()
                 s.assertion_counter += 1
                 cond_z3 = self.expr_to_z3(m, s, stmt.cond)
+                # --- Query slicing (Paper §4.2.2) ---
+                if m.qu_path is not None and cond_z3 is not None:
+                    m.qu_path.register_constraint(cond_z3)
                 if direction:
-                    key = str(cond_z3)
+                    key = _cache_key(m, cond_z3, negate=False)
                     self.branch = True
-                    if m.cache.exists(key):
-                        result = m.cache.get(key).decode()
+                    cached = _cache_lookup(m, key)
+                    if cached is not None:
+                        result = cached
                     else:
                         result = str(solve_pc(s.pc))
-                        m.cache.set(str(cond_z3), str(solve_pc(s.pc)))
+                        _cache_store(m, key, result)
                     s.pc.assert_and_track(cond_z3, f"p{s.assertion_counter}")
                 else:
-                    key = str(f"~{cond_z3}")
+                    key = _cache_key(m, cond_z3, negate=True)
                     self.branch = False
-                    if m.cache.exists(key):
-                        result = m.cache.get(key).decode()
+                    cached = _cache_lookup(m, key)
+                    if cached is not None:
+                        result = cached
                     else:
                         result = str(solve_pc(s.pc))
-                        m.cache.set(f"~{str(cond_z3)}", str(solve_pc(s.pc)))
+                        _cache_store(m, key, result)
                     s.pc.assert_and_track(~cond_z3, f"p{s.assertion_counter}")
                 if not solve_pc(s.pc):
                     s.pc.pop()
-                    m.cache.set(str(cond_z3), False)
+                    neg_key = _cache_key(m, cond_z3, negate=True)
+                    _cache_store(m, neg_key, False)
                     m.abandon = True
                     m.ignore = True
                     return
@@ -810,87 +984,6 @@ class SymbolicDFS:
                 self.visit_stmt(m, s, stmt.body, modules, direction)
             if hasattr(stmt, "cond"):
                 self.visit_expr(m, s, stmt.cond)
-
-        #elif kind == ps.StatementKind.Case:
-        elif stmt.__class__.__name__ == "CaseStatementSyntax":
-            print("case")
-            m.branch_count += 1
-            self.visit_expr(m, s, stmt.expr)
-
-            cond_z3 = self.expr_to_z3(m, s, stmt.expr)
-
-            #for case in stmt.cases:
-            for case in getattr(stmt, "items", getattr(stmt, "case_items", [])):
-                exprs = getattr(case, "expressions", getattr(case, "exprs", []))
-                #for e in case.exprs:
-                for e in exprs:
-                    self.visit_expr(m, s, e)
-                    s.pc.push()
-                    s.assertion_counter += 1
-                    case_z3 = self.expr_to_z3(m, s, e)
-
-                    cond_expr = cond_z3 if isinstance(cond_z3, ExprRef) else None
-                    case_expr = case_z3 if isinstance(case_z3, ExprRef) else None
-
-                    if cond_expr is not None:
-                        if is_bool(cond_expr):
-                            match_guard = cond_expr
-                            mismatch_guard = Not(cond_expr)
-                        elif case_expr is not None:
-                            match_guard = cond_expr == case_expr
-                            mismatch_guard = cond_expr != case_expr
-                        elif isinstance(cond_expr, BitVecRef):
-                            zero = BitVecVal(0, cond_expr.size())
-                            match_guard = cond_expr != zero
-                            mismatch_guard = cond_expr == zero
-                        else:
-                            match_guard = BoolVal(True)
-                            mismatch_guard = BoolVal(True)
-                    else:
-                        match_guard = BoolVal(True)
-                        mismatch_guard = BoolVal(True)
-
-                    guard = match_guard if direction else mismatch_guard
-                    if not isinstance(guard, ExprRef) or not is_bool(guard):
-                        guard = BoolVal(True)
-
-                    key = str(guard)
-                    self.branch = bool(direction)
-                    if m.cache.exists(key):
-                        result = m.cache.get(key).decode()
-                    else:
-                        result = str(solve_pc(s.pc))
-                        m.cache.set(key, result)
-                    s.pc.assert_and_track(guard, f"p{s.assertion_counter}")
-                    if not solve_pc(s.pc):
-                        s.pc.pop()
-                        if m.cache is not None:
-                            m.cache.set(key, str(False))
-                        m.abandon = True
-                        m.ignore = True
-                        return
-
-                    case_body = getattr(case, "statement", getattr(case, "stmt", None))
-                    if case_body is None and hasattr(case, "statements"):
-                        case_body = case.statements
-
-                    if case_body is None:
-                        s.pc.pop()
-                        continue
-
-                    if isinstance(case_body, (list, tuple)):
-                        body_iter = case_body
-                    elif hasattr(case_body, "__iter__") and not isinstance(case_body, ps.StatementSyntax):
-                        body_iter = list(case_body)
-                    else:
-                        body_iter = [case_body]
-
-                    for stmt_node in body_iter:
-                        if stmt_node is None:
-                            continue
-                        self.visit_stmt(m, s, stmt_node, modules, direction)
-
-                    s.pc.pop()
 
         elif kind in [ps.StatementKind.ProceduralAssign]:
             self.visit_expr(m, s, stmt.left)
@@ -910,11 +1003,49 @@ class SymbolicDFS:
                     ps.StatementKind.Timed]:
             self.visit_stmt(m, s, stmt.body, modules, direction)
 
-        # elif kind in [ps.StatementKind.Assert, ps.StatementKind.Assume, ps.StatementKind.Cover]:
-        #     self.visit_expr(m, s, stmt.expr)
-        #     self.visit_stmt(m, s, stmt.body, modules, direction)
-        #     if hasattr(stmt, "elseBody"):
-        #         self.visit_stmt(m, s, stmt.elseBody, modules, direction)
+        elif kind == ps.StatementKind.ImmediateAssertion:
+            # Handle immediate assertions: assert(expr)
+            # Assertions are collected once in the engine's phase (_collect_assertions +
+            # _eval_assertion_expr); do not append here to avoid duplicate entries per path.
+            expr_node = None
+            for attr in ('cond', 'expr', 'condition', 'expression'):
+                if hasattr(stmt, attr):
+                    expr_node = getattr(stmt, attr)
+                    if expr_node is not None:
+                        break
+            if expr_node is not None:
+                self.visit_expr(m, s, expr_node)
+            # Visit the action block (pass/fail body)
+            if hasattr(stmt, 'body'):
+                self.visit_stmt(m, s, stmt.body, modules, direction)
+            if hasattr(stmt, 'ifTrue'):
+                self.visit_stmt(m, s, stmt.ifTrue, modules, direction)
+            if hasattr(stmt, 'elseBody'):
+                self.visit_stmt(m, s, stmt.elseBody, modules, direction)
+
+        elif kind == ps.StatementKind.ConcurrentAssertion:
+            # Handle concurrent assertions: assert property (...)
+            # Assertions are collected once in the engine's phase; do not append here.
+            expr_node = None
+            for attr in ('cond', 'expr', 'condition', 'expression', 'propertySpec'):
+                if hasattr(stmt, attr):
+                    prop = getattr(stmt, attr)
+                    if prop is not None:
+                        inner = getattr(prop, 'expr', None) or getattr(prop, 'expression', None)
+                        if inner is not None:
+                            expr_node = inner
+                        else:
+                            expr_node = prop
+                        break
+            if expr_node is not None:
+                self.visit_expr(m, s, expr_node)
+            # Visit the action block
+            if hasattr(stmt, 'body'):
+                self.visit_stmt(m, s, stmt.body, modules, direction)
+            if hasattr(stmt, 'ifTrue'):
+                self.visit_stmt(m, s, stmt.ifTrue, modules, direction)
+            if hasattr(stmt, 'elseBody'):
+                self.visit_stmt(m, s, stmt.elseBody, modules, direction)
 
         elif kind == ps.StatementKind.Return and hasattr(stmt, "expr"):
             self.visit_expr(m, s, stmt.expr)

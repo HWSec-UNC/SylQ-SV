@@ -1,0 +1,1084 @@
+Executing for 1 clock cycles
+Module or1200_alu single instance
+Module or1200_cfgr single instance
+Module or1200_cpu single instance
+Module or1200_ctrl single instance
+Module or1200_dc_fsm single instance
+Module or1200_dc_ram single instance
+Module or1200_dc_tag single instance
+Module or1200_dc_top single instance
+Module or1200_dmmu_tlb single instance
+Module or1200_dmmu_top single instance
+Module or1200_dpram single instance
+Module or1200_dpram_256x32 single instance
+Module or1200_dpram_32x32 single instance
+Module or1200_du single instance
+Module or1200_except single instance
+Module or1200_fpu single instance
+Module or1200_fpu_addsub single instance
+Module or1200_fpu_arith single instance
+Module or1200_fpu_div single instance
+Module or1200_fpu_fcmp single instance
+Module or1200_fpu_intfloat_conv single instance
+Module or1200_fpu_intfloat_conv_except single instance
+Module or1200_fpu_mul single instance
+Module or1200_fpu_post_norm_addsub single instance
+Module or1200_fpu_post_norm_div single instance
+Module or1200_fpu_post_norm_intfloat_conv single instance
+Module or1200_fpu_post_norm_mul single instance
+Module or1200_fpu_pre_norm_addsub single instance
+Module or1200_fpu_pre_norm_div single instance
+Module or1200_fpu_pre_norm_mul single instance
+Module or1200_freeze single instance
+Module or1200_genpc single instance
+Module or1200_gmultp2_32x32 single instance
+Module or1200_ic_fsm single instance
+Module or1200_ic_ram single instance
+Module or1200_ic_tag single instance
+Module or1200_ic_top single instance
+Module or1200_if single instance
+Module or1200_immu_tlb single instance
+Module or1200_immu_top single instance
+Module or1200_iwb_biu single instance
+Module or1200_lsu single instance
+Module or1200_mem2reg single instance
+Module or1200_mult_mac single instance
+Module or1200_operandmuxes single instance
+Module or1200_pic single instance
+Module or1200_pm single instance
+Module or1200_qmem_top single instance
+Module or1200_reg2mem single instance
+Module or1200_rf single instance
+Module or1200_rfram_generic single instance
+Module or1200_sb single instance
+Module or1200_sb_fifo single instance
+Module or1200_spram single instance
+Module or1200_spram_1024x32 single instance
+Module or1200_spram_1024x32_bw single instance
+Module or1200_spram_1024x8 single instance
+Module or1200_spram_128x32 single instance
+Module or1200_spram_2048x32 single instance
+Module or1200_spram_2048x32_bw single instance
+Module or1200_spram_2048x8 single instance
+Module or1200_spram_256x21 single instance
+Module or1200_spram_32_bw single instance
+Module or1200_spram_32x24 single instance
+Module or1200_spram_512x20 single instance
+Module or1200_spram_64x14 single instance
+Module or1200_spram_64x22 single instance
+Module or1200_spram_64x24 single instance
+Module or1200_sprs single instance
+Module or1200_top single instance
+Module or1200_tpram_32x32 single instance
+Module or1200_tt single instance
+Module or1200_wb_biu single instance
+Module or1200_wbmux single instance
+Here
+Branch points explored: 0 (phase: initial)
+Phase: init_state and module traversal
+Phase: traversing module or1200_alu
+Phase: traversing module or1200_cfgr
+Phase: traversing module or1200_cpu
+Phase: traversing module or1200_ctrl
+Phase: traversing module or1200_dc_fsm
+Phase: traversing module or1200_dc_ram
+Phase: traversing module or1200_dc_tag
+Phase: traversing module or1200_dc_top
+Phase: traversing module or1200_dmmu_tlb
+Phase: traversing module or1200_dmmu_top
+Phase: traversing module or1200_dpram
+Phase: traversing module or1200_dpram_256x32
+Phase: traversing module or1200_dpram_32x32
+Phase: traversing module or1200_du
+Phase: traversing module or1200_except
+Phase: traversing module or1200_fpu
+Phase: traversing module or1200_fpu_addsub
+Phase: traversing module or1200_fpu_arith
+Phase: traversing module or1200_fpu_div
+Phase: traversing module or1200_fpu_fcmp
+Phase: traversing module or1200_fpu_intfloat_conv
+Phase: traversing module or1200_fpu_intfloat_conv_except
+Phase: traversing module or1200_fpu_mul
+Phase: traversing module or1200_fpu_post_norm_addsub
+Phase: traversing module or1200_fpu_post_norm_div
+Phase: traversing module or1200_fpu_post_norm_intfloat_conv
+Phase: traversing module or1200_fpu_post_norm_mul
+Phase: traversing module or1200_fpu_pre_norm_addsub
+Phase: traversing module or1200_fpu_pre_norm_div
+Phase: traversing module or1200_fpu_pre_norm_mul
+Phase: traversing module or1200_freeze
+Phase: traversing module or1200_genpc
+Phase: traversing module or1200_gmultp2_32x32
+Phase: traversing module or1200_ic_fsm
+Phase: traversing module or1200_ic_ram
+Phase: traversing module or1200_ic_tag
+Phase: traversing module or1200_ic_top
+Phase: traversing module or1200_if
+Phase: traversing module or1200_immu_tlb
+Phase: traversing module or1200_immu_top
+Phase: traversing module or1200_iwb_biu
+Phase: traversing module or1200_lsu
+Phase: traversing module or1200_mem2reg
+Phase: traversing module or1200_mult_mac
+Phase: traversing module or1200_operandmuxes
+Phase: traversing module or1200_pic
+Phase: traversing module or1200_pm
+Phase: traversing module or1200_qmem_top
+Phase: traversing module or1200_reg2mem
+Phase: traversing module or1200_rf
+Phase: traversing module or1200_rfram_generic
+Phase: traversing module or1200_sb
+Phase: traversing module or1200_sb_fifo
+Phase: traversing module or1200_spram
+Phase: traversing module or1200_spram_1024x32
+Phase: traversing module or1200_spram_1024x32_bw
+Phase: traversing module or1200_spram_1024x8
+Phase: traversing module or1200_spram_128x32
+Phase: traversing module or1200_spram_2048x32
+Phase: traversing module or1200_spram_2048x32_bw
+Phase: traversing module or1200_spram_2048x8
+Phase: traversing module or1200_spram_256x21
+Phase: traversing module or1200_spram_32_bw
+Phase: traversing module or1200_spram_32x24
+Phase: traversing module or1200_spram_512x20
+Phase: traversing module or1200_spram_64x14
+Phase: traversing module or1200_spram_64x22
+Phase: traversing module or1200_spram_64x24
+Phase: traversing module or1200_sprs
+Phase: traversing module or1200_top
+Phase: traversing module or1200_tpram_32x32
+Phase: traversing module or1200_tt
+Phase: traversing module or1200_wb_biu
+Phase: traversing module or1200_wbmux
+Phase: base_store for module or1200_alu
+Phase: base_store for module or1200_cfgr
+Phase: base_store for module or1200_cpu
+Phase: base_store for module or1200_ctrl
+Phase: base_store for module or1200_dc_fsm
+Phase: base_store for module or1200_dc_ram
+Phase: base_store for module or1200_dc_tag
+Phase: base_store for module or1200_dc_top
+Phase: base_store for module or1200_dmmu_tlb
+Phase: base_store for module or1200_dmmu_top
+Phase: base_store for module or1200_dpram
+Phase: base_store for module or1200_dpram_256x32
+Phase: base_store for module or1200_dpram_32x32
+Phase: base_store for module or1200_du
+Phase: base_store for module or1200_except
+Phase: base_store for module or1200_fpu
+Phase: base_store for module or1200_fpu_addsub
+Phase: base_store for module or1200_fpu_arith
+Phase: base_store for module or1200_fpu_div
+Phase: base_store for module or1200_fpu_fcmp
+Phase: base_store for module or1200_fpu_intfloat_conv
+Phase: base_store for module or1200_fpu_intfloat_conv_except
+Phase: base_store for module or1200_fpu_mul
+Phase: base_store for module or1200_fpu_post_norm_addsub
+Phase: base_store for module or1200_fpu_post_norm_div
+Phase: base_store for module or1200_fpu_post_norm_intfloat_conv
+Phase: base_store for module or1200_fpu_post_norm_mul
+Phase: base_store for module or1200_fpu_pre_norm_addsub
+Phase: base_store for module or1200_fpu_pre_norm_div
+Phase: base_store for module or1200_fpu_pre_norm_mul
+Phase: base_store for module or1200_freeze
+Phase: base_store for module or1200_genpc
+Phase: base_store for module or1200_gmultp2_32x32
+Phase: base_store for module or1200_ic_fsm
+Phase: base_store for module or1200_ic_ram
+Phase: base_store for module or1200_ic_tag
+Phase: base_store for module or1200_ic_top
+Phase: base_store for module or1200_if
+Phase: base_store for module or1200_immu_tlb
+Phase: base_store for module or1200_immu_top
+Phase: base_store for module or1200_iwb_biu
+Phase: base_store for module or1200_lsu
+Phase: base_store for module or1200_mem2reg
+Phase: base_store for module or1200_mult_mac
+Phase: base_store for module or1200_operandmuxes
+Phase: base_store for module or1200_pic
+Phase: base_store for module or1200_pm
+Phase: base_store for module or1200_qmem_top
+Phase: base_store for module or1200_reg2mem
+Phase: base_store for module or1200_rf
+Phase: base_store for module or1200_rfram_generic
+Phase: base_store for module or1200_sb
+Phase: base_store for module or1200_sb_fifo
+Phase: base_store for module or1200_spram
+Phase: base_store for module or1200_spram_1024x32
+Phase: base_store for module or1200_spram_1024x32_bw
+Phase: base_store for module or1200_spram_1024x8
+Phase: base_store for module or1200_spram_128x32
+Phase: base_store for module or1200_spram_2048x32
+Phase: base_store for module or1200_spram_2048x32_bw
+Phase: base_store for module or1200_spram_2048x8
+Phase: base_store for module or1200_spram_256x21
+Phase: base_store for module or1200_spram_32_bw
+Phase: base_store for module or1200_spram_32x24
+Phase: base_store for module or1200_spram_512x20
+Phase: base_store for module or1200_spram_64x14
+Phase: base_store for module or1200_spram_64x22
+Phase: base_store for module or1200_spram_64x24
+Phase: base_store for module or1200_sprs
+Phase: base_store for module or1200_top
+Phase: base_store for module or1200_tpram_32x32
+Phase: base_store for module or1200_tt
+Phase: base_store for module or1200_wb_biu
+Phase: base_store for module or1200_wbmux
+Phase: collecting SVA assertions
+  Found 0 assertion(s), 0 with Z3 expressions
+Phase: explore_block (per-module)
+Phase: merge_block_results (per-module, streaming)
+  merge or1200_alu (1/74): 7 blocks (streaming)
+  merge or1200_cfgr (2/74): 1 blocks (streaming)
+  merge or1200_cpu (3/74): 3 blocks (streaming)
+  merge or1200_ctrl (4/74): 28 blocks (streaming)
+  merge or1200_dc_fsm (5/74): 1 blocks (streaming)
+  merge or1200_dc_ram (6/74): 0 blocks (streaming)
+  merge or1200_dc_tag (7/74): 0 blocks (streaming)
+  merge or1200_dc_top (8/74): 0 blocks (streaming)
+  merge or1200_dmmu_tlb (9/74): 0 blocks (streaming)
+  merge or1200_dmmu_top (10/74): 2 blocks (streaming)
+  merge or1200_dpram (11/74): 3 blocks (streaming)
+  merge or1200_dpram_256x32 (12/74): 2 blocks (streaming)
+  merge or1200_dpram_32x32 (13/74): 2 blocks (streaming)
+  merge or1200_du (14/74): 11 blocks (streaming)
+  merge or1200_except (15/74): 10 blocks (streaming)
+  merge or1200_fpu (16/74): 0 blocks (streaming)
+  merge or1200_fpu_addsub (17/74): 1 blocks (streaming)
+  merge or1200_fpu_arith (18/74): 5 blocks (streaming)
+  merge or1200_fpu_div (19/74): 3 blocks (streaming)
+  merge or1200_fpu_fcmp (20/74): 1 blocks (streaming)
+  merge or1200_fpu_intfloat_conv (21/74): 20 blocks (streaming)
+  merge or1200_fpu_intfloat_conv_except (22/74): 24 blocks (streaming)
+  merge or1200_fpu_mul (23/74): 4 blocks (streaming)
+  merge or1200_fpu_post_norm_addsub (24/74): 4 blocks (streaming)
+  merge or1200_fpu_post_norm_div (25/74): 8 blocks (streaming)
+  merge or1200_fpu_post_norm_intfloat_conv (26/74): 6 blocks (streaming)
+  merge or1200_fpu_post_norm_mul (27/74): 7 blocks (streaming)
+  merge or1200_fpu_pre_norm_addsub (28/74): 4 blocks (streaming)
+  merge or1200_fpu_pre_norm_div (29/74): 4 blocks (streaming)
+  merge or1200_fpu_pre_norm_mul (30/74): 1 blocks (streaming)
+  merge or1200_freeze (31/74): 3 blocks (streaming)
+  merge or1200_genpc (32/74): 5 blocks (streaming)
+  merge or1200_gmultp2_32x32 (33/74): 4 blocks (streaming)
+  merge or1200_ic_fsm (34/74): 1 blocks (streaming)
+  merge or1200_ic_ram (35/74): 0 blocks (streaming)
+  merge or1200_ic_tag (36/74): 0 blocks (streaming)
+  merge or1200_ic_top (37/74): 2 blocks (streaming)
+  merge or1200_if (38/74): 5 blocks (streaming)
+  merge or1200_immu_tlb (39/74): 0 blocks (streaming)
+  merge or1200_immu_top (40/74): 7 blocks (streaming)
+  merge or1200_iwb_biu (41/74): 0 blocks (streaming)
+  merge or1200_lsu (42/74): 4 blocks (streaming)
+  merge or1200_mem2reg (43/74): 2 blocks (streaming)
+  merge or1200_mult_mac (44/74): 11 blocks (streaming)
+  merge or1200_operandmuxes (45/74): 4 blocks (streaming)
+  merge or1200_pic (46/74): 3 blocks (streaming)
+  merge or1200_pm (47/74): 0 blocks (streaming)
+  merge or1200_qmem_top (48/74): 0 blocks (streaming)
+  merge or1200_reg2mem (49/74): 4 blocks (streaming)
+  merge or1200_rf (50/74): 3 blocks (streaming)
+  merge or1200_rfram_generic (51/74): 5 blocks (streaming)
+  merge or1200_sb (52/74): 0 blocks (streaming)
+  merge or1200_sb_fifo (53/74): 1 blocks (streaming)
+  merge or1200_spram (54/74): 3 blocks (streaming)
+  merge or1200_spram_1024x32 (55/74): 2 blocks (streaming)
+  merge or1200_spram_1024x32_bw (56/74): 5 blocks (streaming)
+  merge or1200_spram_1024x8 (57/74): 2 blocks (streaming)
+  merge or1200_spram_128x32 (58/74): 2 blocks (streaming)
+  merge or1200_spram_2048x32 (59/74): 2 blocks (streaming)
+  merge or1200_spram_2048x32_bw (60/74): 5 blocks (streaming)
+  merge or1200_spram_2048x8 (61/74): 2 blocks (streaming)
+  merge or1200_spram_256x21 (62/74): 2 blocks (streaming)
+  merge or1200_spram_32_bw (63/74): 2 blocks (streaming)
+  merge or1200_spram_32x24 (64/74): 2 blocks (streaming)
+  merge or1200_spram_512x20 (65/74): 2 blocks (streaming)
+  merge or1200_spram_64x14 (66/74): 2 blocks (streaming)
+  merge or1200_spram_64x22 (67/74): 2 blocks (streaming)
+  merge or1200_spram_64x24 (68/74): 2 blocks (streaming)
+  merge or1200_sprs (69/74): 12 blocks (streaming)
+  merge or1200_top (70/74): 0 blocks (streaming)
+  merge or1200_tpram_32x32 (71/74): 4 blocks (streaming)
+  merge or1200_tt (72/74): 3 blocks (streaming)
+  merge or1200_wb_biu (73/74): 6 blocks (streaming)
+  merge or1200_wbmux (74/74): 2 blocks (streaming)
+Phase: cross-module path iteration (streaming)
+explore_block: or1200_alu (1 paths)
+  path 1/1
+explore_block: or1200_alu (1 paths)
+  path 1/1
+explore_block: or1200_alu (1 paths)
+  path 1/1
+explore_block: or1200_alu (1 paths)
+  path 1/1
+explore_block: or1200_alu (1 paths)
+  path 1/1
+explore_block: or1200_alu (1 paths)
+  path 1/1
+explore_block: or1200_alu (1 paths)
+  path 1/1
+explore_block: or1200_cfgr (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_cpu (1 paths)
+  path 1/1
+explore_block: or1200_cpu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_ctrl (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_ctrl (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_ctrl (1 paths)
+  path 1/1
+explore_block: or1200_ctrl (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_ctrl (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_ctrl (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_ctrl (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_ctrl (1 paths)
+  path 1/1
+explore_block: or1200_ctrl (1 paths)
+  path 1/1
+explore_block: or1200_ctrl (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_ctrl (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_ctrl (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_ctrl (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_ctrl (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_ctrl (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_ctrl (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_ctrl (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_ctrl (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_ctrl (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_ctrl (1 paths)
+  path 1/1
+explore_block: or1200_ctrl (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_ctrl (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_ctrl (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_ctrl (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_ctrl (1 paths)
+  path 1/1
+explore_block: or1200_ctrl (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_ctrl (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_ctrl (3 paths)
+  path 1/3
+  path 3/3
+    merge or1200_ctrl: checked 100000 combos, yielded 99999 feasible
+    merge or1200_ctrl: checked 200000 combos, yielded 199999 feasible
+    merge or1200_ctrl: checked 300000 combos, yielded 299999 feasible
+    merge or1200_ctrl: checked 400000 combos, yielded 399999 feasible
+    merge or1200_ctrl: checked 500000 combos, yielded 499999 feasible
+    merge or1200_ctrl: checked 600000 combos, yielded 599999 feasible
+    merge or1200_ctrl: checked 700000 combos, yielded 699999 feasible
+    merge or1200_ctrl: checked 800000 combos, yielded 799999 feasible
+    merge or1200_ctrl: checked 900000 combos, yielded 899999 feasible
+    merge or1200_ctrl: checked 1000000 combos, yielded 999999 feasible
+
+=== TIMEOUT: Execution time limit exceeded ===
+  Elapsed time: 60.0264s
+  Paths explored (feasible): 0
+explore_block: or1200_dc_fsm (2 paths)
+  Branch points explored: 149
+  path 1/2
+  Assertions checked: 0
+  Result: No violation found within time limit
+=======================================
+  path 2/2
+explore_block: or1200_dmmu_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_dmmu_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_dpram (1 paths)
+  path 1/1
+explore_block: or1200_dpram (1 paths)
+  path 1/1
+explore_block: or1200_dpram (1 paths)
+  path 1/1
+explore_block: or1200_dpram_256x32 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_dpram_256x32 (1 paths)
+  path 1/1
+explore_block: or1200_dpram_32x32 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_dpram_32x32 (1 paths)
+  path 1/1
+explore_block: or1200_du (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_du (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_du (1 paths)
+  path 1/1
+explore_block: or1200_du (1 paths)
+  path 1/1
+explore_block: or1200_du (1 paths)
+  path 1/1
+explore_block: or1200_du (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_du (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_du (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_du (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_du (1 paths)
+  path 1/1
+explore_block: or1200_du (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_except (1 paths)
+  path 1/1
+explore_block: or1200_except (1 paths)
+  path 1/1
+explore_block: or1200_except (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_except (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_except (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_except (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_except (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_except (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_except (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_except (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_fpu_addsub (1 paths)
+  path 1/1
+explore_block: or1200_fpu_arith (1 paths)
+  path 1/1
+explore_block: or1200_fpu_arith (1 paths)
+  path 1/1
+explore_block: or1200_fpu_arith (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_fpu_arith (1 paths)
+  path 1/1
+explore_block: or1200_fpu_arith (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_fpu_div (1 paths)
+  path 1/1
+explore_block: or1200_fpu_div (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_fpu_div (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_fpu_fcmp (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv_except (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv_except (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv_except (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv_except (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv_except (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv_except (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv_except (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv_except (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv_except (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv_except (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv_except (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv_except (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv_except (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv_except (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv_except (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv_except (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv_except (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv_except (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv_except (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv_except (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv_except (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv_except (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv_except (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv_except (1 paths)
+  path 1/1
+explore_block: or1200_fpu_mul (1 paths)
+  path 1/1
+explore_block: or1200_fpu_mul (1 paths)
+  path 1/1
+explore_block: or1200_fpu_mul (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_fpu_mul (1 paths)
+  path 1/1
+explore_block: or1200_fpu_post_norm_addsub (1 paths)
+  path 1/1
+explore_block: or1200_fpu_post_norm_addsub (1 paths)
+  path 1/1
+explore_block: or1200_fpu_post_norm_addsub (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_fpu_post_norm_addsub (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_fpu_post_norm_div (1 paths)
+  path 1/1
+explore_block: or1200_fpu_post_norm_div (1 paths)
+  path 1/1
+explore_block: or1200_fpu_post_norm_div (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_fpu_post_norm_div (1 paths)
+  path 1/1
+explore_block: or1200_fpu_post_norm_div (1 paths)
+  path 1/1
+explore_block: or1200_fpu_post_norm_div (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_fpu_post_norm_div (1 paths)
+  path 1/1
+explore_block: or1200_fpu_post_norm_div (1 paths)
+  path 1/1
+explore_block: or1200_fpu_post_norm_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_post_norm_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_post_norm_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_post_norm_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_post_norm_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_post_norm_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_post_norm_mul (1 paths)
+  path 1/1
+explore_block: or1200_fpu_post_norm_mul (1 paths)
+  path 1/1
+explore_block: or1200_fpu_post_norm_mul (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_fpu_post_norm_mul (1 paths)
+  path 1/1
+explore_block: or1200_fpu_post_norm_mul (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_fpu_post_norm_mul (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_fpu_post_norm_mul (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_fpu_pre_norm_addsub (1 paths)
+  path 1/1
+explore_block: or1200_fpu_pre_norm_addsub (1 paths)
+  path 1/1
+explore_block: or1200_fpu_pre_norm_addsub (1 paths)
+  path 1/1
+explore_block: or1200_fpu_pre_norm_addsub (1 paths)
+  path 1/1
+explore_block: or1200_fpu_pre_norm_div (1 paths)
+  path 1/1
+explore_block: or1200_fpu_pre_norm_div (1 paths)
+  path 1/1
+explore_block: or1200_fpu_pre_norm_div (1 paths)
+  path 1/1
+explore_block: or1200_fpu_pre_norm_div (1 paths)
+  path 1/1
+explore_block: or1200_fpu_pre_norm_mul (1 paths)
+  path 1/1
+explore_block: or1200_freeze (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_freeze (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_freeze (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_genpc (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_genpc (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_genpc (1 paths)
+  path 1/1
+explore_block: or1200_genpc (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_genpc (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_gmultp2_32x32 (1 paths)
+  path 1/1
+explore_block: or1200_gmultp2_32x32 (1 paths)
+  path 1/1
+explore_block: or1200_gmultp2_32x32 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_gmultp2_32x32 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_ic_fsm (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_ic_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_ic_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_if (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_if (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_if (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_if (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_if (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_immu_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_immu_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_immu_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_immu_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_immu_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_immu_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_immu_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_lsu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_lsu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_lsu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_lsu (1 paths)
+  path 1/1
+explore_block: or1200_mem2reg (1 paths)
+  path 1/1
+explore_block: or1200_mem2reg (1 paths)
+  path 1/1
+explore_block: or1200_mult_mac (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_mult_mac (1 paths)
+  path 1/1
+explore_block: or1200_mult_mac (1 paths)
+  path 1/1
+explore_block: or1200_mult_mac (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_mult_mac (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_mult_mac (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_mult_mac (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_mult_mac (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_mult_mac (6 paths)
+  path 1/6
+  path 6/6
+explore_block: or1200_mult_mac (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_mult_mac (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_operandmuxes (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_operandmuxes (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_operandmuxes (1 paths)
+  path 1/1
+explore_block: or1200_operandmuxes (1 paths)
+  path 1/1
+explore_block: or1200_pic (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_pic (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_pic (1 paths)
+  path 1/1
+explore_block: or1200_reg2mem (1 paths)
+  path 1/1
+explore_block: or1200_reg2mem (1 paths)
+  path 1/1
+explore_block: or1200_reg2mem (1 paths)
+  path 1/1
+explore_block: or1200_reg2mem (1 paths)
+  path 1/1
+explore_block: or1200_rf (1 paths)
+  path 1/1
+explore_block: or1200_rf (1 paths)
+  path 1/1
+explore_block: or1200_rf (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_rfram_generic (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_rfram_generic (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_rfram_generic (1 paths)
+  path 1/1
+explore_block: or1200_rfram_generic (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_rfram_generic (1 paths)
+  path 1/1
+explore_block: or1200_sb_fifo (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_spram (1 paths)
+  path 1/1
+explore_block: or1200_spram (1 paths)
+  path 1/1
+explore_block: or1200_spram (1 paths)
+  path 1/1
+explore_block: or1200_spram_1024x32 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_1024x32 (1 paths)
+  path 1/1
+explore_block: or1200_spram_1024x32_bw (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_1024x32_bw (1 paths)
+  path 1/1
+explore_block: or1200_spram_1024x32_bw (1 paths)
+  path 1/1
+explore_block: or1200_spram_1024x32_bw (1 paths)
+  path 1/1
+explore_block: or1200_spram_1024x32_bw (1 paths)
+  path 1/1
+explore_block: or1200_spram_1024x8 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_1024x8 (1 paths)
+  path 1/1
+explore_block: or1200_spram_128x32 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_128x32 (1 paths)
+  path 1/1
+explore_block: or1200_spram_2048x32 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_2048x32 (1 paths)
+  path 1/1
+explore_block: or1200_spram_2048x32_bw (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_2048x32_bw (1 paths)
+  path 1/1
+explore_block: or1200_spram_2048x32_bw (1 paths)
+  path 1/1
+explore_block: or1200_spram_2048x32_bw (1 paths)
+  path 1/1
+explore_block: or1200_spram_2048x32_bw (1 paths)
+  path 1/1
+explore_block: or1200_spram_2048x8 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_2048x8 (1 paths)
+  path 1/1
+explore_block: or1200_spram_256x21 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_256x21 (1 paths)
+  path 1/1
+explore_block: or1200_spram_32_bw (1 paths)
+  path 1/1
+explore_block: or1200_spram_32_bw (1 paths)
+  path 1/1
+explore_block: or1200_spram_32x24 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_32x24 (1 paths)
+  path 1/1
+explore_block: or1200_spram_512x20 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_512x20 (1 paths)
+  path 1/1
+explore_block: or1200_spram_64x14 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_64x14 (1 paths)
+  path 1/1
+explore_block: or1200_spram_64x22 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_64x22 (1 paths)
+  path 1/1
+explore_block: or1200_spram_64x24 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_64x24 (1 paths)
+  path 1/1
+explore_block: or1200_sprs (1 paths)
+  path 1/1
+explore_block: or1200_sprs (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_sprs (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_sprs (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_sprs (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_sprs (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_sprs (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_sprs (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_sprs (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_sprs (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_sprs (1 paths)
+  path 1/1
+explore_block: or1200_sprs (1 paths)
+  path 1/1
+explore_block: or1200_tpram_32x32 (1 paths)
+  path 1/1
+explore_block: or1200_tpram_32x32 (1 paths)
+  path 1/1
+explore_block: or1200_tpram_32x32 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_tpram_32x32 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_tt (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_tt (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_tt (1 paths)
+  path 1/1
+explore_block: or1200_wb_biu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_wb_biu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_wb_biu (1 paths)
+  path 1/1
+explore_block: or1200_wb_biu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_wb_biu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_wb_biu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_wbmux (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_wbmux (1 paths)
+  path 1/1
+Phase: cross-module path iteration complete.
+Branch points explored: 717
+Paths explored (feasible): 0
+Paths explored: 0
+0
+0
+
+=== EXECUTION SUMMARY ===
+  Elapsed time: 61.7739s
+  Paths explored (feasible): 0
+  Branch points explored: 717
+  Assertions found: 0
+  Solver time: 0.0000s
+  Result: Exploratory run complete (no assertions in design)
+=========================
+Top level design units:
+    or1200_dc_fsm
+    or1200_dc_ram
+    or1200_dc_tag
+    or1200_dpram_256x32
+    or1200_dpram_32x32
+    or1200_fpu_arith
+    or1200_fpu_fcmp
+    or1200_fpu_intfloat_conv
+    or1200_iwb_biu
+    or1200_rfram_generic
+    or1200_sb_fifo
+    or1200_spram_1024x32
+    or1200_spram_1024x32_bw
+    or1200_spram_1024x8
+    or1200_spram_128x32
+    or1200_spram_2048x32
+    or1200_spram_2048x32_bw
+    or1200_spram_2048x8
+    or1200_spram_256x21
+    or1200_spram_32_bw
+    or1200_spram_32x24
+    or1200_spram_512x20
+    or1200_spram_64x14
+    or1200_spram_64x22
+    or1200_spram_64x24
+    or1200_top
+    or1200_tpram_32x32
+
+Build succeeded: 0 errors, 0 warnings

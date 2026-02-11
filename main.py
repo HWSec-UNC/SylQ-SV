@@ -24,13 +24,34 @@ logging.basicConfig(filename='errors.log', level=logging.DEBUG)
 logging.debug("Starting over")
 
 
-INFO = "Verilog Symbolic Execution Engine"
+INFO = "SylQ-SV Symbolic Execution Engine"
 USAGE = "Usage: python3 -m main <num_cycles> <verilog_file>.v > out.txt"
-    
+
+# Global references so timeout_exit can print summary stats and request stop
+_engine_ref = None
+_start_time_ref = None
+
 def timeout_exit():
     """This only happens when the timer runs out."""
-    print("Execution time limit exceeded. Exiting.")
-    sys.exit(1)
+    elapsed = time.process_time() - _start_time_ref if _start_time_ref else 0
+    print("\n=== TIMEOUT: Execution time limit exceeded ===", flush=True)
+    print(f"  Elapsed time: {elapsed:.4f}s", flush=True)
+    if _engine_ref and hasattr(_engine_ref, '_last_manager'):
+        # Mark the engine as timed out so long-running loops can exit cooperatively.
+        try:
+            setattr(_engine_ref, "timeout", True)
+        except Exception:
+            pass
+        mgr = _engine_ref._last_manager
+        print(f"  Paths explored (feasible): {mgr.path_count}", flush=True)
+        print(f"  Branch points explored: {mgr.branch_count}", flush=True)
+        n_assertions = len(mgr.assertions) if hasattr(mgr, 'assertions') else 0
+        print(f"  Assertions checked: {n_assertions}", flush=True)
+        if mgr.assertion_violation:
+            print("  Result: VIOLATION FOUND (see above)", flush=True)
+        else:
+            print("  Result: No violation found within time limit", flush=True)
+    print("=======================================", flush=True)
 
 def showVersion():
     print(INFO)
@@ -39,6 +60,8 @@ def showVersion():
     
 def main():
     """Entrypoint of the program."""
+    # OR1200 and large designs recurse deeply; avoid RecursionError.
+    sys.setrecursionlimit(50000)
     engine: ExecutionEngine = ExecutionEngine()
     optparser = OptionParser()
     optparser.add_option("-v", "--version", action="store_true", dest="showversion",
@@ -119,11 +142,11 @@ def main():
         compilation = driver.createCompilation()
         modules =  compilation.getDefinitions()
 
-        # IF using pyslang 7.0.0, uncomment the following line and comment out the other successful_compilation
-        # successful_compilation = driver.reportCompilation(compilation, False)
-
-        #IF using pyslang 9.0.0/9.1.0, use this version of successful_compilation
-        successful_compilation = driver.runFullCompilation(False)
+        # pyslang 9.x has runFullCompilation; 7.x has reportCompilation
+        if hasattr(driver, 'runFullCompilation'):
+            successful_compilation = driver.runFullCompilation(False)
+        else:
+            successful_compilation = driver.reportCompilation(compilation, False)
         
         if successful_compilation:
             #print(driver.reportMacros())
@@ -132,13 +155,38 @@ def main():
             my_visitor_for_symbol.expr_to_z3 = lambda m, s, e: parse_expr_to_Z3(e, s, m)
 
             symbol_visitor = SlangSymbolVisitor() #Post processor visitor -> doesn't depend on the num_cycles
+
+            # Store global refs for timeout reporting
+            global _engine_ref, _start_time_ref
+            _engine_ref = engine
+            _start_time_ref = start
+
             engine.execute_sv(my_visitor_for_symbol, modules, None, num_cycles)
             symbol_visitor.visit(modules)
-            print(symbol_visitor.branch_points)
-            print(symbol_visitor.paths)
-            
+            print(symbol_visitor.branch_points, flush=True)
+            print(symbol_visitor.paths, flush=True)
+
         end = time.process_time()
-        print(f"Elapsed time {end - start}")
+        elapsed = end - start
+
+        # --- Final summary report ---
+        print("\n=== EXECUTION SUMMARY ===", flush=True)
+        print(f"  Elapsed time: {elapsed:.4f}s", flush=True)
+        if hasattr(engine, '_last_manager'):
+            mgr = engine._last_manager
+            print(f"  Paths explored (feasible): {mgr.path_count}", flush=True)
+            print(f"  Branch points explored: {mgr.branch_count}", flush=True)
+            n_assertions = len(mgr.assertions) if hasattr(mgr, 'assertions') else 0
+            print(f"  Assertions found: {n_assertions}", flush=True)
+            print(f"  Solver time: {mgr.solver_time:.4f}s", flush=True)
+            if mgr.assertion_violation:
+                print("  Result: ASSERTION VIOLATION FOUND", flush=True)
+            elif n_assertions > 0:
+                print("  Result: All paths explored, no violations", flush=True)
+            else:
+                print("  Result: Exploratory run complete (no assertions in design)", flush=True)
+        print("=========================", flush=True)
+
         if timer:
             timer.cancel()
         exit()
