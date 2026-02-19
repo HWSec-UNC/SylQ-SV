@@ -417,9 +417,31 @@ explore_block: or1200_ctrl (3 paths)
     merge or1200_ctrl: checked 800000 combos, yielded 799999 feasible
     merge or1200_ctrl: checked 900000 combos, yielded 899999 feasible
     merge or1200_ctrl: checked 1000000 combos, yielded 999999 feasible
+    merge or1200_ctrl: checked 1100000 combos, yielded 1099999 feasible
+    merge or1200_ctrl: checked 1200000 combos, yielded 1199999 feasible
+    merge or1200_ctrl: checked 1300000 combos, yielded 1299999 feasible
+    merge or1200_ctrl: checked 1400000 combos, yielded 1399999 feasible
+    merge or1200_ctrl: checked 1500000 combos, yielded 1499999 feasible
+    merge or1200_ctrl: checked 1600000 combos, yielded 1599999 feasible
+    merge or1200_ctrl: checked 1700000 combos, yielded 1699999 feasible
+    merge or1200_ctrl: checked 1800000 combos, yielded 1799999 feasible
+    merge or1200_ctrl: checked 1900000 combos, yielded 1899999 feasible
+    merge or1200_ctrl: checked 2000000 combos, yielded 1999999 feasible
+    merge or1200_ctrl: checked 2100000 combos, yielded 2099999 feasible
+    merge or1200_ctrl: checked 2200000 combos, yielded 2199999 feasible
+    merge or1200_ctrl: checked 2300000 combos, yielded 2299999 feasible
+    merge or1200_ctrl: checked 2400000 combos, yielded 2399999 feasible
+    merge or1200_ctrl: checked 2500000 combos, yielded 2499999 feasible
+    merge or1200_ctrl: checked 2600000 combos, yielded 2599999 feasible
+    merge or1200_ctrl: checked 2700000 combos, yielded 2699999 feasible
+    merge or1200_ctrl: checked 2800000 combos, yielded 2799999 feasible
+    merge or1200_ctrl: checked 2900000 combos, yielded 2899999 feasible
+    merge or1200_ctrl: checked 3000000 combos, yielded 2999999 feasible
+    merge or1200_ctrl: checked 3100000 combos, yielded 3099999 feasible
+    merge or1200_ctrl: checked 3200000 combos, yielded 3199999 feasible
 
 === TIMEOUT: Execution time limit exceeded ===
-  Elapsed time: 60.0264s
+  Elapsed time: 180.0245s
   Paths explored (feasible): 0
 explore_block: or1200_dc_fsm (2 paths)
   Branch points explored: 149
@@ -1045,7 +1067,7 @@ Paths explored: 0
 0
 
 === EXECUTION SUMMARY ===
-  Elapsed time: 61.7739s
+  Elapsed time: 185.0886s
   Paths explored (feasible): 0
   Branch points explored: 717
   Assertions found: 0

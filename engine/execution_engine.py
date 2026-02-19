@@ -5,7 +5,7 @@ from z3 import z3util
 from .execution_manager import ExecutionManager
 from .symbolic_state import SymbolicState
 from .cfg import CFG
-from typing import Optional, Generator
+from typing import Optional, List
 import time
 import gc
 from itertools import product
@@ -180,13 +180,14 @@ class ExecutionEngine:
                     manager.seen_mod[child][(to_binary(i))] = {}
 
     def explore_block(self, visitor, manager: ExecutionManager, state_template: SymbolicState,
-                      module_name: str, cfg: CFG, modules_dict: dict) -> Generator[dict, None, None]:
-        """Explore all paths through a single always block independently (streaming generator).
-        Yields {'pc': list of z3 constraints, 'store': {signal: expr}} per feasible path."""
+                      module_name: str, cfg: CFG, modules_dict: dict) -> List[dict]:
+        """Explore all paths through a single always block (Paper §3.3). Returns a list of
+        {'pc': list of z3 constraints, 'store': {signal: expr}} per feasible path."""
         prev_curr_module = manager.curr_module
         manager.curr_module = module_name
         num_paths = cfg.get_path_count()
         print("explore_block: {} ({} paths)".format(module_name, num_paths), flush=True)
+        results = []
         try:
             for path_idx, path in enumerate(cfg.get_paths()):
                 if path_idx == 0 or (path_idx + 1) % 100 == 0 or path_idx == num_paths - 1:
@@ -204,7 +205,6 @@ class ExecutionEngine:
                     k += 1
                     basic_block = cfg.basic_block_list[bb_idx]
                     for stmt in basic_block:
-                        # Expose current PC for _cache_key slicing (Paper §4.2.2)
                         manager._pc_ref = path_state.pc
                         try:
                             visitor.visit_stmt(manager, path_state, stmt, modules_dict, direction)
@@ -219,14 +219,15 @@ class ExecutionEngine:
                 except Exception:
                     pass
                 if not constraints or str(path_state.pc.check()) == "sat":
-                    yield {
+                    results.append({
                         "pc": constraints,
                         "store": dict(path_state.store.get(module_name, {}))
-                    }
+                    })
         finally:
             manager.curr_module = prev_curr_module
             if hasattr(manager, '_pc_ref'):
                 manager._pc_ref = None
+        return results
 
     def _collect_assertions(self, ast, module_name, assertions_list):
         """Recursively walk a pyslang AST and collect SVA assertion nodes.
@@ -365,30 +366,24 @@ class ExecutionEngine:
                 pass
         return out
 
-    def merge_block_results_streaming(self, block_result_lists: list, module_name: str = "",
-                                      manager=None):
-        """Combine per-block results: Cartesian product filtered by SAT (streaming generator).
-        If two blocks' PCs share no symbolic variables, skip the solver (paper §4.3).
-        Merge-query caching uses a separate QU from path exploration (paper §4.3).
-        Yields merged {'pc': list of constraints, 'store': dict} one at a time."""
+    def merge_block_results(self, block_result_lists: List[list], module_name: str = "",
+                            manager=None) -> List[dict]:
+        """Piecewise composition merge step (Paper §3.3, §4.3): combine path fragments from
+        always blocks via SMT. Returns a list of feasible merged {pc, store}. Per paper:
+        (1) combine path conditions P₁∧P₂∧... and check SAT; (2) separate QU for merge (qu_merge);
+        (3) if blocks share no symbolic variables, skip solver; (4) cache merge queries."""
         if not block_result_lists:
-            yield {"pc": [], "store": {}}
-            return
+            return [{"pc": [], "store": {}}]
 
-        # Import merge-query caching utilities
         from .query_normalization import normalize_query_list
 
+        results = []
         combo_count = 0
-        yielded_count = 0
         for combo in product(*block_result_lists):
-            # Global timeout hook: if main.py marked the engine as timed out,
-            # stop generating further merged combinations.
-            if getattr(self, "timeout", False):
-                break
             combo_count += 1
             if combo_count % 100000 == 0:
-                print(f"    merge {module_name}: checked {combo_count} combos, yielded {yielded_count} feasible", flush=True)
-            
+                print(f"    merge {module_name}: checked {combo_count} combos, {len(results)} feasible", flush=True)
+
             all_pcs = []
             all_stores = {}
             var_sets = []
@@ -405,7 +400,6 @@ class ExecutionEngine:
                 if need_solver:
                     break
             if need_solver and all_pcs:
-                # --- Merge-query caching (Paper §4.3) ---
                 merge_cache_key = None
                 if manager and manager.cache:
                     try:
@@ -414,14 +408,11 @@ class ExecutionEngine:
                         if cached is not None:
                             if cached.decode() != "sat":
                                 continue
-                            else:
-                                yielded_count += 1
-                                yield {"pc": all_pcs, "store": all_stores}
-                                continue
+                            results.append({"pc": all_pcs, "store": all_stores})
+                            continue
                     except Exception:
                         merge_cache_key = None
 
-                # Register merge constraints in separate QU
                 if manager and manager.qu_merge is not None:
                     for c in all_pcs:
                         manager.qu_merge.register_constraint(c)
@@ -434,7 +425,6 @@ class ExecutionEngine:
                 for c in all_pcs:
                     s.add(c)
                 result_str = str(s.check())
-                # Cache the merge result
                 if merge_cache_key and manager and manager.cache:
                     try:
                         manager.cache.set(merge_cache_key, result_str)
@@ -442,8 +432,8 @@ class ExecutionEngine:
                         pass
                 if result_str != "sat":
                     continue
-            yielded_count += 1
-            yield {"pc": all_pcs, "store": all_stores}
+            results.append({"pc": all_pcs, "store": all_stores})
+        return results
 
     def execute_sv(self, visitor, modules, manager: Optional[ExecutionManager], num_cycles: int) -> None:
         """Main entry point for PySlang execution
@@ -694,37 +684,34 @@ class ExecutionEngine:
         print(f"  Found {n_total} assertion(s), {n_with_z3} with Z3 expressions", flush=True)
 
         print("Phase: explore_block (per-module)", flush=True)
+        # Per paper §3.3: explore full path tree per always block; materialize list per block
         block_results = {}
         for module_name in keys:
             state_template = state.fresh_for_block(module_name, base_store[module_name])
-            # List of generators (one per block); no per-block materialization
             block_results[module_name] = [
                 self.explore_block(visitor, manager, state_template, module_name, cfg, modules_dict)
                 for cfg in cfgs_by_module[module_name]
             ]
 
-        print("Phase: merge_block_results (per-module, streaming)", flush=True)
-        # No per-module materialization: merge is a generator; cross-module product uses factories
-        def make_merge_gen(module_name):
-            """Return a callable that yields a fresh merge generator for this module."""
-            return lambda: self.merge_block_results_streaming(
-                block_results[module_name], module_name, manager=manager)
-
+        print("Phase: merge_block_results (per-module, Paper §4.3)", flush=True)
+        # Per paper: combine path fragments with SMT; materialize list of feasible merged results per module
+        merged_by_module = {}
         for idx, module_name in enumerate(keys):
             n_blocks = len(block_results[module_name])
-            print(f"  merge {module_name} ({idx+1}/{len(keys)}): {n_blocks} blocks (streaming)", flush=True)
+            print(f"  merge {module_name} ({idx+1}/{len(keys)}): {n_blocks} blocks", flush=True)
+            merged_by_module[module_name] = self.merge_block_results(
+                block_results[module_name], module_name, manager=manager)
+            print(f"    -> {len(merged_by_module[module_name])} feasible merged paths", flush=True)
 
-        print("Phase: cross-module path iteration (streaming)", flush=True)
-        # Per-module: product of num_cycles fresh merge runs (no materialization)
-        per_module_cycle_iter = [
-            product(*(make_merge_gen(m)() for _ in range(int(num_cycles))))
+        print("Phase: cross-module path iteration", flush=True)
+        # Product of (per-module merged list × num_cycles) across modules; then iterate
+        per_module_cycle_lists = [
+            list(product(merged_by_module[m], repeat=int(num_cycles)))
             for m in keys
         ]
-        path_combo_gen = product(*per_module_cycle_iter)
         path_combo_iteration = 0
 
-        for path_combo in path_combo_gen:
-            # Stop iterating cross-module combinations if a timeout was requested.
+        for path_combo in product(*per_module_cycle_lists):
             if getattr(self, "timeout", False):
                 break
             path_combo_iteration += 1
