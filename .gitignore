@@ -1,4 +1,5 @@
 parser_testing/
+venv/
 
 .vscode/*
 __pycache__/*
