@@ -14,8 +14,6 @@ import redis
 import threading
 import time
 
-from helpers.rvalue_to_z3 import parse_expr_to_Z3
-
 gc.collect()
 
 with open('errors.log', 'w'):
@@ -72,7 +70,7 @@ def main():
                          default=[], help="Macro Definition")
     optparser.add_option("-B", "--debug", action="store_true", dest="showdebug", help="Debug Mode")
     optparser.add_option("-t", "--top", dest="topmodule",
-                         default="top", help="Top module, Default=top")
+                         default=None, help="Top module name (filters topInstances to this one)")
     optparser.add_option("--nobind", action="store_true", dest="nobind",
                          default=False, help="No binding traversal, Default=False")
     optparser.add_option("--noreorder", action="store_true", dest="noreorder",
@@ -120,10 +118,28 @@ def main():
         if not os.path.exists(f):
             raise IOError("file not found: " + f)
 
-    # If more than one file, create a .F file listing all files
-    if len(filelist) > 1:
+    # Create a .F file listing all source files (pyslang expects command files, not source files directly).
+    # If the single argument is already a .F/.f file, use it as the file list; otherwise write filelist.F.
+    # Include paths (-I) are written as +incdir+<path> lines.
+    if len(filelist) == 1 and (filelist[0].endswith('.F') or filelist[0].endswith('.f')):
+        if not os.path.exists(filelist[0]):
+            raise IOError("file list not found: " + filelist[0])
+        # If user-provided .F file and we have includes, prepend them to a new file
+        if options.include:
+            with open(filelist[0], 'r') as orig:
+                orig_content = orig.read()
+            flist_path = "filelist.F"
+            with open(flist_path, "w") as flist:
+                for inc in options.include:
+                    flist.write(f"+incdir+{inc}\n")
+                flist.write(orig_content)
+            filelist = [flist_path]
+    elif len(filelist) >= 1:
         flist_path = "filelist.F"
         with open(flist_path, "w") as flist:
+            if options.include:
+                for inc in options.include:
+                    flist.write(f"+incdir+{inc}\n")
             for f in filelist:
                 flist.write(f + "\n")
         filelist = [flist_path]
@@ -140,7 +156,6 @@ def main():
         driver.parseAllSources()
         
         compilation = driver.createCompilation()
-        modules =  compilation.getDefinitions()
 
         # pyslang 9.x has runFullCompilation; 7.x has reportCompilation
         if hasattr(driver, 'runFullCompilation'):
@@ -149,20 +164,32 @@ def main():
             successful_compilation = driver.reportCompilation(compilation, False)
         
         if successful_compilation:
-            #print(driver.reportMacros())
-            my_visitor_for_symbol = SymbolicDFS(num_cycles)
-            #delegate method from z3Visitor
-            my_visitor_for_symbol.expr_to_z3 = lambda m, s, e: parse_expr_to_Z3(e, s, m)
+            root = compilation.getRoot()
+            top_instances = root.topInstances
 
-            symbol_visitor = SlangSymbolVisitor() #Post processor visitor -> doesn't depend on the num_cycles
+            if options.topmodule:
+                filtered = [t for t in top_instances if t.name == options.topmodule]
+                if not filtered:
+                    all_names = [t.name for t in top_instances]
+                    print(f"ERROR: --top '{options.topmodule}' not found in topInstances: {all_names}",
+                          file=sys.stderr, flush=True)
+                    exit(1)
+                top_instances = filtered
+                print(f"--top: filtered to {options.topmodule} "
+                      f"(skipping {len(root.topInstances) - 1} other top-level modules)",
+                      flush=True)
+
+            my_visitor_for_symbol = SymbolicDFS(num_cycles)
+
+            symbol_visitor = SlangSymbolVisitor()
 
             # Store global refs for timeout reporting
             global _engine_ref, _start_time_ref
             _engine_ref = engine
             _start_time_ref = start
 
-            engine.execute_sv(my_visitor_for_symbol, modules, None, num_cycles)
-            symbol_visitor.visit(modules)
+            engine.execute_sv(my_visitor_for_symbol, top_instances, None, num_cycles)
+            symbol_visitor.visit(top_instances)
             print(symbol_visitor.branch_points, flush=True)
             print(symbol_visitor.paths, flush=True)
 

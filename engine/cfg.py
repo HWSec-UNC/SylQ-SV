@@ -1,24 +1,11 @@
 """Converts PySlang AST (representing SystemVerilog) into executable CFG structure that enables path exploration"""
-from math import comb
 from operator import indexOf
-import z3
-from z3 import Solver, Int, BitVec, Context, BitVecSort, ExprRef, BitVecRef, If, BitVecVal, And
-from .execution_manager import ExecutionManager
-from .symbolic_state import SymbolicState
 import os
-from optparse import OptionParser
-from typing import Optional
-import random, string
-import time
-import gc
-from itertools import product, permutations, combinations
-import logging
-from helpers.utils import to_binary
-import sys
 import networkx as nx
 import matplotlib.pyplot as plt
 import pyslang as ps
-from pyslang import ConditionalStatementSyntax, DataDeclarationSyntax
+from .basic_block_visitor import BasicBlockVisitor
+from helpers.visitor_helpers import handles, build_lookup_table
 
 class CFG:
     """Represents the control flow graph of a module/always block"""
@@ -45,15 +32,17 @@ class CFG:
         # indices of basic blocks that need to connect to dummy exit node
         self.leaves = set()
 
-        # Paths: streamed via get_paths(); count cached via get_path_count()
-        self._paths_graph = None  # set in build_cfg
-        self._path_count = None   # cached count (computed on first get_path_count())
+        #paths... list of paths with start and end being the dummy nodes
+        self.paths = []
 
         # name corresponding to the module. there could be multiple always blocks (or CFGS) per module
         self.module_name = ""
 
-        # Whether this CFG represents an always_comb block (Paper §4.4)
+        # Whether this CFG represents combinational (always_comb) or sequential logic
         self.is_combinational = False
+
+        # NetworkX DiGraph built by build_cfg; used by compute_direction
+        self.graph = None
 
         # Decl nodes outside the always block to be executed once up front for all paths
         self.decls = []
@@ -63,7 +52,7 @@ class CFG:
 
         # the nodes in the AST that correspond to always blocks
         self.always_blocks = []
-        # Separate lists for always_comb blocks (Paper §4.4)
+        # always_comb / always_latch blocks (Paper §4.4 piecewise optimisation)
         self.always_comb_blocks = []
 
         # branch-point set
@@ -79,387 +68,303 @@ class CFG:
         #submodules defined
         self.submodules = []
 
+        # InstanceBodySymbol for the module being analyzed; set by get_always_sv
+        self._instance_body = None
+
+        # Visitor for partitioning and building basic blocks
+        self.basic_block_visitor = BasicBlockVisitor(self)
+
     def reset(self):
         """Return to defaults."""
         self.__init__()
-        """self.basic_block_list = []
-        self.curr_idx = 0
-        self.all_nodes = []
-        self.partition_points = set()
-        self.partition_points.add(0)
-        self.edgelist = []
-        self.cfg_edges = []
-        self.leaves = set()
-        self._paths_graph = None
-        self._path_count = None
-        self.always_blocks = []
-        self.ind_branch_points = {1: set()}
-        self.block_smt = [False]
-        self.block_stmt_depth = 0"""
 
-    def compute_direction(self, path):
-        """Given a path, figure out the direction"""
-        directions = []
-        for i in range(1, len(path)-1):
-            if path[i] + 1 == path[i + 1]:
-                directions.append(1)
-            else:
-                directions.append(0)
-        return directions
-    
-    def resolve_independent_branch_pts(self, idx):
-        """After visiting a basic block, form edges between the branching points at that same level."""
-        if len(self.ind_branch_points[idx]) <= 1:
-            return 
+    def get_always_sv(self, ast):
+        """
+        Extracts always blocks from PySlang AST using the always block visitor. The visitor
+        will populate our lists of always blocks, declarations, and
+        combinational logic statements automatically.
+        """
+        self._instance_body = ast
+        visitor = AlwaysBlockVisitor(
+            self.always_blocks, self.always_comb_blocks, self.decls, self.comb,
+        )
+        ast.visit(visitor)
 
-        res = list(combinations(self.ind_branch_points[idx], r=len(self.ind_branch_points[idx])))
+    def build_cfg(self, always_block):
+        """Build networkx digraph / CFG for the Statement body of a ProceduralBlock symbol."""
 
-        self.edgelist += res 
+        # Give the visitor the module scope so it can evaluate loop bounds
+        self.basic_block_visitor._scope = self._instance_body
 
+        # finds all edges and partition points in the always block for the CFG
+        always_block.visit(self.basic_block_visitor)
 
-    def _is_always_comb(self, ast):
-        """Check if a ProceduralBlockSyntax represents an always_comb block."""
-        if ast is None:
-            return False
-        # Check the SyntaxKind
-        kind = getattr(ast, 'kind', None)
-        if kind is not None:
-            kind_name = str(kind)
-            if 'AlwaysComb' in kind_name:
-                return True
-        # Check keyword text
-        keyword = getattr(ast, 'keyword', None)
-        if keyword is not None:
-            kw_str = str(keyword).strip().lower()
-            if 'always_comb' in kw_str:
-                return True
-        # Check string representation
-        ast_str = str(getattr(ast, 'toString', lambda: '')() if callable(getattr(ast, 'toString', None)) else '')
-        if 'always_comb' in ast_str.lower():
-            return True
-        return False
+        # Partitions the nodes into basic blocks
+        # The partition points are the first node in each basic block
+        self._partition()
 
-    def get_always_sv(self, m: ExecutionManager, s: SymbolicState, ast):
-        """Extracts always blocks from PySlang AST.
-        Distinguishes always_comb blocks for piecewise optimization (Paper §4.4)."""
-        if (ast != None and isinstance(ast, ps.DefinitionSymbol)):
-            self.get_always_sv(m, s, ast.syntax)
-            return
+        # Finds the paths between basic blocks
+        self._make_paths()
 
-        if isinstance(ast, ps.ModuleDeclarationSyntax):
-            for mem in ast.members:
-                self.get_always_sv(m, s, mem)
-            return
+        G = nx.DiGraph()
+        for block in self.basic_block_list:
+            G.add_node(indexOf(self.basic_block_list, block), data=tuple(block))
 
-        if hasattr(ast, '__iter__'):
-            if ast.__class__.__name__ == "ProceduralBlockSyntax":
-                if self._is_always_comb(ast):
-                    self.always_comb_blocks.append(ast)
-                else:
-                    self.always_blocks.append(ast)
-            elif ast.__class__.__name__ == "ConditionalStatementSyntax":
-                self.get_always_sv(m, s, ast.statement) 
-                self.get_always_sv(m, s, ast.elseClause)
-            elif ast.__class__.__name__ == "CaseStatementSyntax":
-                return self.get_always_sv(m, s, ast.items)
-            elif ast.__class__.__name__ == "ForLoopStatementSyntax":
-                return self.get_always_sv(m, s, ast.statement)
-            elif ast.__class__.__name__ == "BlockStatementSyntax":
-                self.get_always_sv(m, s, ast.items)
-            else:
-                if isinstance(ast, ps.ConditionalStatementSyntax):
-                    then_body = getattr(ast, "ifTrue", getattr(ast, "statement", None))
-                    else_clause = getattr(ast, "elseClause", None)
-                    else_body = getattr(else_clause, "statement", None) if else_clause is not None else None
-                    self.get_always_sv(m, s, then_body)
-                    self.get_always_sv(m, s, else_body)
-                elif isinstance(ast, ps.CaseStatementSyntax):
-                    self.get_always_sv(m, s, ast.items)
-                elif isinstance(ast, ps.ForLoopStatementSyntax):
-                    self.get_always_sv(m, s, ast.statement)
-                elif isinstance(ast, ps.BlockStatementSyntax):
-                    self.get_always_sv(m, s, ast.items)
-                elif isinstance(ast, ps.ProceduralBlockSyntax):
-                    if self._is_always_comb(ast):
-                        self.always_comb_blocks.append(ast)
-                    else:
-                        self.always_blocks.append(ast)
-                elif isinstance(ast, ps.StatementSyntax):
-                    self.get_always_sv(m, s, ast.statement)
-                else:
-                    if isinstance(ast, ps.DataDeclarationSyntax):
-                        self.decls.append(ast)
-                    elif isinstance(ast, ps.ContinuousAssignSyntax):
-                        self.comb.append(ast)
-                    ...
-        elif ast != None:
-            # print(f"ast ! {ast.definitionKind} {dir(ast)}")
-            # print(type(ps.DefinitionSymbol))
-            # print(type(ast) == type(ps.DefinitionSymbol))
-            # print(type(ast))
-            if isinstance(ast, ps.ConditionalStatementSyntax):
-                #print("11")
-                then_body = getattr(ast, "ifTrue", getattr(ast, "statement", None))
-                else_clause = getattr(ast, "elseClause", None)
-                else_body = getattr(else_clause, "statement", None) if else_clause is not None else None
-                self.get_always_sv(m, s, then_body)
-                self.get_always_sv(m, s, else_body)
-            elif isinstance(ast, ps.CaseStatementSyntax):
-                #print("12")
-                #self.get_always(m, s, ast.caseStatements)
-                self.get_always_sv(m, s, ast.items)
-            elif isinstance(ast, ps.CaseItemSyntax):
-                #print("13")
-                body = getattr(ast, "statements", getattr(ast, "statement", None))
-                self.get_always_sv(m, s, body)
-            elif isinstance(ast, ps.ForLoopStatementSyntax):
-                #print("14")
-                self.get_always_sv(m, s, ast.statement)
-            elif isinstance(ast, ps.BlockStatementSyntax):
-                #print("15")
-                self.get_always_sv(m, s, ast.items)
-            elif isinstance(ast, ps.ProceduralBlockSyntax):
-                #print("16")
-                if self._is_always_comb(ast):
-                    self.always_comb_blocks.append(ast)
-                else:
-                    self.always_blocks.append(ast)
-            # elif isinstance(ast, ps.InitialConstructSyntax):
-            #     self.get_always(m, s, ast.statement)
-            elif isinstance(ast, ps.StatementSyntax):
-                #print("17")
-                self.get_always_sv(m, s, ast.statement)
-            else:
-                #print("18")
-                if isinstance(ast, ps.DataDeclarationSyntax):
-                    self.decls.append(ast)
-                elif isinstance(ast, ps.ContinuousAssignSyntax):
-                    self.comb.append(ast)
-                # elif isinstance(ast, ps.HierarchicalReference):
-                #     print("FOUND SUBModule!")
-                ...
+        G.add_node(-1, data="Dummy Start")
+        G.add_node(-2, data="Dummy End")
 
-    def _process_conditional_sv(self, m: ExecutionManager, s: SymbolicState, parent_idx: int, node) -> None:
-        """Handle ConditionalStatementSyntax nodes, including nested else-if chains."""
-        then_body = getattr(node, "ifTrue", getattr(node, "statement", None))
-        else_clause = getattr(node, "elseClause", None)
-        else_body = None
-        if else_clause is not None:
-            else_body = getattr(else_clause, "statement", getattr(else_clause, "clause", None))
+        for block1, block2, condition in self.cfg_edges:
+            G.add_edge(block1, block2, condition=condition)
 
-        # Process the true branch
-        then_start_idx = self.curr_idx
-        self.partition_points.add(self.curr_idx)
-        self.basic_blocks_sv(m, s, then_body)
-        if self.curr_idx == then_start_idx:
-            # Empty branch: allocate a dummy node so the edge has a destination
-            self.all_nodes.append(None)
-            self.curr_idx += 1
-        self.edgelist.append((parent_idx, then_start_idx))
+        G.add_edge(-1, 0)
 
-        if else_body is None:
-            return
+        # Connect dangling control-flow edges (e.g. if-without-else false
+        # branches) to the exit node BEFORE computing leaves so _find_leaves
+        # won't duplicate them.
+        exit_connected = set()
+        for (node_idx, condition) in self.basic_block_visitor.edge_stack:
+            bb = self._find_basic_block(node_idx)
+            G.add_edge(bb, -2, condition=condition)
+            exit_connected.add(bb)
 
-        if isinstance(else_body, ps.ConditionalStatementSyntax):
-            # Nested else-if: treat the nested conditional as its own node
-            nested_parent_idx = self.curr_idx
-            self.all_nodes.append(else_body)
-            self.partition_points.add(self.curr_idx)
-            self.curr_idx += 1
-            self.edgelist.append((parent_idx, nested_parent_idx))
-            self._process_conditional_sv(m, s, nested_parent_idx, else_body)
-        else:
-            else_start_idx = self.curr_idx
-            self.partition_points.add(self.curr_idx)
-            self.basic_blocks_sv(m, s, else_body)
-            if self.curr_idx == else_start_idx:
-                # Empty else branch: allocate a dummy node to terminate this path
-                self.all_nodes.append(None)
-                self.curr_idx += 1
-            self.edgelist.append((parent_idx, else_start_idx))
+        self._find_leaves()
+        for leaf in self.leaves:
+            if leaf not in exit_connected:
+                G.add_edge(leaf, -2)
 
-    def basic_blocks_sv(self, m:ExecutionManager, s: SymbolicState, ast):
-        """We want to get a list of AST nodes partitioned into basic blocks.
-        Need to keep track of children/parent indices of each block in the list."""
-        if hasattr(ast, '__iter__'):
-            for item in ast:
-                if self.block_smt[self.block_stmt_depth] and (isinstance(item, ps.ConditionalStatementSyntax) or isinstance(item, ps.CaseStatementSyntax) or isinstance(item, ps.ForLoopStatementSyntax)):
-                    if not self.block_stmt_depth in self.ind_branch_points:
-                        self.ind_branch_points[self.block_stmt_depth] = set()
+        self.graph = G
 
-                    self.ind_branch_points[self.block_stmt_depth].add(self.curr_idx)
+        # TODO: Will this materialization blow up memory?
+        # Should restore lazy generator-based path enumeration for large designs.
+        self.paths = list(nx.all_simple_paths(G, source=-1, target=-2))
 
-                if isinstance(item, ps.ConditionalStatementSyntax):
-                    self.all_nodes.append(item)
-                    self.partition_points.add(self.curr_idx)
-                    parent_idx = self.curr_idx
-                    self.curr_idx += 1
-
-                    self._process_conditional_sv(m, s, parent_idx, item)
-                
-                elif isinstance(item, ps.CaseStatementSyntax):
-                    #self.all_nodes.append(ast)
-                    self.all_nodes.append(item)
-                    self.partition_points.add(self.curr_idx)
-                    self.curr_idx += 1
-                    #self.basic_blocks_sv(m, s, item.caselist) 
-                    self.basic_blocks_sv(m, s, item.items)
-                elif isinstance(item, ps.CaseItemSyntax):
-                    body = getattr(item, "statements", getattr(item, "statement", None))
-                    self.basic_blocks_sv(m, s, body)
-
-
-                elif isinstance(item, ps.ForLoopStatementSyntax):
-                    self.all_nodes.append(item)
-                    #self.all_nodes.append(ast)
-                    self.partition_points.add(self.curr_idx)
-                    self.curr_idx += 1
-                    self.basic_blocks_sv(m, s, item.statement) 
-                elif isinstance(item, ps.BlockStatementSyntax):
-                    self.basic_blocks_sv(m, s, item.items)
-                elif isinstance(item, ps.ProceduralBlockSyntax):
-                    self.all_nodes.append(item)
-                    self.curr_idx += 1
-                    self.basic_blocks_sv(m, s, item.statement)             
-                # elif isinstance(item, ps.InitialConstructSyntax):
-                #     self.all_nodes.append(item)
-                #     self.curr_idx += 1
-                #     self.basic_blocks(m, s, item.statement)
-                else:
-                    self.all_nodes.append(item)
-                    self.curr_idx += 1
-
-        elif ast != None:
-            if isinstance(ast, ps.ConditionalStatementSyntax):
-                self.partition_points.add(self.curr_idx)
-                self.all_nodes.append(ast)
-                parent_idx = self.curr_idx
-                self.curr_idx += 1
-
-                self._process_conditional_sv(m, s, parent_idx, ast)
-            elif isinstance(ast, ps.CaseStatementSyntax):
-                self.all_nodes.append(ast)
-                self.partition_points.add(self.curr_idx)
-                self.curr_idx += 1
-                self.basic_blocks_sv(m, s, ast.items)
-            elif isinstance(ast, ps.CaseItemSyntax):
-                body = getattr(ast, "statements", getattr(ast, "statement", None))
-                self.basic_blocks_sv(m, s, body)
-            elif isinstance(ast, ps.ForLoopStatementSyntax):
-                self.all_nodes.append(ast)
-                self.partition_points.add(self.curr_idx)
-                self.curr_idx += 1
-                self.basic_blocks_sv(m, s, ast.statement)
-            elif isinstance(ast, ps.BlockStatementSyntax):
-                self.block_stmt_depth += 1
-                self.block_smt.append(True)
-                self.basic_blocks_sv(m, s, ast.items)
-                if self.block_stmt_depth in self.ind_branch_points:
-                    self.resolve_independent_branch_pts(self.block_stmt_depth)
-                self.block_smt.pop()
-                self.block_stmt_depth -= 1
-            elif isinstance(ast, ps.ProceduralBlockSyntax):
-                self.all_nodes.append(ast)
-                self.curr_idx += 1
-                self.basic_blocks_sv(m, s, ast.statement)
-            else:
-                self.all_nodes.append(ast)
-                self.curr_idx += 1
-
-    def get_paths(self):
-        """Return a fresh generator over all simple paths (start -> end). Streams paths; no materialization."""
-        if self._paths_graph is None:
-            return iter(())
-        return nx.all_simple_paths(self._paths_graph, source=-1, target=-2)
-
-    def get_path_count(self):
-        """Return number of paths. Caches count on first call (one pass over path generator)."""
-        if self._path_count is None:
-            self._path_count = sum(1 for _ in self.get_paths())
-        return self._path_count
-
-    def map_to_path(self):
-        """Return a fresh generator over paths (same as get_paths)."""
-        return self.get_paths()
-
-    def partition(self):
+    def _partition(self):
         """Partitions all_nodes into basic blocks based on partition_points"""
-        self.partition_points.add(len(self.all_nodes)-1)
-        partition_list = list(self.partition_points)
-        for i in range(len(partition_list)-1):
-            if i > 0: 
-                basic_block = self.all_nodes[partition_list[i]+1:partition_list[i+1]+1]
-                self.basic_block_list.append(basic_block)
-            else:
-                basic_block = self.all_nodes[partition_list[i]:partition_list[i+1]+1]
+        if not self.all_nodes:
+            return
+
+        sorted_points = sorted(list(self.partition_points))
+        sorted_points.append(len(self.all_nodes))
+
+        self.basic_block_list = []
+
+        for i in range(len(sorted_points) - 1):
+            start_idx = sorted_points[i]
+            end_idx = sorted_points[i+1]
+
+            # Slice from this leader to the next leader
+            basic_block = self.all_nodes[start_idx:end_idx]
+
+            if basic_block:
                 self.basic_block_list.append(basic_block)
 
-    def find_basic_block(self, node_idx) -> int:
+    def _make_paths(self):
+        """Map the edge between AST nodes to a path between basic blocks."""
+        for (node1, node2, condition) in self.edgelist:
+            block1 = self._find_basic_block(node1)
+            block2 = self._find_basic_block(node2)
+
+            if block1 != block2:
+                self.cfg_edges.append((block1, block2, condition))
+
+    def _find_basic_block(self, node_idx):
         """Given a node index, find the index of the basic block that we're in."""
         if node_idx < len(self.all_nodes):
             node = self.all_nodes[node_idx]
         else:
             node = self.all_nodes[len(self.all_nodes)-1]
-        found_block = None
+
         for block in self.basic_block_list:
             if node in block:
-                found_block = indexOf(self.basic_block_list, block)
-                return found_block
+                return indexOf(self.basic_block_list, block)
 
-    def make_paths(self):
-        """Map the edge between AST nodes to a path between basic blocks."""
-        for edge in self.edgelist:
-            block1 = self.find_basic_block(edge[0])
-            block2 = self.find_basic_block(edge[1])
-            path = (block1, block2)
-            self.cfg_edges.append(path)
+        raise ValueError(
+            f"Node index {node_idx} not found in any basic block "
+            f"(all_nodes length={len(self.all_nodes)}, "
+            f"basic_block_list length={len(self.basic_block_list)})"
+        )
 
-    def find_leaves(self):
+    def _find_leaves(self):
         """Find leaves in cfg, to know which nodes need to connect to dummy exit."""
-        starts = set(edge[0] for edge in self.cfg_edges)
-        ends = set(edges[1] for edges in self.cfg_edges)
-        self.leaves = ends - starts
+        if self.cfg_edges:
+            starts = set(edge[0] for edge in self.cfg_edges)
+            ends = set(edge[1] for edge in self.cfg_edges)
+            self.leaves = ends - starts
+        elif self.basic_block_list:
+            self.leaves = {len(self.basic_block_list) - 1}
+        else:
+            self.leaves = set()
 
-    def display_cfg(self, graph):
-        """Display CFG."""
-        subax1 = plt.subplot(121)
-        nx.draw(graph, with_labels=True, font_weight='bold')
-        plt.show()
+    def get_paths(self):
+        """Return an iterator over all CFG paths (backward-compat wrapper)."""
+        return iter(self.paths)
 
-    def build_cfg(self, m: ExecutionManager, s: SymbolicState):
-        """Build networkx digraph."""
-        self.make_paths()
-        # print(self.basic_block_list)
-        # print(self.cfg_edges)
+    def get_path_count(self):
+        """Return the number of paths in the CFG (backward-compat wrapper)."""
+        return len(self.paths)
 
-        G = nx.DiGraph()
-        for block in self.basic_block_list:
-            # converts the list into a tuple. Needs to be hashable type
-            G.add_node(indexOf(self.basic_block_list, block), data=tuple(block))
-        
-        G.add_node(-1, data="Dummy Start")
-        G.add_node(-2, data="Dummy End")
+    def compute_direction(self, path):
+        """Derive a direction value for each real basic block from edge conditions.
 
-        for edge in self.cfg_edges:
-            start = edge[0]
-            end = edge[1]
-            G.add_edge(start, end)
-        
-        # edgecase lol
-        if self.edgelist == []:
-            G.add_edge(0, -2)
+        Returns a list aligned with the non-negative nodes in *path*.
+        Mapping: 'true' → 1, 'false' → 0, None (sequential) → 1, other → label.
+        """
+        if self.graph is None:
+            return []
+        directions = []
+        for i in range(len(path)):
+            if path[i] < 0:
+                continue
+            if i > 0:
+                edge_data = self.graph.get_edge_data(path[i - 1], path[i])
+                if edge_data:
+                    cond = edge_data.get('condition')
+                    if cond == 'true':
+                        directions.append(1)
+                    elif cond == 'false':
+                        directions.append(0)
+                    elif cond is None:
+                        directions.append(1)
+                    else:
+                        directions.append(cond)
+                else:
+                    directions.append(1)
+            else:
+                directions.append(1)
+        return directions
 
-        # link up dummy start
-        G.add_edge(-1, 0)
-        self.find_leaves()
-        
-        # link of dummy exit
-        for leaf in self.leaves:
-            G.add_edge(leaf, -2)
+    def _print_simple_paths_with_conditions(self, G, paths):
+        for i, path in enumerate(paths):
+            print(f"\n--- Path {i} ---")
+            path_str = ""
 
-        #print(G.edges())
+            for j in range(len(path) - 1):
+                u, v = path[j], path[j+1]
 
-        #self.display_cfg(G)
+                edge_data = G.get_edge_data(u, v)
+                condition = edge_data.get("condition", "sequential")
+                if condition is None:
+                    condition = "sequential"
 
-        #traversed = nx.edge_dfs(G, source=-1)
-        self._paths_graph = G  # stream paths via get_paths(); no materialization
+                if condition == "true":
+                    label = "[TRUE] -> "
+                elif condition == "false":
+                    label = "[FALSE] -> "
+                elif condition == 'sequential':
+                    label = "-> "
+                else:
+                    label = f"[CASE: {condition}] -> "
+
+                path_str += f"Block({u}) {label}"
+
+            path_str += f"Block({path[-1]})"
+            print(path_str)
+
+    def save_cfg_visualization(self, G, filename="cfg_output.png"):
+        """
+        Renders the CFG using a multipartite (layered) layout and saves it.
+        """
+        plt.figure(figsize=(14, 12))
+
+        try:
+            levels = nx.shortest_path_length(G, source=-1)
+            for node, dist in levels.items():
+                G.nodes[node]['layer'] = dist
+
+            max_level = max(levels.values()) if levels else 0
+            G.nodes[-2]['layer'] = max_level + 1
+
+            pos = nx.multipartite_layout(G, subset_key="layer", align='vertical')
+
+            pos = {node: (coords[1], -coords[0]) for node, coords in pos.items()}
+
+        except (nx.NetworkXNoPath, nx.NodeNotFound):
+            pos = nx.spring_layout(G, seed=42)
+
+        color_map = []
+        for node in G.nodes():
+            if node == -1: color_map.append('limegreen')
+            elif node == -2: color_map.append('tomato')
+            else: color_map.append('skyblue')
+
+        nx.draw_networkx_nodes(G, pos, node_size=1200, node_color=color_map, edgecolors='black')
+        nx.draw_networkx_labels(G, pos, font_size=10, font_weight='bold')
+
+        nx.draw_networkx_edges(
+            G, pos,
+            arrowstyle='->',
+            arrowsize=20,
+            edge_color='gray',
+            width=1.5,
+            connectionstyle="arc3,rad=0.1"
+        )
+
+        edge_labels = {}
+        for u, v, data in G.edges(data=True):
+            cond = data.get('condition')
+            if cond is not None:
+                edge_labels[(u, v)] = str(cond)
+
+        nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_color='darkred', font_size=9)
+
+        plt.title(f"Multipartite CFG: {filename}", pad=20)
+        plt.axis('off')
+
+        file_ext = os.path.splitext(filename)[1][1:]
+        plt.savefig(filename, format=file_ext, bbox_inches='tight', dpi=300)
+        print(f"CFG saved successfully to {os.path.abspath(filename)}")
+        plt.close()
+
+class AlwaysBlockVisitor:
+    """
+    Visitor for a pyslang InstanceBody symbol that extracts ProceduralBlock,
+    Variable/Net, and ContinuousAssign symbols from the symbol tree.
+    """
+
+    _COMB_KINDS = frozenset({
+        ps.ProceduralBlockKind.AlwaysComb,
+        ps.ProceduralBlockKind.AlwaysLatch,
+    })
+    _SKIP_KINDS = frozenset({
+        ps.ProceduralBlockKind.Initial,
+        ps.ProceduralBlockKind.Final,
+    })
+
+    def __init__(self, always_blocks, always_comb_blocks, decls, comb):
+        self.always_blocks = always_blocks
+        self.always_comb_blocks = always_comb_blocks
+        self.decls = decls
+        self.comb = comb
+        self.lookup_table = build_lookup_table(self)
+
+    def __call__(self, node):
+        """Visitor dispatcher called by pyslang. Only handles Symbol nodes."""
+        if not isinstance(node, ps.Symbol):
+            return
+        handler = self.lookup_table.get(node.kind)
+        if handler:
+            return handler(node)
+
+    ### SYMBOL HANDLERS ###
+
+    @handles(ps.SymbolKind.ProceduralBlock)
+    def handle_procedural_block(self, node: ps.Symbol):
+        """Sort procedural blocks by kind: comb vs ff/always, skip initial/final."""
+        kind = node.procedureKind
+        if kind in self._SKIP_KINDS:
+            return ps.VisitAction.Skip
+        if kind in self._COMB_KINDS:
+            self.always_comb_blocks.append(node)
+        else:
+            self.always_blocks.append(node)
+        return ps.VisitAction.Skip
+
+    @handles(ps.SymbolKind.Variable, ps.SymbolKind.Net)
+    def handle_variable(self, node: ps.Symbol):
+        """Captures data declarations."""
+        self.decls.append(node)
+
+    @handles(ps.SymbolKind.ContinuousAssign)
+    def handle_continuous_assign(self, node: ps.Symbol):
+        """Captures continuous assignments (combinational logic)."""
+        self.comb.append(node)

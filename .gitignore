@@ -1,3 +1,5 @@
+parser_testing/
+
 .vscode/*
 __pycache__/*
 *.out

@@ -5,12 +5,11 @@ from z3 import z3util
 from .execution_manager import ExecutionManager
 from .symbolic_state import SymbolicState
 from .cfg import CFG
+from .dfs_iterator import DFSMergeIterator, DFSCrossModuleIterator, partition_blocks, LazyProduct
 from typing import Optional, List
 import time
 import gc
-from itertools import product
 from helpers.utils import to_binary
-from copy import deepcopy
 import pyslang as ps
 from helpers.slang_helpers import get_module_name, init_state
 
@@ -77,82 +76,15 @@ class ExecutionEngine:
             return True
         return False
 
-    def module_count_sv(self, m: ExecutionManager, items) -> None:
-        """Traverse a top level SystemVerilog module (pyslang AST) and count instances.
-
-        This implementation uses duck-typing and classname checks so it is robust
-        across pyslang node variants. It attempts to find instantiation nodes
-        and increment m.instance_count[module_name].
-        """
-        if items is None:
+    def collect_all_instances(self, instance: ps.Symbol, out: list) -> None:
+        """Recursively collect this Instance symbol and all nested sub-instances depth-first."""
+        out.append(instance)
+        body = getattr(instance, 'body', getattr(instance, 'instanceBody', None))
+        if body is None:
             return
-
-        # If it's a plain list/tuple of nodes, recurse over each element
-        if isinstance(items, (list, tuple)):
-            for it in items:
-                self.module_count_sv(m, it)
-            return
-
-        # Normalize access: many pyslang nodes wrap a single statement under .statement
-        # e.g., ProceduralBlockSyntax -> .statement; handle that first.
-        cname = items.__class__.__name__ if hasattr(items, '__class__') else ''
-        if cname == "ProceduralBlockSyntax" and hasattr(items, 'statement'):
-            self.module_count_sv(m, items.statement)
-            return
-
-        # If the node exposes an `instances` collection (common for instantiation lists),
-        # traverse it first so nested instance lists are handled.
-        if hasattr(items, 'instances'):
-            self.module_count_sv(m, items.instances)
-
-        # Heuristic: if the class name suggests an instantiation/instance, try to extract module name
-        lower_name = cname.lower()
-        if 'instance' in lower_name or 'instantiat' in lower_name or 'moduleinst' in lower_name:
-            # Try a set of common attribute names that may hold the referenced module name/object
-            mod_name = None
-            for attr in ('module', 'module_name', 'moduleName', 'module_identifier',
-                         'moduleReference', 'module_ref', 'moduleIdentifier', 'moduleType',
-                         'type'):
-                if hasattr(items, attr):
-                    val = getattr(items, attr)
-                    if val is None:
-                        continue
-                    if isinstance(val, str):
-                        mod_name = val
-                    else:
-                        # attempt to extract a name from an identifier node
-                        mod_name = getattr(val, 'name', None) or getattr(val, 'identifier', None) or str(val)
-                    break
-
-            # If we couldn't find a direct attribute, some pyslang instantiation nodes
-            # keep the module reference under a nested template like `.module` or `.moduleName`
-            if not mod_name:
-                # inspect all attributes for something that looks like a module identifier
-                for a in dir(items):
-                    if 'module' in a.lower() or 'instance' in a.lower():
-                        val = getattr(items, a)
-                        if isinstance(val, str):
-                            mod_name = val
-                            break
-                        if hasattr(val, 'name'):
-                            mod_name = getattr(val, 'name')
-                            break
-
-            if mod_name:
-                m.instance_count[mod_name] = m.instance_count.get(mod_name, 0) + 1
-
-            # If the instantiation node also contains nested children, traverse them
-            for child_attr in ('items', 'statements', 'statement', 'instances', 'children', 'body'):
-                if hasattr(items, child_attr):
-                    self.module_count_sv(m, getattr(items, child_attr))
-            return
-
-        # Otherwise, descend into common container attributes to find nested instantiations
-        for attr in ('items', 'statements', 'body', 'statement', 'declarationList', 'declarations'):
-            if hasattr(items, attr):
-                child = getattr(items, attr)
-                if child is not None:
-                    self.module_count_sv(m, child)
+        for member in body:
+            if member.kind == ps.SymbolKind.Instance:
+                self.collect_all_instances(member, out)
 
 
 
@@ -196,20 +128,10 @@ class ExecutionEngine:
                 manager.abandon = False
                 path_state = state_template.fresh_for_block(module_name,
                     state_template.snapshot(module_name))
-                directions = cfg.compute_direction(path)
-                k = 0
-                for bb_idx in path:
-                    if bb_idx < 0:
-                        continue
-                    direction = directions[k] if k < len(directions) else 1
-                    k += 1
-                    basic_block = cfg.basic_block_list[bb_idx]
-                    for stmt in basic_block:
-                        manager._pc_ref = path_state.pc
-                        try:
-                            visitor.visit_stmt(manager, path_state, stmt, modules_dict, direction)
-                        finally:
-                            manager._pc_ref = None
+
+                self._execute_cfg_path(visitor, manager, path_state, module_name,
+                                       cfg, path, modules_dict)
+
                 try:
                     constraints = list(path_state.pc.assertions())
                 except Exception:
@@ -228,6 +150,130 @@ class ExecutionEngine:
             if hasattr(manager, '_pc_ref'):
                 manager._pc_ref = None
         return results
+
+    def _execute_cfg_path(self, visitor, manager, path_state, module_name, cfg, path, modules_dict):
+        """Execute a single CFG path: add edge constraints to pc and run assignment statements."""
+
+        prev_bb_idx = None
+        for bb_idx in path:
+            if bb_idx == -1:
+                prev_bb_idx = bb_idx
+                continue
+            if bb_idx == -2:
+                # Exit node: handle trailing condition from previous condition BB
+                if prev_bb_idx is not None and prev_bb_idx >= 0:
+                    edge_data = cfg.graph.get_edge_data(prev_bb_idx, -2)
+                    if edge_data:
+                        self._assert_edge_condition(
+                            edge_data, cfg, prev_bb_idx, path_state, manager)
+                break
+
+            # Add constraint from the incoming edge
+            if prev_bb_idx is not None:
+                edge_data = cfg.graph.get_edge_data(prev_bb_idx, bb_idx)
+                if edge_data:
+                    self._assert_edge_condition(
+                        edge_data, cfg, prev_bb_idx, path_state, manager)
+
+            # Execute statements in this BB (skip bare condition Expression nodes)
+            basic_block = cfg.basic_block_list[bb_idx]
+            for stmt in basic_block:
+                if isinstance(stmt, ps.Expression):
+                    continue
+                manager._pc_ref = path_state.pc
+                try:
+                    visitor.visit_stmt(manager, path_state, stmt, modules_dict, 1)
+                finally:
+                    manager._pc_ref = None
+
+            prev_bb_idx = bb_idx
+
+    @staticmethod
+    def _to_bool(z3_expr):
+        """Coerce a Z3 expression to BoolRef. BitVec values become (val != 0)."""
+        from z3 import BoolRef, BitVecRef, BitVecVal, ArithRef, IntVal
+        if isinstance(z3_expr, BoolRef):
+            return z3_expr
+        if isinstance(z3_expr, BitVecRef):
+            return z3_expr != BitVecVal(0, z3_expr.size())
+        if isinstance(z3_expr, ArithRef):
+            return z3_expr != IntVal(0)
+        return z3_expr != 0
+
+    def _assert_edge_condition(self, edge_data, cfg, source_bb_idx, path_state, manager):
+        """Add a Z3 constraint to path_state.pc based on a CFG edge condition."""
+        import z3
+        from z3 import Not, Or, And
+        from helpers.rvalue_to_z3 import semantic_expr_to_z3
+        from engine.basic_block_visitor import CaseLabel, DefaultLabel
+
+        cond = edge_data.get('condition')
+        if cond is None:
+            return
+
+        if source_bb_idx < 0:
+            return
+        source_bb = cfg.basic_block_list[source_bb_idx]
+        cond_expr_node = None
+        for node in source_bb:
+            if isinstance(node, ps.Expression):
+                cond_expr_node = node
+                break
+        if cond_expr_node is None:
+            return
+
+        module = manager.curr_module
+        store = path_state.store.get(module, {})
+        cond_z3 = semantic_expr_to_z3(cond_expr_node, store, module)
+        if cond_z3 is None:
+            return
+
+        from z3 import BoolRef, BitVecRef, ArithRef
+        if not isinstance(cond_z3, (BoolRef, BitVecRef, ArithRef)):
+            return
+
+        path_state.assertion_counter += 1
+        tag = "cfg_p{}".format(path_state.assertion_counter)
+
+        try:
+            if cond == 'true':
+                path_state.pc.assert_and_track(self._to_bool(cond_z3), tag)
+            elif cond == 'false':
+                path_state.pc.assert_and_track(Not(self._to_bool(cond_z3)), tag)
+            elif isinstance(cond, CaseLabel):
+                item_z3s = []
+                for item_expr in cond:
+                    item_z3 = semantic_expr_to_z3(item_expr, store, module)
+                    if item_z3 is not None and isinstance(item_z3, (BoolRef, BitVecRef, ArithRef)):
+                        if isinstance(cond_z3, BitVecRef) and isinstance(item_z3, BitVecRef):
+                            if cond_z3.size() != item_z3.size():
+                                tgt = max(cond_z3.size(), item_z3.size())
+                                c = cond_z3 if cond_z3.size() == tgt else z3.ZeroExt(tgt - cond_z3.size(), cond_z3)
+                                i = item_z3 if item_z3.size() == tgt else z3.ZeroExt(tgt - item_z3.size(), item_z3)
+                                item_z3s.append(c == i)
+                                continue
+                        item_z3s.append(cond_z3 == item_z3)
+                if item_z3s:
+                    constraint = item_z3s[0] if len(item_z3s) == 1 else Or(*item_z3s)
+                    path_state.pc.assert_and_track(constraint, tag)
+            elif isinstance(cond, DefaultLabel):
+                neg_z3s = []
+                for item_expr in cond.get('default_from', []):
+                    item_z3 = semantic_expr_to_z3(item_expr, store, module)
+                    if item_z3 is not None and isinstance(item_z3, (BoolRef, BitVecRef, ArithRef)):
+                        if isinstance(cond_z3, BitVecRef) and isinstance(item_z3, BitVecRef):
+                            if cond_z3.size() != item_z3.size():
+                                tgt = max(cond_z3.size(), item_z3.size())
+                                c = cond_z3 if cond_z3.size() == tgt else z3.ZeroExt(tgt - cond_z3.size(), cond_z3)
+                                i = item_z3 if item_z3.size() == tgt else z3.ZeroExt(tgt - item_z3.size(), item_z3)
+                                neg_z3s.append(c != i)
+                                continue
+                        neg_z3s.append(cond_z3 != item_z3)
+                    pass
+                if neg_z3s:
+                    path_state.pc.assert_and_track(And(*neg_z3s), tag)
+        except Exception:
+            pass
 
     def _collect_assertions(self, ast, module_name, assertions_list):
         """Recursively walk a pyslang AST and collect SVA assertion nodes.
@@ -251,7 +297,8 @@ class ExecutionEngine:
         cname = ast.__class__.__name__ if hasattr(ast, '__class__') else ''
 
         # Check for immediate assertion statements: assert(expr)
-        if cname in ('ImmediateAssertStatementSyntax', 'ImmediateAssertionMemberSyntax',
+        if cname in ('ImmediateAssertStatementSyntax', 'ImmediateAssertionStatementSyntax',
+                      'ImmediateAssertionMemberSyntax',
                       'ImmediateAssumeStatementSyntax', 'ImmediateCoverStatementSyntax'):
             source = str(getattr(ast, 'sourceRange', getattr(ast, 'toString',
                          lambda: '<unknown>'))() if callable(
@@ -302,6 +349,37 @@ class ExecutionEngine:
         if hasattr(ast, 'body'):
             self._collect_assertions(getattr(ast, 'body'), module_name, assertions_list)
 
+    def _collect_procedural_assertions(self, always_blocks, module_name, assertions_list):
+        """Walk the semantic statement trees of always blocks to find immediate assertions.
+
+        PySlang represents ``assert(expr)`` inside procedural blocks as
+        ``ImmediateAssertionStatement`` (StatementKind.ImmediateAssertion).
+        The module-level syntax walker in ``_collect_assertions`` misses these
+        because they live inside procedural block bodies, not at module scope.
+        """
+        found = []
+
+        def _visitor(node):
+            if getattr(node, 'kind', None) == ps.StatementKind.ImmediateAssertion:
+                cond = getattr(node, 'cond', None)
+                source_range = getattr(node, 'sourceRange', None)
+                source = str(source_range) if source_range else '<unknown>'
+                found.append({
+                    'node': node,
+                    'module': module_name,
+                    'source': source,
+                    'kind': 'immediate',
+                    'cond_expr': cond,
+                    'z3_expr': None,
+                })
+
+        for ab in always_blocks:
+            ab_body = getattr(ab, 'body', getattr(ab, 'statement', None))
+            if ab_body is not None:
+                ab_body.visit(_visitor)
+
+        assertions_list.extend(found)
+
     def _eval_assertion_expr(self, assertion_info, visitor, manager, state, modules_dict):
         """Attempt to evaluate the assertion node's condition/expression into a Z3 expression.
 
@@ -310,14 +388,14 @@ class ExecutionEngine:
         Sets assertion_info['z3_expr'] if successful.
         """
         node = assertion_info['node']
-        expr_node = None
+        expr_node = assertion_info.get('cond_expr')
 
-        # Try various attribute names for the assertion expression
-        for attr in ('cond', 'expr', 'condition', 'expression'):
-            if hasattr(node, attr):
-                expr_node = getattr(node, attr)
-                if expr_node is not None:
-                    break
+        if expr_node is None:
+            for attr in ('cond', 'expr', 'condition', 'expression'):
+                if hasattr(node, attr):
+                    expr_node = getattr(node, attr)
+                    if expr_node is not None:
+                        break
 
         # For concurrent assertions, try the property spec
         if expr_node is None:
@@ -367,73 +445,69 @@ class ExecutionEngine:
         return out
 
     def merge_block_results(self, block_result_lists: List[list], module_name: str = "",
-                            manager=None) -> List[dict]:
-        """Piecewise composition merge step (Paper §3.3, §4.3): combine path fragments from
-        always blocks via SMT. Returns a list of feasible merged {pc, store}. Per paper:
-        (1) combine path conditions P₁∧P₂∧... and check SAT; (2) separate QU for merge (qu_merge);
-        (3) if blocks share no symbolic variables, skip solver; (4) cache merge queries."""
+                            manager=None):
+        """Piecewise composition merge step (Paper §3.3, §4.3).
+        
+        Combines path fragments from always blocks via SMT while preserving completeness.
+        
+        Pipeline:
+        1. Partition blocks into connected components (union-find on shared variables)
+        2. Within each component: DFS merge with early pruning, slice → normalize → cache
+        3. Across components: LazyProduct (no materialization, lazy Cartesian product)
+        
+        Returns a LazyProduct (iterable, supports len()) or a plain list."""
         if not block_result_lists:
             return [{"pc": [], "store": {}}]
 
-        from .query_normalization import normalize_query_list
-
-        results = []
-        combo_count = 0
-        for combo in product(*block_result_lists):
-            combo_count += 1
-            if combo_count % 100000 == 0:
-                print(f"    merge {module_name}: checked {combo_count} combos, {len(results)} feasible", flush=True)
-
-            all_pcs = []
-            all_stores = {}
-            var_sets = []
-            for r in combo:
-                all_pcs.extend(r["pc"])
-                all_stores.update(r["store"])
-                var_sets.append(self._vars_in_pcs(r["pc"]))
-            need_solver = False
-            for i in range(len(var_sets)):
-                for j in range(i + 1, len(var_sets)):
-                    if var_sets[i] & var_sets[j]:
-                        need_solver = True
-                        break
-                if need_solver:
-                    break
-            if need_solver and all_pcs:
-                merge_cache_key = None
-                if manager and manager.cache:
-                    try:
-                        merge_cache_key = "merge:" + normalize_query_list(all_pcs)
-                        cached = manager.cache.get(merge_cache_key)
-                        if cached is not None:
-                            if cached.decode() != "sat":
-                                continue
-                            results.append({"pc": all_pcs, "store": all_stores})
-                            continue
-                    except Exception:
-                        merge_cache_key = None
-
-                if manager and manager.qu_merge is not None:
-                    for c in all_pcs:
-                        manager.qu_merge.register_constraint(c)
-
-                s = Solver()
-                try:
-                    s.set("timeout", 10000)
-                except Exception:
-                    pass
-                for c in all_pcs:
-                    s.add(c)
-                result_str = str(s.check())
-                if merge_cache_key and manager and manager.cache:
-                    try:
-                        manager.cache.set(merge_cache_key, result_str)
-                    except Exception:
-                        pass
-                if result_str != "sat":
-                    continue
-            results.append({"pc": all_pcs, "store": all_stores})
-        return results
+        groups = partition_blocks(block_result_lists)
+        n_groups = len(groups)
+        
+        if n_groups > 1:
+            total_product = 1
+            for bl in block_result_lists:
+                total_product *= max(len(bl), 1)
+            print(f"    merge {module_name}: partitioned {len(block_result_lists)} blocks "
+                  f"into {n_groups} independent groups (full product would be {total_product:,})",
+                  flush=True)
+        
+        component_results: List[List[dict]] = []
+        for group_idx, block_indices in enumerate(groups):
+            group_block_lists = [block_result_lists[i] for i in block_indices]
+            
+            if len(group_block_lists) == 1:
+                component_results.append(group_block_lists[0])
+            else:
+                dfs_iter = DFSMergeIterator(
+                    block_result_lists=group_block_lists,
+                    module_name=f"{module_name}_g{group_idx}",
+                    manager=manager,
+                    enable_early_pruning=True,
+                    enable_caching=True,
+                )
+                group_results = []
+                for idx, merged in enumerate(dfs_iter):
+                    if idx > 0 and idx % 100000 == 0:
+                        stats = dfs_iter.get_stats()
+                        print(f"    merge {module_name} group {group_idx}: yielded {idx}, "
+                              f"checked {stats['combos_checked']}, "
+                              f"pruned {stats['combos_pruned']}", flush=True)
+                    group_results.append(merged)
+                
+                stats = dfs_iter.get_stats()
+                if stats['combos_pruned'] > 0:
+                    print(f"    merge {module_name} group {group_idx}: DFS pruned "
+                          f"{stats['combos_pruned']} (cache hits: {stats['cache_hits']})",
+                          flush=True)
+                component_results.append(group_results)
+        
+        if n_groups == 1:
+            return component_results[0]
+        
+        lazy = LazyProduct(component_results)
+        print(f"    merge {module_name}: LazyProduct of {n_groups} groups, "
+              f"sizes={lazy.component_sizes}, stored={lazy.total_stored()}, "
+              f"logical_size={lazy.logical_size:,}", flush=True)
+        return lazy
 
     def execute_sv(self, visitor, modules, manager: Optional[ExecutionManager], num_cycles: int) -> None:
         """Main entry point for PySlang execution
@@ -458,152 +532,61 @@ class ExecutionEngine:
         manager.qu_merge = QuickUnion()
 
         modules_dict = {}
-        # a dictionary keyed by module name, that gives the list of cfgs
         cfgs_by_module = {}
-        for module in modules:
-            sv_module_name = get_module_name(module)
-            modules_dict[sv_module_name] = module
-            always_blocks_by_module = {sv_module_name: []}
-            manager.seen_mod[sv_module_name] = {}
-            cfgs_by_module[sv_module_name] = []
-    
-            self.module_count_sv(manager, module) 
-            if sv_module_name in manager.instance_count:
-                print(f"Module {sv_module_name} has {manager.instance_count[sv_module_name]} instances")
-                manager.instances_seen[sv_module_name] = 0
-                manager.instances_loc[sv_module_name] = ""
-                num_instances = manager.instance_count[sv_module_name]
-                cfgs_by_module.pop(sv_module_name, None)
-                for i in range(num_instances):
-                    instance_name = f"{sv_module_name}_{i}"
-                    manager.names_list.append(instance_name)
-                    cfgs_by_module[instance_name] = []
-    
-                     # 1) discover always blocks once
-                    probe = CFG()
-                    probe.get_always_sv(manager, state, module)
-    
-                    # 2) build a fresh CFG per sequential always block (SV walker)
-                    for ab in probe.always_blocks:
-                        ab_body = getattr(ab, "statement", getattr(ab, "members", ab))
-                        c = CFG()
-                        c.module_name = instance_name
-                        c.is_combinational = False
-                        c.basic_blocks_sv(manager, state, ab_body)
-                        c.partition()
-                        c.build_cfg(manager, state)
-                        cfgs_by_module[instance_name].append(c)
-    
-                    # 3) build CFGs for always_comb blocks (Paper §4.4)
-                    for ab in probe.always_comb_blocks:
-                        ab_body = getattr(ab, "statement", getattr(ab, "members", ab))
-                        c = CFG()
-                        c.module_name = instance_name
-                        c.is_combinational = True
-                        c.basic_blocks_sv(manager, state, ab_body)
-                        c.partition()
-                        c.build_cfg(manager, state)
-                        cfgs_by_module[instance_name].append(c)
-    
-    
-                    """# build X CFGx for the particular module 
-                    cfg = CFG()
-                    cfg.reset()
-                    cfg.get_always_sv(manager, state, module.items)
-                    cfg_count = len(cfg.always_blocks)
-                    for k in range(cfg_count):
-                        cfg.basic_blocks(manager, state, cfg.always_blocks[k])
-                        cfg.partition()
-                        # print(cfg.all_nodes)
-                        # print(cfg.partition_points)
-                        # print(len(cfg.basic_block_list))
-                        # print(cfg.edgelist)
-                        cfg.build_cfg(manager, state)
-                        cfg.module_name = ast.name
-    
-                        cfgs_by_module[instance_name].append(deepcopy(cfg))
-                        cfg.reset()"""
-                        #print(cfg.paths)
-                    state.store[instance_name] = {}
-                    manager.dependencies[instance_name] = {}
-                    manager.intermodule_dependencies[instance_name] = {}
-                    manager.cond_assigns[instance_name] = {}
-            else: 
-                """print(f"Module {sv_module_name} single instance")
-                manager.names_list.append(sv_module_name)
-                # build X CFGx for the particular module 
-                cfg = CFG()
-                cfg.all_nodes = []
-                #cfg.partition_points = []
-                cfg.get_always_sv(manager, state, module)
-                cfg_count = len(cfg.always_blocks)
-                # TODO: resolve deepcopy issue here
-                always_blocks_by_module[sv_module_name] = cfg.always_blocks
-                for k in range(cfg_count):
-                    cfg.basic_blocks_sv(manager, state, always_blocks_by_module[sv_module_name][k])
-                    cfg.partition()
-                    # print(cfg.partition_points)
-                    # print(len(cfg.basic_block_list))
-                    # print(cfg.edgelist)
-                    cfg.build_cfg(manager, state)
-                    #print(cfg.cfg_edges)
-    
-                    #TODO: double-check curr_module starts at the right spot
-                    cfg.module_name = manager.curr_module
-                    # TODO: used to be Deepcopy in Sylvia,too 
-                    cfgs_by_module[sv_module_name].append(cfg)
-                    cfg.reset()
-                    #print(cfg.paths)"""
-                
-    
-    
-                print(f"Module {sv_module_name} single instance")
-                manager.names_list.append(sv_module_name)
-    
-                # discover always blocks once
-                probe = CFG()
-                probe.get_always_sv(manager, state, module)
-                always_blocks_by_module[sv_module_name] = probe.always_blocks
-    
-                # fresh CFG per sequential always block (SV walker)
-                cfgs_by_module[sv_module_name] = []
-                for ab in always_blocks_by_module[sv_module_name]:
-                    ab_body = getattr(ab, "statement", getattr(ab, "members", ab))
-                    c = CFG()
-                    c.module_name = sv_module_name
-                    c.is_combinational = False
-                    c.basic_blocks_sv(manager, state, ab_body)
-                    c.partition()
-                    c.build_cfg(manager, state)
-                    cfgs_by_module[sv_module_name].append(c)
-    
-                # Build CFGs for always_comb blocks (Paper §4.4)
-                for ab in probe.always_comb_blocks:
-                    ab_body = getattr(ab, "statement", getattr(ab, "members", ab))
-                    c = CFG()
-                    c.module_name = sv_module_name
-                    c.is_combinational = True
-                    c.basic_blocks_sv(manager, state, ab_body)
-                    c.partition()
-                    c.build_cfg(manager, state)
-                    cfgs_by_module[sv_module_name].append(c)
-    
-    
-                state.store[sv_module_name] = {}
-                manager.dependencies[sv_module_name] = {}
-                manager.intermodule_dependencies[sv_module_name] = {}
-                manager.cond_assigns[sv_module_name] = {}
-        # total_paths = 1
-        # for x in manager.child_num_paths.values():
-        #     total_paths *= x
-    
-        # have do do things piece wise
+        always_blocks_by_module = {}
+
+        all_instances = []
+        for top in modules:
+            self.collect_all_instances(top, all_instances)
+
+        for instance in all_instances:
+            instance_name = instance.name
+            body = getattr(instance, 'body', getattr(instance, 'instanceBody', None))
+
+            modules_dict[instance_name] = instance
+            manager.names_list.append(instance_name)
+            manager.seen_mod[instance_name] = {}
+            cfgs_by_module[instance_name] = []
+
+            probe = CFG()
+            probe.get_always_sv(body)
+            always_blocks_by_module[instance_name] = (
+                list(probe.always_blocks) + list(probe.always_comb_blocks)
+            )
+
+            for ab in probe.always_blocks:
+                ab_body = getattr(ab, 'body', getattr(ab, 'statement', None))
+                c = CFG()
+                c._instance_body = probe._instance_body
+                c.module_name = instance_name
+                c.is_combinational = False
+                c.build_cfg(ab_body)
+                cfgs_by_module[instance_name].append(c)
+
+            for ab in probe.always_comb_blocks:
+                ab_body = getattr(ab, 'body', getattr(ab, 'statement', None))
+                c = CFG()
+                c._instance_body = probe._instance_body
+                c.module_name = instance_name
+                c.is_combinational = True
+                c.build_cfg(ab_body)
+                cfgs_by_module[instance_name].append(c)
+
+            # Copy decls/comb from probe to the first CFG so downstream
+            # base_store initialisation picks them up.
+            if cfgs_by_module[instance_name]:
+                cfgs_by_module[instance_name][0].decls = probe.decls
+                cfgs_by_module[instance_name][0].comb = probe.comb
+
+            state.store[instance_name] = {}
+            manager.dependencies[instance_name] = {}
+            manager.intermodule_dependencies[instance_name] = {}
+            manager.cond_assigns[instance_name] = {}
+
         manager.debug = self.debug
-    
-    
-        if len(modules) > 1:
+
+        if len(all_instances) > 1:
             self.populate_seen_mod(manager)
-            #manager.opt_1 = True
         else:
             manager.opt_1 = False
         manager.modules = modules_dict
@@ -650,10 +633,14 @@ class ExecutionEngine:
             for c in cfgs_by_module[module_name]:
                 for node in c.decls:
                     visitor.dfs(node)
+                    if hasattr(node, 'name') and node.name not in state.store[module_name]:
+                        state.store[module_name][node.name] = node.name
                 for node in c.comb:
                     visitor.dfs(node)
+            n_signals = len(state.store[module_name])
+            if n_signals:
+                print("  {} signal(s) initialized in store".format(n_signals), flush=True)
             base_store[module_name] = state.snapshot(module_name)
-            # Capture the combinational-logic result for this module
             comb_lookup[module_name] = state.snapshot(module_name)
 
         # Count sequential vs combinational CFGs for reporting
@@ -667,21 +654,29 @@ class ExecutionEngine:
         print("Phase: collecting SVA assertions", flush=True)
         manager.assertions = []
         for module_name in manager.names_list:
-            module_ast = modules_dict.get(module_name, None)
-            if module_ast is None:
-                # For instance names like "mod_0", try the base module name
+            # 1) Module-level syntax walk (concurrent assertions, SVA properties)
+            module_sym = modules_dict.get(module_name, None)
+            if module_sym is None:
                 base_name = module_name.rsplit('_', 1)[0] if '_' in module_name else module_name
-                module_ast = modules_dict.get(base_name, None)
-            if module_ast is not None:
+                module_sym = modules_dict.get(base_name, None)
+            if module_sym is not None:
+                module_ast = getattr(module_sym, 'syntax', module_sym)
                 self._collect_assertions(module_ast, module_name, manager.assertions)
-        # Evaluate assertion expressions symbolically using the base store
+            # 2) Procedural-block walk (immediate assertions inside always blocks)
+            ab_list = always_blocks_by_module.get(module_name, [])
+            if ab_list:
+                self._collect_procedural_assertions(ab_list, module_name, manager.assertions)
+
         for assertion_info in manager.assertions:
             amod = assertion_info['module']
             manager.curr_module = amod
             self._eval_assertion_expr(assertion_info, visitor, manager, state, modules_dict)
         n_total = len(manager.assertions)
         n_with_z3 = sum(1 for a in manager.assertions if a.get('z3_expr') is not None)
-        print(f"  Found {n_total} assertion(s), {n_with_z3} with Z3 expressions", flush=True)
+        n_immediate = sum(1 for a in manager.assertions if a.get('kind') == 'immediate')
+        n_concurrent = n_total - n_immediate
+        print(f"  Found {n_total} assertion(s) ({n_immediate} immediate, {n_concurrent} concurrent), "
+              f"{n_with_z3} with Z3 expressions", flush=True)
 
         print("Phase: explore_block (per-module)", flush=True)
         # Per paper §3.3: explore full path tree per always block; materialize list per block
@@ -694,78 +689,82 @@ class ExecutionEngine:
             ]
 
         print("Phase: merge_block_results (per-module, Paper §4.3)", flush=True)
-        # Per paper: combine path fragments with SMT; materialize list of feasible merged results per module
         merged_by_module = {}
         for idx, module_name in enumerate(keys):
             n_blocks = len(block_results[module_name])
             print(f"  merge {module_name} ({idx+1}/{len(keys)}): {n_blocks} blocks", flush=True)
             merged_by_module[module_name] = self.merge_block_results(
                 block_results[module_name], module_name, manager=manager)
-            print(f"    -> {len(merged_by_module[module_name])} feasible merged paths", flush=True)
+            merged = merged_by_module[module_name]
+            if isinstance(merged, LazyProduct):
+                print(f"    -> {merged.logical_size:,} feasible merged paths "
+                      f"(lazy: {merged.n_components} groups, {merged.total_stored()} stored)",
+                      flush=True)
+            else:
+                print(f"    -> {len(merged)} feasible merged paths", flush=True)
 
-        print("Phase: cross-module path iteration", flush=True)
-        # Product of (per-module merged list × num_cycles) across modules; then iterate
-        per_module_cycle_lists = [
-            list(product(merged_by_module[m], repeat=int(num_cycles)))
-            for m in keys
-        ]
+        valid_assertions = [a for a in manager.assertions
+                            if a.get("z3_expr") is not None]
+        if not valid_assertions:
+            print("Phase: cross-module path iteration — SKIPPED (no assertions to check)",
+                  flush=True)
+            print(f"  {len(manager.assertions)} assertion(s) collected, "
+                  f"0 with valid Z3 expressions", flush=True)
+            print(f"  Per-module merged results available for "
+                  f"{len(merged_by_module)} modules.", flush=True)
+            total_logical = 1
+            for m, res in merged_by_module.items():
+                count = res.logical_size if isinstance(res, LazyProduct) else len(res)
+                total_logical *= max(count, 1)
+            print(f"  Cross-module product would have been {total_logical:,} paths — "
+                  f"all skipped.", flush=True)
+            print("Branch points explored: {}".format(manager.branch_count), flush=True)
+            print("Paths explored (feasible): 0 (no assertions)", flush=True)
+            self.module_depth -= 1
+            return
+
+        print("Phase: cross-module path iteration (DFS)", flush=True)
+        print(f"  Checking {len(valid_assertions)} assertion(s)", flush=True)
+        dfs_xmod = DFSCrossModuleIterator(
+            per_module_results=merged_by_module,
+            num_cycles=int(num_cycles),
+            manager=manager,
+            enable_early_pruning=True,
+            enable_caching=True,
+        )
+        
         path_combo_iteration = 0
-
-        for path_combo in product(*per_module_cycle_lists):
+        for path_combo, all_pcs, all_stores in dfs_xmod:
             if getattr(self, "timeout", False):
                 break
             path_combo_iteration += 1
             if path_combo_iteration <= 5 or path_combo_iteration % 1000000 == 0:
-                print("  path_combo iteration: {} (feasible so far: {})".format(
-                    path_combo_iteration, manager.path_count), flush=True)
-            curr_path = {keys[i]: path_combo[i] for i in range(len(keys))}
-
-            all_pcs = []
-            all_stores = {}
-            var_sets = []
-            for module_name in keys:
-                for cycle_result in curr_path[module_name]:
-                    all_pcs.extend(cycle_result["pc"])
-                    var_sets.append(self._vars_in_pcs(cycle_result["pc"]))
-                    for sig, expr in cycle_result["store"].items():
-                        all_stores[f"{module_name}.{sig}"] = expr
-            need_solver = False
-            for i in range(len(var_sets)):
-                for j in range(i + 1, len(var_sets)):
-                    if var_sets[i] & var_sets[j]:
-                        need_solver = True
-                        break
-                if need_solver:
-                    break
-            if need_solver and all_pcs:
-                s = Solver()
-                try:
-                    s.set("timeout", 10000)
-                except Exception:
-                    pass
-                for c in all_pcs:
-                    s.add(c)
-                if str(s.check()) != "sat":
-                    continue
+                stats = dfs_xmod.get_stats()
+                print("  path_combo iteration: {} (feasible so far: {}, pruned: {})".format(
+                    path_combo_iteration, manager.path_count, stats['combos_pruned']), flush=True)
+            
             manager.path_count += 1
             if manager.path_count <= 5 or manager.path_count % 10000 == 0:
                 print("  path_combo: {} paths".format(manager.path_count), flush=True)
 
-            # --- Assertion checking on this feasible path ---
             violation = self._check_assertions_on_path(
                 manager, visitor, all_pcs, all_stores, modules_dict)
             if violation:
+                stats = dfs_xmod.get_stats()
                 print("Phase: cross-module path iteration complete (violation found).", flush=True)
+                print("  DFS stats: checked {}, pruned {}, cache hits {}".format(
+                    stats['combos_checked'], stats['combos_pruned'], stats['cache_hits']), flush=True)
                 print("Branch points explored: {}".format(manager.branch_count), flush=True)
                 print("Paths explored (feasible): {}".format(manager.path_count), flush=True)
-                print("Paths explored: {}".format(manager.path_count), flush=True)
                 self.module_depth -= 1
                 return
-
+        
+        stats = dfs_xmod.get_stats()
         print("Phase: cross-module path iteration complete.", flush=True)
+        print("  DFS stats: checked {}, pruned {}, cache hits {}".format(
+            stats['combos_checked'], stats['combos_pruned'], stats['cache_hits']), flush=True)
         print("Branch points explored: {}".format(manager.branch_count), flush=True)
         print("Paths explored (feasible): {}".format(manager.path_count), flush=True)
-        print("Paths explored: {}".format(manager.path_count), flush=True)
         self.module_depth -= 1
 
     def _check_assertions_on_path(self, manager, visitor, all_pcs, all_stores, modules_dict):

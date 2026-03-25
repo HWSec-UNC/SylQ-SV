@@ -1,360 +1,14 @@
-"""Helpers for working with Z3, specifically parsing the symbolic expressions into 
-Z3 expressions and solving for assertion violations."""
+"""Helpers for working with Z3: semantic expression conversion and solving."""
 
 import z3
-from z3 import Solver, Int, BitVec, Context, BitVecSort, ExprRef, BitVecRef, If, BitVecVal, And, IntVal, Int2BV, Or, Not, ULT, UGT, Z3Exception, BoolRef
-from z3 import is_and, is_app_of, Z3_OP_EXTRACT, is_eq, is_distinct
-from helpers.rvalue_parser import parse_tokens, tokenize
-from engine.execution_manager import ExecutionManager
-from engine.symbolic_state import SymbolicState
+from z3 import Solver, BitVec, BitVecRef, If, BitVecVal, And, Or, Not, ULT, UGT, BoolRef
 import pyslang as ps
-import networkx as nx
-import ast
-from copy import deepcopy
 
 
-BINARY_OPS = ("Plus", "Minus", "Power", "Times", "Divide", "Mod", "Sll", "Srl", "Sla", "Sra", "LessThan",
-"GreaterThan", "LessEq", "GreaterEq", "Eq", "NotEq", "Eql", "NotEql", "And", "Xor",
-"Xnor", "Or", "Land", "Lor")
-op_map = {"Plus": "+", "Minus": "-", "Power": "**", "Times": "*", "Divide": "/", "Mod": "%", "Sll": "<<", "Srl": ">>>",
-"Sra": ">>", "LessThan": "<", "GreaterThan": ">", "LessEq": "<=", "GreaterEq": ">=", "Eq": "=", "NotEq": "!=", "Eql": "===", "NotEql": "!==",
-"And": "&", "Xor": "^", "Xnor": "<->", "Land": "&&", "Lor": "||"}
-
-class Z3Visitor():
-    def __init__(self, prefix):
-        """Constructor that sets the prefix for variable names."""
-        self.prefix = prefix
-        print("prefix", prefix)
-        #self.visited_nodes = set() 
-
-    def visit(self, node):
-        """A visitor that processes the node to generate Z3 expressions."""
-        print(f"Visiting node: {node}") 
-        print(f"Visiting node Type: {type(node)}")  
-        if isinstance(node, ps.Token):
-            result = self.handle_token(node)
-        elif isinstance(node, ps.IdentifierNameSyntax):
-            result = self.handle_identifier(node)
-        elif isinstance(node, ps.IdentifierSelectNameSyntax):
-            result = self.handle_identifier_select_name(node)
-        elif isinstance(node, ps.ElementSelectSyntax):
-            result = self.handle_element_select(node)
-        elif isinstance(node, ps.BinaryExpressionSyntax):
-            result = self.handle_binary_expression(node)
-        elif isinstance(node, ps.ParenthesizedExpressionSyntax):
-            result = self.handle_parenthesized_expression(node)
-            print("result", type(result))
-        elif isinstance(node, ps.LiteralExpressionSyntax):
-            result = self.handle_literal_expression(node)
-        elif isinstance(node, ps.BitSelectSyntax):
-            result = self.handle_bit_select(node)
-        elif isinstance(node, ps.ScopedNameSyntax):
-            result = self.handle_scoped_name(node)
-        elif isinstance(node, ps.IntegerVectorExpressionSyntax):
-            result = self.handle_integer_vector_expression(node)
-        elif isinstance(node, ps.PrefixUnaryExpressionSyntax):
-            result = self.handle_prefix_unary_expression(node)
-        else:
-            print(f"Unhandled syntax: {type(node)}")
-            return None
-        print(result)
-        if isinstance(result, ps.VisitAction):
-            print(f"Encountered VisitAction: {result}")
-            return None  
-        return result
-
-    def handle_integer_vector_expression(self, node):
-        """Handle integer vector expressions."""
-        # if debug: print(f"Handling IntegerVectorExpression: {node}")
-        # if debug: print("Attributes of the node:", dir(node))
-
-        if hasattr(node, 'value'):
-            value = node.value  
-            # if debug: print(f"Value of the IntegerVectorExpression: {value}")
-            return BitVecVal(int(str(value)), 32)  #
-
-        elif hasattr(node, 'size'):
-            size = node.size 
-            # if debug: print(f"Size of the IntegerVectorExpression: {size}")
-            return BitVecVal(int(str(size)), 32)  
-        return None   
-
-    def handle_identifier(self, node):
-        """Handle identifiers."""
-        # if debug: print(f"Handling identifier: {str(node.identifier)}")
-        variable = str(node.identifier)
-        return BitVec(variable, 32)
-    
-    def handle_identifier_select_name(self, node):
-        """Handle indexed or array accesses like 'match[i]'."""
-        print(f"Handling identifier select: {str(node.identifier)}[{node.selectors}]")
-        
-        # Extract the identifier ('match' or 'conf_i')
-        identifier = str(node.identifier)
-        
-        # Get the index, assuming it's the first selector for example  'match[i]', i will be the selector)
-        index_expr = self.visit(node.selectors[0])  
-        print("index_expr",type(index_expr))
-        index_val = int(str(index_expr))  
-        variable = f"{identifier}[{index_val}]" 
-        print("Fully Verified Variable:", variable)
-        return BitVec(variable, 32)
- 
-    def handle_scoped_name(self, node):
-            """Handle scoped names, including indexed names like conf_i[i].locked."""
-            print(f"Handling scoped name: {node}")
-            
-            if str(node.separator) == "::":
-                # Scoped names like riscv::PRIV_LVL_M
-                scoped_name = str(node)
-                return BitVec(scoped_name, 32)
-            
-            elif str(node.separator) == ".":
-                # Field access like conf_i[i].locked
-                # First, handle the base (conf_i[i])
-                base = self.visit(node.left)  # Conf_i[i]
-                print("base",base)
-                # Then handle the field (locked)
-                field = str(node.right)  # Field access (locked)
-                variable= str(f"{base}[{field}]")
-                return BitVec(variable, 32)
-
-    def handle_element_select(self, node):
-        """Handle element selection like structs and arrays."""
-        print(f"Handling element select: {node}")
-        element = self.visit(node.selector)  
-        return element
-    
-
-    def handle_bit_select(self, node):
-        """Handle bit select expressions like 'match[i]'."""
-        print(f"Handling bit select expression: {node}")
-
-       
-        return BitVec(f"{node}", 32)
-
-    def handle_literal_expression(self, node):
-        """Handle literal expressions."""
-        print(f"Handling literal expression: {node}")
-        literal_value = node  
-        if literal_value == 0:
-            return BitVecVal(0, 32)  
-        return BitVecVal(int(str(literal_value)), 32)  
-
-    def convert_bitvec_to_bool(self, bitvec_expr):
-        """Converts a BitVec expression to a Boolean (True if non-zero, False if zero)."""
-        return UGT(bitvec_expr, BitVecVal(0, 32))
-
-    def handle_prefix_unary_expression(self, node):
-        """Handle prefix unary expressions (like NOT)."""
-        print(f"Handling prefix unary expression: {node}")
-        operator = str(node.operatorToken).strip()
-        operand = self.visit(node.operand)
-        if operator == "!":
-            return Not(operand)
-        elif operator == "-":
-            return -operand
-        else:
-            print(f"Unsupported unary operator: {operator}")
-            raise ValueError(f"Unsupported unary operator: {operator}")
-
-
-    def handle_binary_expression(self, node):
-        """Handle binary expressions (AND, OR, equality, etc.)."""
-        print(f"Handling binary expression: {node.operatorToken}")
-        left_expr = self.visit(node.left)
-        print("done")
-        right_expr = self.visit(node.right)
-        print("done2")
-        operator = str(node.operatorToken).strip()
-
-        # issue
-        print((left_expr))
-        print(node.left)
-        if str(left_expr.sort()) == "Bool" and str(right_expr.sort()) != "Bool":
-            right_expr = UGT(right_expr, BitVecVal(0, 32)) 
-            print(f"Converted Right Expression to Bool: {right_expr}")
-
-        print(operator)
-        print(node.left)
-        print(node.right)
-        print(left_expr.sort())
-        print(right_expr.sort())
-        if operator == "==":
-            return left_expr == right_expr
-        elif operator == "!=":
-            return left_expr != right_expr
-        elif operator == "&&":
-            return And(left_expr, right_expr)
-        elif operator == "||":
-            return Or(left_expr, right_expr)
-        elif operator == ">":
-            return UGT(left_expr, right_expr) 
-        elif operator == "<":
-            return ULT(left_expr, right_expr) 
-        elif isinstance(left_expr, BitVecRef) and isinstance(right_expr, BitVecRef):
-            return UGT(left_expr, BitVecVal(0, 32)) == right_expr
-        
-        else:
-            print(f"Unsupported binary operator: {operator}")
-            raise ValueError(f"Unsupported binary operator: {operator}")
-
-
-    def handle_parenthesized_expression(self, node):
-        """Handle parenthesized expressions."""
-        print("Handling parenthesized expression.")
-        return (self.visit(node.expression))
-    
-    def get_full_variable_name(self,variable):
-        """Generate the full variable name by appending the variable to the prefix."""
-        return f"{self.prefix}.{variable}"
-    
-def pyslang_to_z3(expr, prefix=""):
-    """Parse the expression and convert it into a Z3 expression."""
-    print(f"Parsing expression: {expr}")
-    syntax_tree = ps.SyntaxTree.fromText(expr)
-    root = syntax_tree.root
-    visitor = Z3Visitor(prefix)
-    z3_expression = visitor.visit(root)    
-    return z3_expression
-
-
-def get_constants_list(new_constraint, s: SymbolicState, m: ExecutionManager):
-    """Get list of constants that need to be added to z3 context from symbolic expressions."""
-    res = []
-    words = new_constraint.split(" ")
-    for word in words:
-        if word in s.store[m.curr_module].values():
-            res.append(word)
-    return res
-
-def parse_concat_to_Z3(concat, s: SymbolicState, m: ExecutionManager):
-    """Takes a concatenation of symbolic symbols areturns the list of bitvectors"""
-    res = []
-    for key in concat:
-        x = BitVec(concat[key], 1)
-        res.append(x)
-    return res
-
-
-def parse_expr_to_Z3(e: ps.ExpressionSyntax, s: SymbolicState, m: ExecutionManager):
-    """Takes in a complex Verilog Expression and converts it to 
-    a Z3 query."""
-    tokens_list = parse_tokens(tokenize(e, s, m))
-    new_constraint = evaluate_expr(tokens_list, s, m)
-    new_constants = []
-    if not new_constraint is None: 
-        new_constants = get_constants_list(new_constraint, s, m)
-    if is_and(e):
-        lhs = parse_expr_to_Z3(e.left, s, m)
-        rhs = parse_expr_to_Z3(e.right, s, m)
-        return s.pc.add(lhs.assertions() and rhs.assertions())
-    elif is_app_of(e, Z3_OP_EXTRACT):
-        part_sel_expr = f"{e.var.name}[{e.msb}:{e.lsb}]"
-        module_name = m.curr_module
-        is_reg = e.var.name in m.reg_decls
-        if not e.var.scope is None:
-            module_name = e.scope.labellist[0].name
-        if s.store[module_name][e.var.name].isdigit():
-            int_val = IntVal(int(s.store[module_name][e.name]))
-            return Int2BV(int_val, 32)
-        else:
-            if not part_sel_expr in s.store[m.curr_module] and "[" in part_sel_expr:
-                parts = part_sel_expr.partition("[")
-                first_part = parts[0]
-                s.store[m.curr_module][part_sel_expr] = s.store[m.curr_module][first_part]
-            return BitVec(s.store[module_name][part_sel_expr], 32)
-    elif e.__class__.__name__ == "IdentifierNameSyntax":
-        module_name = m.curr_module  # Default to current module
-        # PySlang 7.0 IdentifierNameSyntax uses .identifier.valueText for the name
-        # Access the identifier name through .identifier attribute
-        if not hasattr(e, "identifier"):
-            # Fallback: try to get name directly if identifier attribute doesn't exist
-            var_name = getattr(e, "valueText", getattr(e, "name", None))
-            if var_name is None:
-                return BitVecVal(0, 32)  # Return zero if we can't get the name
-        else:
-            var_name = e.identifier.valueText if hasattr(e.identifier, "valueText") else None
-            if var_name is None:
-                var_name = getattr(e.identifier, "name", None)
-        
-        if var_name is None:
-            return BitVecVal(0, 32)  # Return zero if we can't get the name
-            
-        is_reg = var_name in m.reg_decls if hasattr(m, "reg_decls") else False
-        
-        # Check if variable exists in store, if not return zero
-        if module_name not in s.store or var_name not in s.store[module_name]:
-            return BitVecVal(0, 32)
-            
-        if s.store[module_name][var_name].isdigit():
-            int_val = IntVal(int(s.store[module_name][var_name]))
-            return Int2BV(int_val, 32)
-        else:
-            return BitVec(s.store[module_name][var_name], 32)
-    elif e.__class__.__name__ == "IntegerLiteralExpressionSyntax":
-        int_val = IntVal(e.value)
-        return Int2BV(int_val, 32)
-    elif is_eq(e):
-        lhs = parse_expr_to_Z3(e.left, s, m)
-        rhs = parse_expr_to_Z3(e.right, s, m)
-        if m.branch:
-            s.pc.add(lhs == rhs)
-        else:
-            s.pc.add(lhs != rhs)
-        return (lhs == rhs)
-    elif is_distinct(e):
-        lhs = parse_expr_to_Z3(e.left, s, m)
-        rhs = parse_expr_to_Z3(e.right, s, m)
-        if m.branch:          
-            # only RHS is BitVec (Lhs is a more complex expr)
-            if isinstance(rhs, z3.z3.BitVecRef) and not isinstance(lhs, z3.z3.BitVecRef):
-                c = If(lhs, BitVecVal(1, 32), BitVecVal(0, 32))
-                s.pc.add(c != rhs)
-            else:
-                s.pc.add(lhs != rhs)
-        else:
-            # only RHS is bitVEC 
-            if isinstance(rhs, z3.z3.BitVecRef) and not isinstance(lhs, z3.z3.BitVecRef):
-                c = If(lhs, BitVecVal(1, 32), BitVecVal(0, 32))
-                #print("a")
-                s.pc.add(c == rhs)
-            else:
-                s.pc.push()
-                s.pc.add(lhs == rhs)
-                if not solve_pc(s.pc):
-                    s.pc.pop()
-                    m.abandon = True
-                    m.ignore = True
-    elif is_and(e):
-        lhs = parse_expr_to_Z3(e.left, s, m)
-        rhs = parse_expr_to_Z3(e.right, s, m)
-
-        if isinstance(rhs, BitVecRef) and isinstance(lhs, BitVecRef):
-            return s
-        elif isinstance(rhs, BitVecRef):
-            return s
-        elif isinstance(lhs, BitVecRef):
-            return s
-        else:
-            if lhs is None:
-                return s.pc.add(rhs.pc.assertions())
-            
-            if rhs is None:
-                return s.pc.add(rhs.pc.assertions())
-
-            return s
-    return s
-
-_solve_pc_count = 0
-# Z3 timeout in ms so a single check doesn't hang (e.g. on large OR1200 path conditions)
 SOLVE_PC_TIMEOUT_MS = 10000
 
 def solve_pc(s: Solver) -> bool:
     """Solve path condition. Returns True iff sat; False for unsat or timeout (unknown)."""
-    global _solve_pc_count
-    _solve_pc_count += 1
-    # Optional progress heartbeat removed; keep solve_pc lightweight.
     try:
         s.set("timeout", SOLVE_PC_TIMEOUT_MS)
     except Exception:
@@ -363,42 +17,243 @@ def solve_pc(s: Solver) -> bool:
     if result == "sat":
         return True
     if result == "unknown":
-        # Timeout or resource limit; treat as infeasible so we don't hang
         return False
-    # unsat
     return False
 
-def evaluate_expr(parsedList, s: SymbolicState, m: ExecutionManager):
-    for i in parsedList:
-        res = eval_expr(i, s, m)
-    return res
 
-def evaluate_expr_to_smt(lhs, rhs, op, s: SymbolicState, m: ExecutionManager) -> str: 
-    """Helper function to resolve binary symbolic expressions."""
-    if (isinstance(lhs,tuple) and isinstance(rhs,tuple)):
-        return f"({op} ({eval_expr(lhs, s, m)})  ({eval_expr(rhs, s, m)}))"
-    elif (isinstance(lhs,tuple)):
-        if (isinstance(rhs,str)) and not rhs.isdigit():
-            return f"({op} ({eval_expr(lhs, s, m)}) {s.get_symbolic_expr(m.curr_module, rhs)})"
-        else:
-            return f"({op} ({eval_expr(lhs, s, m)}) {str(rhs)})"
-    elif (isinstance(rhs,tuple)):
-        if (isinstance(lhs,str)) and not lhs.isdigit():
-            return f"({op} ({s.get_symbolic_expr(m.curr_module, lhs)}) ({eval_expr(rhs, s, m)}))"
-        else:
-            return f"({op} {str(lhs)}  ({eval_expr(rhs, s, m)}))"
-    else:
-        if (isinstance(lhs ,str) and isinstance(rhs , str)) and not lhs.isdigit() and not rhs.isdigit():
-            return f"({op} {s.get_symbolic_expr(m.curr_module, lhs)} {s.get_symbolic_expr(m.curr_module, rhs)})"
-        elif (isinstance(lhs ,str)) and not lhs.isdigit():
-            return f"({op} {s.get_symbolic_expr(m.curr_module, lhs)} {str(rhs)})"
-        elif (isinstance(rhs ,str)) and not rhs.isdigit():
-            return f"({op} {str(lhs)}  {s.get_symbolic_expr(m.curr_module, rhs)})"
-        else: 
-            return f"({op} {str(lhs)} {str(rhs)})"
- 
-def eval_expr(expr, s: SymbolicState, m: ExecutionManager) -> str:
-    """Takes in an AST and should return the new symbolic expression for the symbolic state."""
-    if not expr is None and expr[0] in BINARY_OPS:
-        return evaluate_expr_to_smt(expr[1], expr[2], op_map[expr[0]], s, m)
+# ---------------------------------------------------------------------------
+# Semantic Expression → Z3 converter
+# ---------------------------------------------------------------------------
+# Works directly with pyslang's semantic Expression objects (the nodes stored
+# in CFG basic blocks).  This replaces the old syntax-based tokenizer path
+# for any call site that has semantic nodes.
+# ---------------------------------------------------------------------------
+
+def _parse_svint(sv) -> int:
+    """Convert a pyslang SVInt to a Python int."""
+    s = str(sv).strip()
+    if not s:
+        return 0
+    if "'" not in s:
+        return int(s)
+    parts = s.split("'", 1)
+    base_char = parts[1][0].lower() if parts[1] else 'd'
+    digits = parts[1][1:] if len(parts[1]) > 1 else '0'
+    bases = {'b': 2, 'o': 8, 'd': 10, 'h': 16}
+    base = bases.get(base_char, 10)
+    clean = digits.replace('_', '').replace('?', '0')
+    clean = clean.replace('x', '0').replace('X', '0')
+    clean = clean.replace('z', '0').replace('Z', '0')
+    return int(clean, base) if clean else 0
+
+
+_BINOP_MAP = {
+    ps.BinaryOperator.Add:                lambda a, b: a + b,
+    ps.BinaryOperator.Subtract:           lambda a, b: a - b,
+    ps.BinaryOperator.Multiply:           lambda a, b: a * b,
+    ps.BinaryOperator.BinaryAnd:          lambda a, b: a & b,
+    ps.BinaryOperator.BinaryOr:           lambda a, b: a | b,
+    ps.BinaryOperator.BinaryXor:          lambda a, b: a ^ b,
+    ps.BinaryOperator.BinaryXnor:         lambda a, b: ~(a ^ b),
+    ps.BinaryOperator.Equality:           lambda a, b: a == b,
+    ps.BinaryOperator.Inequality:         lambda a, b: a != b,
+    ps.BinaryOperator.CaseEquality:       lambda a, b: a == b,
+    ps.BinaryOperator.CaseInequality:     lambda a, b: a != b,
+    ps.BinaryOperator.WildcardEquality:   lambda a, b: a == b,
+    ps.BinaryOperator.WildcardInequality: lambda a, b: a != b,
+    ps.BinaryOperator.LessThan:           lambda a, b: ULT(a, b),
+    ps.BinaryOperator.LessThanEqual:      lambda a, b: z3.ULE(a, b),
+    ps.BinaryOperator.GreaterThan:        lambda a, b: UGT(a, b),
+    ps.BinaryOperator.GreaterThanEqual:   lambda a, b: z3.UGE(a, b),
+    ps.BinaryOperator.LogicalAnd:         lambda a, b: And(a != 0, b != 0)
+                                                        if not isinstance(a, BoolRef)
+                                                        else And(a, b if isinstance(b, BoolRef) else b != 0),
+    ps.BinaryOperator.LogicalOr:          lambda a, b: Or(a != 0, b != 0)
+                                                        if not isinstance(a, BoolRef)
+                                                        else Or(a, b if isinstance(b, BoolRef) else b != 0),
+    ps.BinaryOperator.LogicalShiftLeft:   lambda a, b: a << b,
+    ps.BinaryOperator.LogicalShiftRight:  lambda a, b: z3.LShR(a, b),
+    ps.BinaryOperator.ArithmeticShiftLeft:  lambda a, b: a << b,
+    ps.BinaryOperator.ArithmeticShiftRight: lambda a, b: a >> b,
+}
+
+_UNOP_MAP = {
+    ps.UnaryOperator.LogicalNot:  lambda a: a == BitVecVal(0, a.size()) if isinstance(a, BitVecRef) else Not(a),
+    ps.UnaryOperator.BitwiseNot:  lambda a: ~a,
+    ps.UnaryOperator.Plus:        lambda a: a,
+    ps.UnaryOperator.Minus:       lambda a: -a,
+    ps.UnaryOperator.BitwiseAnd:  lambda a: z3.BVRedAnd(a),
+    ps.UnaryOperator.BitwiseOr:   lambda a: z3.BVRedOr(a),
+    ps.UnaryOperator.BitwiseXor:  None,  # no single Z3 call
+    ps.UnaryOperator.BitwiseNand: lambda a: ~z3.BVRedAnd(a),
+    ps.UnaryOperator.BitwiseNor:  lambda a: ~z3.BVRedOr(a),
+}
+
+
+def semantic_expr_to_z3(expr, store: dict, module: str, width_hint: int = 32):
+    """Convert a pyslang semantic Expression to a Z3 BitVecRef/BoolRef.
+
+    *store* is ``state.store[module]`` — maps signal names to symbolic names
+    (strings) or Z3 expressions.
+    *width_hint* is the default bit-width when the expression doesn't carry one.
+
+    Returns a Z3 expression or None on failure.
+    """
+    if expr is None:
+        return None
+
+    kind = expr.kind
+    w = getattr(expr, 'effectiveWidth', None) or width_hint
+
+    # --- Leaf nodes --------------------------------------------------------
+    if kind == ps.ExpressionKind.NamedValue:
+        name = expr.symbol.name
+        sym = store.get(name, name)
+        if isinstance(sym, (BitVecRef, BoolRef, z3.ArithRef)):
+            return sym
+        sym_str = str(sym)
+        if sym_str.lstrip('-').isdigit():
+            return BitVecVal(int(sym_str), w)
+        return BitVec(sym_str, w)
+
+    if kind == ps.ExpressionKind.IntegerLiteral:
+        return BitVecVal(_parse_svint(expr.value), w)
+
+    if kind == ps.ExpressionKind.UnbasedUnsizedIntegerLiteral:
+        return BitVecVal(_parse_svint(expr.value), w)
+
+    # --- Conversion (width cast / sign cast) --------------------------------
+    if kind == ps.ExpressionKind.Conversion:
+        inner = semantic_expr_to_z3(expr.operand, store, module, w)
+        if inner is None:
+            return None
+        if isinstance(inner, BoolRef):
+            inner = If(inner, BitVecVal(1, 1), BitVecVal(0, 1))
+        iw = inner.size() if isinstance(inner, BitVecRef) else w
+        if iw < w:
+            return z3.ZeroExt(w - iw, inner)
+        if iw > w:
+            return z3.Extract(w - 1, 0, inner)
+        return inner
+
+    # --- Binary operators ---------------------------------------------------
+    if kind == ps.ExpressionKind.BinaryOp:
+        op = expr.op
+        lhs = semantic_expr_to_z3(expr.left, store, module, w)
+        rhs = semantic_expr_to_z3(expr.right, store, module, w)
+        if lhs is None or rhs is None:
+            return None
+        # Widen/narrow to match
+        if isinstance(lhs, BoolRef):
+            lhs = If(lhs, BitVecVal(1, w), BitVecVal(0, w))
+        if isinstance(rhs, BoolRef):
+            rhs = If(rhs, BitVecVal(1, w), BitVecVal(0, w))
+        if isinstance(lhs, BitVecRef) and isinstance(rhs, BitVecRef):
+            if lhs.size() != rhs.size():
+                target = max(lhs.size(), rhs.size())
+                if lhs.size() < target:
+                    lhs = z3.ZeroExt(target - lhs.size(), lhs)
+                if rhs.size() < target:
+                    rhs = z3.ZeroExt(target - rhs.size(), rhs)
+        fn = _BINOP_MAP.get(op)
+        if fn is not None:
+            return fn(lhs, rhs)
+        return None
+
+    # --- Unary operators ----------------------------------------------------
+    if kind == ps.ExpressionKind.UnaryOp:
+        inner = semantic_expr_to_z3(expr.operand, store, module, w)
+        if inner is None:
+            return None
+        fn = _UNOP_MAP.get(expr.op)
+        if fn is not None:
+            return fn(inner)
+        return None
+
+    # --- Range select  (e.g. id_insn[31:26]) --------------------------------
+    if kind == ps.ExpressionKind.RangeSelect:
+        base = semantic_expr_to_z3(expr.value, store, module, width_hint)
+        if base is None:
+            return None
+        left_expr = expr.left
+        right_expr = expr.right
+        try:
+            hi = _parse_svint(left_expr.value) if hasattr(left_expr, 'value') else int(str(left_expr.constant))
+            lo = _parse_svint(right_expr.value) if hasattr(right_expr, 'value') else int(str(right_expr.constant))
+        except Exception:
+            return None
+        if isinstance(base, BoolRef):
+            base = If(base, BitVecVal(1, width_hint), BitVecVal(0, width_hint))
+        if isinstance(base, BitVecRef):
+            if hi >= base.size():
+                hi = base.size() - 1
+            if lo < 0:
+                lo = 0
+            return z3.Extract(hi, lo, base)
+        return None
+
+    # --- Element select  (e.g. sig[idx]) ------------------------------------
+    if kind == ps.ExpressionKind.ElementSelect:
+        base = semantic_expr_to_z3(expr.value, store, module, width_hint)
+        bw = base.size() if isinstance(base, BitVecRef) else width_hint
+        idx_expr = semantic_expr_to_z3(expr.selector, store, module, bw)
+        if base is None or idx_expr is None:
+            return None
+        if isinstance(base, BitVecRef) and isinstance(idx_expr, BitVecRef):
+            if idx_expr.size() != base.size():
+                if idx_expr.size() < base.size():
+                    idx_expr = z3.ZeroExt(base.size() - idx_expr.size(), idx_expr)
+                else:
+                    idx_expr = z3.Extract(base.size() - 1, 0, idx_expr)
+            return z3.LShR(base, idx_expr) & BitVecVal(1, base.size())
+        return None
+
+    # --- Ternary  (cond ? a : b) --------------------------------------------
+    if kind == ps.ExpressionKind.ConditionalOp:
+        pred = semantic_expr_to_z3(expr.predicate, store, module, w)
+        t_val = semantic_expr_to_z3(expr.left, store, module, w)
+        f_val = semantic_expr_to_z3(expr.right, store, module, w)
+        if pred is None or t_val is None or f_val is None:
+            return None
+        if isinstance(pred, BitVecRef):
+            pred = pred != BitVecVal(0, pred.size())
+        return If(pred, t_val, f_val)
+
+    # --- Concatenation  ({a, b, c}) -----------------------------------------
+    if kind == ps.ExpressionKind.Concatenation:
+        parts = []
+        for op_expr in expr.operands:
+            p = semantic_expr_to_z3(op_expr, store, module, width_hint)
+            if p is None:
+                return None
+            if isinstance(p, BoolRef):
+                p = If(p, BitVecVal(1, 1), BitVecVal(0, 1))
+            parts.append(p)
+        if len(parts) == 1:
+            return parts[0]
+        return z3.Concat(*parts)
+
+    # --- Replication  ({N{expr}}) -------------------------------------------
+    if kind == ps.ExpressionKind.Replication:
+        count_expr = expr.count
+        inner = semantic_expr_to_z3(expr.concat, store, module, width_hint)
+        if inner is None:
+            return None
+        try:
+            n = _parse_svint(count_expr.value) if hasattr(count_expr, 'value') else 1
+        except Exception:
+            n = 1
+        if n <= 1:
+            return inner
+        return z3.Concat(*([inner] * n))
+
+    # --- Fallback: try to evaluate via constant property --------------------
+    try:
+        cv = expr.constant
+        sv = cv.integer() if hasattr(cv, 'integer') else cv
+        return BitVecVal(_parse_svint(sv), w)
+    except Exception:
+        pass
+
+    return None
 
