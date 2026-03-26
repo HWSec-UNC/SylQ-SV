@@ -15,7 +15,9 @@ For blocks A, B, C (A is root, C is leaf), each with paths a1, a2, ..., b1, b2, 
 - Keep all c1..cn cached since they're reused immediately with each new parent
 """
 
+import os
 import sys
+import time
 from typing import List, Dict, Iterator, Optional, Any, Callable, Tuple
 from z3 import Solver, ExprRef
 from z3 import z3util
@@ -30,6 +32,11 @@ from operator import mul
 VARS_EXCLUDED_FROM_DISJOINT = frozenset(
     {"rst", "clk", "rst_n", "rst_ni", "clk_i", "rst_i", "reset", "clock"}
 )
+
+# Progress while merge DFS runs (set 0 to disable heartbeat)
+_MERGE_HEARTBEAT_SEC = float(os.environ.get("SYLQ_MERGE_HEARTBEAT_SEC", "20"))
+# Log individual SAT checks slower than this (seconds); 0 disables
+_SLOW_SAT_WARN_SEC = float(os.environ.get("SYLQ_SLOW_SAT_WARN_SEC", "5"))
 
 
 @dataclass
@@ -239,6 +246,7 @@ class DFSMergeIterator:
         enable_early_pruning: bool = True,
         enable_caching: bool = True,
         solver_timeout: int = 10000,
+        heartbeat_sec: Optional[float] = None,
     ):
         """Initialize the DFS merge iterator.
         
@@ -251,6 +259,8 @@ class DFSMergeIterator:
             enable_early_pruning: If True, prune when partial merge is UNSAT.
             enable_caching: If True, cache SAT results.
             solver_timeout: Timeout for Z3 solver in milliseconds.
+            heartbeat_sec: Wall-clock interval for stall diagnostics (default: env
+                SYLQ_MERGE_HEARTBEAT_SEC or 20s); 0 or None with env 0 disables.
         """
         self.block_result_lists = block_result_lists
         self.module_name = module_name
@@ -270,6 +280,10 @@ class DFSMergeIterator:
         self.combos_checked = 0
         self.combos_pruned = 0
         self.cache_hits = 0
+        if heartbeat_sec is None:
+            self._heartbeat_sec = _MERGE_HEARTBEAT_SEC
+        else:
+            self._heartbeat_sec = float(heartbeat_sec)
         
     def _vars_in_pcs(self, pc_list: List[ExprRef]) -> set:
         """Extract variable names from a list of Z3 constraints."""
@@ -286,6 +300,7 @@ class DFSMergeIterator:
         """Default SAT checking using Z3 solver."""
         if not constraints:
             return True
+        t0 = time.monotonic()
         s = Solver()
         try:
             s.set("timeout", self.solver_timeout)
@@ -293,7 +308,15 @@ class DFSMergeIterator:
             pass
         for c in constraints:
             s.add(c)
-        return str(s.check()) == "sat"
+        out = str(s.check()) == "sat"
+        dt = time.monotonic() - t0
+        if _SLOW_SAT_WARN_SEC > 0 and dt >= _SLOW_SAT_WARN_SEC:
+            print(
+                f"    [merge-slow-sat] {self.module_name}: {dt:.1f}s for "
+                f"{len(constraints)} constraint(s), result={'sat' if out else 'unsat'}",
+                flush=True,
+            )
+        return out
     
     def _check_disjoint(self, vars1: set, vars2: set) -> bool:
         """Disjoint = (vars1 \\ {rst,clk}) ∩ (vars2 \\ {rst,clk}) == {}."""
@@ -417,8 +440,28 @@ class DFSMergeIterator:
         # Initialize stack with first level
         self._push_level(0, [], {}, set())
         
+        yielded_count = 0
+        merge_t0 = time.monotonic()
+        last_hb = merge_t0
+        
         while self.stack:
             frame = self.stack[-1]
+            
+            # Stall diagnostics: progress can be invisible if yields are rare but SAT is busy
+            if self._heartbeat_sec > 0:
+                now = time.monotonic()
+                if now - last_hb >= self._heartbeat_sec:
+                    depth = len(self.stack)
+                    top_lv = frame.level
+                    print(
+                        f"    [merge-heartbeat] {self.module_name}: "
+                        f"{now - merge_t0:.1f}s elapsed, stack_depth={depth}, "
+                        f"top_level={top_lv}, yielded={yielded_count}, "
+                        f"combos_checked={self.combos_checked}, pruned={self.combos_pruned}, "
+                        f"cache_hits={self.cache_hits}",
+                        flush=True,
+                    )
+                    last_hb = now
             
             # Try to get next result at current level
             try:
@@ -449,6 +492,7 @@ class DFSMergeIterator:
             
             # If at last level, yield the complete merged result
             if frame.level == self.num_levels - 1:
+                yielded_count += 1
                 yield {"pc": new_pc, "store": new_store}
             else:
                 # Push next level onto stack

@@ -7,6 +7,8 @@ from .symbolic_state import SymbolicState
 from .cfg import CFG
 from .dfs_iterator import DFSMergeIterator, DFSCrossModuleIterator, partition_blocks, LazyProduct
 from typing import Optional, List
+from functools import reduce
+from operator import mul
 import time
 import gc
 from helpers.utils import to_binary
@@ -473,6 +475,14 @@ class ExecutionEngine:
         component_results: List[List[dict]] = []
         for group_idx, block_indices in enumerate(groups):
             group_block_lists = [block_result_lists[i] for i in block_indices]
+            sizes = [max(len(bl), 1) for bl in group_block_lists]
+            group_naive = reduce(mul, sizes, 1)
+            if len(group_block_lists) > 1:
+                print(
+                    f"    merge {module_name} group {group_idx}: block indices {block_indices}, "
+                    f"per-block outcome counts {sizes}, naive Cartesian size {group_naive:,}",
+                    flush=True,
+                )
             
             if len(group_block_lists) == 1:
                 component_results.append(group_block_lists[0])

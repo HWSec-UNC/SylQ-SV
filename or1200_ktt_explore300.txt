@@ -1,0 +1,2151 @@
+Executing for 1 clock cycles
+Here
+Branch points explored: 0 (phase: initial)
+Phase: init_state and module traversal
+Phase: traversing module or1200_dc_fsm
+Phase: traversing module or1200_dc_ram
+Phase: traversing module or1200_dc_tag
+Phase: traversing module or1200_dpram_256x32
+Phase: traversing module or1200_dpram_32x32
+Phase: traversing module or1200_fpu_arith
+Phase: traversing module fpu_prenorm_addsub
+Phase: traversing module fpu_addsub
+Phase: traversing module fpu_postnorm_addsub
+Phase: traversing module fpu_pre_norm_mul
+Phase: traversing module fpu_mul
+Phase: traversing module fpu_post_norm_mul
+Phase: traversing module fpu_pre_norm_div
+Phase: traversing module fpu_div
+Phase: traversing module fpu_post_norm_div
+Phase: traversing module or1200_fpu_fcmp
+Phase: traversing module or1200_fpu_intfloat_conv
+Phase: traversing module u0
+Phase: traversing module u4
+Phase: traversing module or1200_iwb_biu
+Phase: traversing module or1200_rfram_generic
+Phase: traversing module or1200_sb_fifo
+Phase: traversing module or1200_spram_1024x32
+Phase: traversing module or1200_spram_1024x32_bw
+Phase: traversing module or1200_spram_1024x8
+Phase: traversing module or1200_spram_128x32
+Phase: traversing module or1200_spram_2048x32
+Phase: traversing module or1200_spram_2048x32_bw
+Phase: traversing module or1200_spram_2048x8
+Phase: traversing module or1200_spram_256x21
+Phase: traversing module or1200_spram_32_bw
+Phase: traversing module or1200_spram_32x24
+Phase: traversing module or1200_spram_512x20
+Phase: traversing module or1200_spram_64x14
+Phase: traversing module or1200_spram_64x22
+Phase: traversing module or1200_spram_64x24
+Phase: traversing module or1200_top
+Phase: traversing module iwb_biu
+Phase: traversing module dwb_biu
+Phase: traversing module or1200_immu_top
+Phase: traversing module or1200_immu_tlb
+Phase: traversing module itlb_mr_ram
+Phase: traversing module itlb_tr_ram
+Phase: traversing module or1200_ic_top
+Phase: traversing module or1200_ic_fsm
+Phase: traversing module or1200_ic_ram
+Phase: traversing module or1200_ic_tag
+Phase: traversing module or1200_cpu
+Phase: traversing module or1200_genpc
+Phase: traversing module or1200_if
+Phase: traversing module or1200_ctrl
+Phase: traversing module or1200_rf
+Phase: traversing module rf_a
+Phase: traversing module rf_b
+Phase: traversing module or1200_operandmuxes
+Phase: traversing module or1200_alu
+Phase: traversing module or1200_fpu
+Phase: traversing module or1200_mult_mac
+Phase: traversing module or1200_gmultp2_32x32
+Phase: traversing module or1200_sprs
+Phase: traversing module or1200_lsu
+Phase: traversing module or1200_mem2reg
+Phase: traversing module or1200_reg2mem
+Phase: traversing module or1200_wbmux
+Phase: traversing module or1200_freeze
+Phase: traversing module or1200_except
+Phase: traversing module or1200_cfgr
+Phase: traversing module or1200_dmmu_top
+Phase: traversing module or1200_dmmu_tlb
+Phase: traversing module dtlb_ram
+Phase: traversing module dtlb_tr_ram
+Phase: traversing module or1200_dc_top
+Phase: traversing module or1200_qmem_top
+Phase: traversing module or1200_sb
+Phase: traversing module or1200_du
+Phase: traversing module or1200_pic
+Phase: traversing module or1200_tt
+Phase: traversing module or1200_pm
+Phase: traversing module or1200_tpram_32x32
+Phase: base_store for module or1200_dc_fsm
+  61 signal(s) initialized in store
+Phase: base_store for module or1200_dc_ram
+Phase: base_store for module or1200_dc_tag
+Phase: base_store for module or1200_dpram_256x32
+  14 signal(s) initialized in store
+Phase: base_store for module or1200_dpram_32x32
+  14 signal(s) initialized in store
+Phase: base_store for module or1200_fpu_arith
+  203 signal(s) initialized in store
+Phase: base_store for module fpu_prenorm_addsub
+  29 signal(s) initialized in store
+Phase: base_store for module fpu_addsub
+  17 signal(s) initialized in store
+Phase: base_store for module fpu_postnorm_addsub
+  44 signal(s) initialized in store
+Phase: base_store for module fpu_pre_norm_mul
+  15 signal(s) initialized in store
+Phase: base_store for module fpu_mul
+  21 signal(s) initialized in store
+Phase: base_store for module fpu_post_norm_mul
+  48 signal(s) initialized in store
+Phase: base_store for module fpu_pre_norm_div
+  23 signal(s) initialized in store
+Phase: base_store for module fpu_div
+  26 signal(s) initialized in store
+Phase: base_store for module fpu_post_norm_div
+  53 signal(s) initialized in store
+Phase: base_store for module or1200_fpu_fcmp
+  35 signal(s) initialized in store
+Phase: base_store for module or1200_fpu_intfloat_conv
+  172 signal(s) initialized in store
+Phase: base_store for module u0
+  31 signal(s) initialized in store
+Phase: base_store for module u4
+  104 signal(s) initialized in store
+Phase: base_store for module or1200_iwb_biu
+Phase: base_store for module or1200_rfram_generic
+  15 signal(s) initialized in store
+Phase: base_store for module or1200_sb_fifo
+  12 signal(s) initialized in store
+Phase: base_store for module or1200_spram_1024x32
+  10 signal(s) initialized in store
+Phase: base_store for module or1200_spram_1024x32_bw
+  13 signal(s) initialized in store
+Phase: base_store for module or1200_spram_1024x8
+  10 signal(s) initialized in store
+Phase: base_store for module or1200_spram_128x32
+  10 signal(s) initialized in store
+Phase: base_store for module or1200_spram_2048x32
+  10 signal(s) initialized in store
+Phase: base_store for module or1200_spram_2048x32_bw
+  13 signal(s) initialized in store
+Phase: base_store for module or1200_spram_2048x8
+  10 signal(s) initialized in store
+Phase: base_store for module or1200_spram_256x21
+  10 signal(s) initialized in store
+Phase: base_store for module or1200_spram_32_bw
+  11 signal(s) initialized in store
+Phase: base_store for module or1200_spram_32x24
+  10 signal(s) initialized in store
+Phase: base_store for module or1200_spram_512x20
+  10 signal(s) initialized in store
+Phase: base_store for module or1200_spram_64x14
+  10 signal(s) initialized in store
+Phase: base_store for module or1200_spram_64x22
+  10 signal(s) initialized in store
+Phase: base_store for module or1200_spram_64x24
+  10 signal(s) initialized in store
+Phase: base_store for module or1200_top
+  948 signal(s) initialized in store
+Phase: base_store for module iwb_biu
+  47 signal(s) initialized in store
+Phase: base_store for module dwb_biu
+  47 signal(s) initialized in store
+Phase: base_store for module or1200_immu_top
+  69 signal(s) initialized in store
+Phase: base_store for module or1200_immu_tlb
+  33 signal(s) initialized in store
+Phase: base_store for module itlb_mr_ram
+  9 signal(s) initialized in store
+Phase: base_store for module itlb_tr_ram
+  9 signal(s) initialized in store
+Phase: base_store for module or1200_ic_top
+  67 signal(s) initialized in store
+Phase: base_store for module or1200_ic_fsm
+  24 signal(s) initialized in store
+Phase: base_store for module or1200_ic_ram
+Phase: base_store for module or1200_ic_tag
+Phase: base_store for module or1200_cpu
+  469 signal(s) initialized in store
+Phase: base_store for module or1200_genpc
+  37 signal(s) initialized in store
+Phase: base_store for module or1200_if
+  27 signal(s) initialized in store
+Phase: base_store for module or1200_ctrl
+  75 signal(s) initialized in store
+Phase: base_store for module or1200_rf
+  58 signal(s) initialized in store
+Phase: base_store for module rf_a
+  14 signal(s) initialized in store
+Phase: base_store for module rf_b
+  14 signal(s) initialized in store
+Phase: base_store for module or1200_operandmuxes
+  17 signal(s) initialized in store
+Phase: base_store for module or1200_alu
+  32 signal(s) initialized in store
+Phase: base_store for module or1200_fpu
+Phase: base_store for module or1200_mult_mac
+  53 signal(s) initialized in store
+Phase: base_store for module or1200_gmultp2_32x32
+  9 signal(s) initialized in store
+Phase: base_store for module or1200_sprs
+  111 signal(s) initialized in store
+Phase: base_store for module or1200_lsu
+  42 signal(s) initialized in store
+Phase: base_store for module or1200_mem2reg
+  5 signal(s) initialized in store
+Phase: base_store for module or1200_reg2mem
+  8 signal(s) initialized in store
+Phase: base_store for module or1200_wbmux
+  12 signal(s) initialized in store
+Phase: base_store for module or1200_freeze
+  27 signal(s) initialized in store
+Phase: base_store for module or1200_except
+  96 signal(s) initialized in store
+Phase: base_store for module or1200_cfgr
+  2 signal(s) initialized in store
+Phase: base_store for module or1200_dmmu_top
+  62 signal(s) initialized in store
+Phase: base_store for module or1200_dmmu_tlb
+  35 signal(s) initialized in store
+Phase: base_store for module dtlb_ram
+  9 signal(s) initialized in store
+Phase: base_store for module dtlb_tr_ram
+  9 signal(s) initialized in store
+Phase: base_store for module or1200_dc_top
+Phase: base_store for module or1200_qmem_top
+Phase: base_store for module or1200_sb
+Phase: base_store for module or1200_du
+  94 signal(s) initialized in store
+Phase: base_store for module or1200_pic
+  15 signal(s) initialized in store
+Phase: base_store for module or1200_tt
+  16 signal(s) initialized in store
+Phase: base_store for module or1200_pm
+Phase: base_store for module or1200_tpram_32x32
+  19 signal(s) initialized in store
+Phase: collecting SVA assertions
+  Found 0 assertion(s) (0 immediate, 0 concurrent), 0 with Z3 expressions
+Phase: explore_block (per-module)
+explore_block: or1200_dc_fsm (38 paths)
+  path 1/38
+  path 38/38
+explore_block: or1200_dpram_256x32 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_dpram_256x32 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_dpram_32x32 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_dpram_32x32 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_fpu_arith (1 paths)
+  path 1/1
+explore_block: or1200_fpu_arith (1 paths)
+  path 1/1
+explore_block: or1200_fpu_arith (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_fpu_arith (29 paths)
+  path 1/29
+  path 29/29
+explore_block: or1200_fpu_arith (1 paths)
+  path 1/1
+explore_block: or1200_fpu_arith (1 paths)
+  path 1/1
+explore_block: or1200_fpu_arith (28 paths)
+  path 1/28
+  path 28/28
+explore_block: or1200_fpu_arith (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_fpu_arith (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_fpu_arith (1 paths)
+  path 1/1
+explore_block: or1200_fpu_arith (1 paths)
+  path 1/1
+explore_block: or1200_fpu_arith (1 paths)
+  path 1/1
+explore_block: or1200_fpu_arith (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_fpu_arith (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_fpu_arith (1 paths)
+  path 1/1
+explore_block: or1200_fpu_arith (1 paths)
+  path 1/1
+explore_block: or1200_fpu_arith (48 paths)
+  path 1/48
+  path 48/48
+explore_block: or1200_fpu_arith (49 paths)
+  path 1/49
+  path 49/49
+explore_block: or1200_fpu_arith (8 paths)
+  path 1/8
+  path 8/8
+explore_block: or1200_fpu_arith (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_fpu_arith (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_fpu_arith (1 paths)
+  path 1/1
+explore_block: or1200_fpu_arith (25 paths)
+  path 1/25
+  path 25/25
+explore_block: or1200_fpu_arith (25 paths)
+  path 1/25
+  path 25/25
+explore_block: or1200_fpu_arith (1 paths)
+  path 1/1
+explore_block: or1200_fpu_arith (1 paths)
+  path 1/1
+explore_block: or1200_fpu_arith (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_fpu_arith (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_fpu_arith (1 paths)
+  path 1/1
+explore_block: or1200_fpu_arith (1 paths)
+  path 1/1
+explore_block: or1200_fpu_arith (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_fpu_arith (1 paths)
+  path 1/1
+explore_block: or1200_fpu_arith (1 paths)
+  path 1/1
+explore_block: or1200_fpu_arith (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_fpu_arith (28 paths)
+  path 1/28
+  path 28/28
+explore_block: or1200_fpu_arith (1 paths)
+  path 1/1
+explore_block: or1200_fpu_arith (1 paths)
+  path 1/1
+explore_block: or1200_fpu_arith (1 paths)
+  path 1/1
+explore_block: or1200_fpu_arith (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_fpu_arith (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_fpu_arith (7 paths)
+  path 1/7
+  path 7/7
+explore_block: fpu_prenorm_addsub (1 paths)
+  path 1/1
+explore_block: fpu_prenorm_addsub (1 paths)
+  path 1/1
+explore_block: fpu_prenorm_addsub (4 paths)
+  path 1/4
+  path 4/4
+explore_block: fpu_prenorm_addsub (29 paths)
+  path 1/29
+  path 29/29
+explore_block: fpu_addsub (1 paths)
+  path 1/1
+explore_block: fpu_postnorm_addsub (1 paths)
+  path 1/1
+explore_block: fpu_postnorm_addsub (28 paths)
+  path 1/28
+  path 28/28
+explore_block: fpu_postnorm_addsub (4 paths)
+  path 1/4
+  path 4/4
+explore_block: fpu_postnorm_addsub (2 paths)
+  path 1/2
+  path 2/2
+explore_block: fpu_pre_norm_mul (1 paths)
+  path 1/1
+explore_block: fpu_mul (1 paths)
+  path 1/1
+explore_block: fpu_mul (1 paths)
+  path 1/1
+explore_block: fpu_mul (4 paths)
+  path 1/4
+  path 4/4
+explore_block: fpu_mul (3 paths)
+  path 1/3
+  path 3/3
+explore_block: fpu_post_norm_mul (1 paths)
+  path 1/1
+explore_block: fpu_post_norm_mul (1 paths)
+  path 1/1
+explore_block: fpu_post_norm_mul (48 paths)
+  path 1/48
+  path 48/48
+explore_block: fpu_post_norm_mul (49 paths)
+  path 1/49
+  path 49/49
+explore_block: fpu_post_norm_mul (8 paths)
+  path 1/8
+  path 8/8
+explore_block: fpu_post_norm_mul (2 paths)
+  path 1/2
+  path 2/2
+explore_block: fpu_post_norm_mul (2 paths)
+  path 1/2
+  path 2/2
+explore_block: fpu_pre_norm_div (1 paths)
+  path 1/1
+explore_block: fpu_pre_norm_div (25 paths)
+  path 1/25
+  path 25/25
+explore_block: fpu_pre_norm_div (25 paths)
+  path 1/25
+  path 25/25
+explore_block: fpu_pre_norm_div (1 paths)
+  path 1/1
+explore_block: fpu_div (1 paths)
+  path 1/1
+explore_block: fpu_div (4 paths)
+  path 1/4
+  path 4/4
+explore_block: fpu_div (4 paths)
+  path 1/4
+  path 4/4
+explore_block: fpu_post_norm_div (1 paths)
+  path 1/1
+explore_block: fpu_post_norm_div (1 paths)
+  path 1/1
+explore_block: fpu_post_norm_div (2 paths)
+  path 1/2
+  path 2/2
+explore_block: fpu_post_norm_div (1 paths)
+  path 1/1
+explore_block: fpu_post_norm_div (1 paths)
+  path 1/1
+explore_block: fpu_post_norm_div (2 paths)
+  path 1/2
+  path 2/2
+explore_block: fpu_post_norm_div (28 paths)
+  path 1/28
+  path 28/28
+explore_block: fpu_post_norm_div (1 paths)
+  path 1/1
+explore_block: or1200_fpu_fcmp (28 paths)
+  path 1/28
+  path 28/28
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (48 paths)
+  path 1/48
+  path 48/48
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_fpu_intfloat_conv (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u4 (48 paths)
+  path 1/48
+  path 48/48
+explore_block: u4 (1 paths)
+  path 1/1
+explore_block: u4 (1 paths)
+  path 1/1
+explore_block: u4 (1 paths)
+  path 1/1
+explore_block: u4 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: u4 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_rfram_generic (34 paths)
+  path 1/34
+  path 34/34
+explore_block: or1200_rfram_generic (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_rfram_generic (32 paths)
+  path 1/32
+  path 32/32
+explore_block: or1200_rfram_generic (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_rfram_generic (32 paths)
+  path 1/32
+  path 32/32
+explore_block: or1200_sb_fifo (18 paths)
+  path 1/18
+  path 18/18
+explore_block: or1200_spram_1024x32 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_spram_1024x32 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_1024x32_bw (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_spram_1024x32_bw (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_1024x32_bw (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_1024x32_bw (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_1024x32_bw (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_1024x8 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_spram_1024x8 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_128x32 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_spram_128x32 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_2048x32 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_spram_2048x32 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_2048x32_bw (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_spram_2048x32_bw (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_2048x32_bw (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_2048x32_bw (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_2048x32_bw (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_2048x8 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_spram_2048x8 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_256x21 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_spram_256x21 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_32_bw (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_32_bw (17 paths)
+  path 1/17
+  path 17/17
+explore_block: or1200_spram_32x24 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_spram_32x24 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_512x20 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_spram_512x20 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_64x14 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_spram_64x14 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_64x22 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_spram_64x22 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_64x24 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_spram_64x24 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_top (8 paths)
+  path 1/8
+  path 8/8
+explore_block: or1200_top (49 paths)
+  path 1/49
+  path 49/49
+explore_block: or1200_top (28 paths)
+  path 1/28
+  path 28/28
+explore_block: or1200_top (55 paths)
+  path 1/55
+  path 55/55
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_top (8 paths)
+  path 1/8
+  path 8/8
+explore_block: or1200_top (49 paths)
+  path 1/49
+  path 49/49
+explore_block: or1200_top (28 paths)
+  path 1/28
+  path 28/28
+explore_block: or1200_top (55 paths)
+  path 1/55
+  path 55/55
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (48 paths)
+  path 1/48
+  path 48/48
+explore_block: or1200_top (1 paths)
+  path 1/1
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (11 paths)
+  path 1/11
+  path 11/11
+explore_block: or1200_top (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_top (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_top (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_top (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_top (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (10 paths)
+  path 1/10
+  path 10/10
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_top (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (15 paths)
+  path 1/15
+  path 15/15
+explore_block: or1200_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (16 paths)
+  path 1/16
+  path 16/16
+explore_block: or1200_top (6 paths)
+  path 1/6
+  path 6/6
+explore_block: or1200_top (15 paths)
+  path 1/15
+  path 15/15
+explore_block: or1200_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_top (6 paths)
+  path 1/6
+  path 6/6
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_top (22 paths)
+  path 1/22
+  path 22/22
+explore_block: or1200_top (11 paths)
+  path 1/11
+  path 11/11
+explore_block: or1200_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_top (10 paths)
+  path 1/10
+  path 10/10
+explore_block: or1200_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (1 paths)
+  path 1/1
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_top (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_top (13 paths)
+  path 1/13
+  path 13/13
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (7 paths)
+  path 1/7
+  path 7/7
+explore_block: or1200_top (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_top (1 paths)
+  path 1/1
+explore_block: or1200_top (1 paths)
+  path 1/1
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (7 paths)
+  path 1/7
+  path 7/7
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (7 paths)
+  path 1/7
+  path 7/7
+explore_block: or1200_top (32 paths)
+  path 1/32
+  path 32/32
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_top (1 paths)
+  path 1/1
+explore_block: or1200_top (10 paths)
+  path 1/10
+  path 10/10
+explore_block: or1200_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_top (15 paths)
+  path 1/15
+  path 15/15
+explore_block: or1200_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_top (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (1 paths)
+  path 1/1
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_top (6 paths)
+  path 1/6
+  path 6/6
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (90 paths)
+  path 1/90
+  path 90/90
+explore_block: or1200_top (10 paths)
+  path 1/10
+  path 10/10
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (1 paths)
+  path 1/1
+explore_block: or1200_top (1 paths)
+  path 1/1
+explore_block: or1200_top (15 paths)
+  path 1/15
+  path 15/15
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_top (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: iwb_biu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: iwb_biu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: iwb_biu (8 paths)
+  path 1/8
+  path 8/8
+explore_block: iwb_biu (49 paths)
+  path 1/49
+  path 49/49
+explore_block: iwb_biu (28 paths)
+  path 1/28
+  path 28/28
+explore_block: iwb_biu (55 paths)
+  path 1/55
+  path 55/55
+explore_block: dwb_biu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: dwb_biu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: dwb_biu (8 paths)
+  path 1/8
+  path 8/8
+explore_block: dwb_biu (49 paths)
+  path 1/49
+  path 49/49
+explore_block: dwb_biu (28 paths)
+  path 1/28
+  path 28/28
+explore_block: dwb_biu (55 paths)
+  path 1/55
+  path 55/55
+explore_block: or1200_immu_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_immu_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_immu_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_immu_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_immu_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_immu_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_immu_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_immu_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_immu_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_immu_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_immu_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_immu_tlb (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_immu_tlb (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_immu_tlb (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_immu_tlb (2 paths)
+  path 1/2
+  path 2/2
+explore_block: itlb_mr_ram (2 paths)
+  path 1/2
+  path 2/2
+explore_block: itlb_mr_ram (2 paths)
+  path 1/2
+  path 2/2
+explore_block: itlb_tr_ram (2 paths)
+  path 1/2
+  path 2/2
+explore_block: itlb_tr_ram (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_ic_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_ic_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_ic_top (48 paths)
+  path 1/48
+  path 48/48
+explore_block: or1200_ic_fsm (48 paths)
+  path 1/48
+  path 48/48
+explore_block: or1200_cpu (1 paths)
+  path 1/1
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_cpu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_cpu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_cpu (11 paths)
+  path 1/11
+  path 11/11
+explore_block: or1200_cpu (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_cpu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_cpu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_cpu (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_cpu (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_cpu (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_cpu (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_cpu (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_cpu (10 paths)
+  path 1/10
+  path 10/10
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_cpu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_cpu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_cpu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_cpu (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_cpu (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_cpu (15 paths)
+  path 1/15
+  path 15/15
+explore_block: or1200_cpu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_cpu (16 paths)
+  path 1/16
+  path 16/16
+explore_block: or1200_cpu (6 paths)
+  path 1/6
+  path 6/6
+explore_block: or1200_cpu (15 paths)
+  path 1/15
+  path 15/15
+explore_block: or1200_cpu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_cpu (6 paths)
+  path 1/6
+  path 6/6
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_cpu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_cpu (22 paths)
+  path 1/22
+  path 22/22
+explore_block: or1200_cpu (11 paths)
+  path 1/11
+  path 11/11
+explore_block: or1200_cpu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_cpu (10 paths)
+  path 1/10
+  path 10/10
+explore_block: or1200_cpu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_cpu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_cpu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_cpu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_cpu (1 paths)
+  path 1/1
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_cpu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_cpu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_cpu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_cpu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_cpu (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_cpu (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_cpu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_cpu (13 paths)
+  path 1/13
+  path 13/13
+explore_block: or1200_cpu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_cpu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_cpu (7 paths)
+  path 1/7
+  path 7/7
+explore_block: or1200_cpu (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_cpu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_cpu (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_cpu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_cpu (1 paths)
+  path 1/1
+explore_block: or1200_cpu (1 paths)
+  path 1/1
+explore_block: or1200_cpu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_cpu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_cpu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_cpu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_cpu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_cpu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_cpu (7 paths)
+  path 1/7
+  path 7/7
+explore_block: or1200_cpu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_cpu (7 paths)
+  path 1/7
+  path 7/7
+explore_block: or1200_cpu (32 paths)
+  path 1/32
+  path 32/32
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_cpu (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_cpu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_cpu (1 paths)
+  path 1/1
+explore_block: or1200_cpu (10 paths)
+  path 1/10
+  path 10/10
+explore_block: or1200_cpu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_cpu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_cpu (15 paths)
+  path 1/15
+  path 15/15
+explore_block: or1200_cpu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_cpu (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_cpu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_cpu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_cpu (1 paths)
+  path 1/1
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_cpu (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_cpu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_cpu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_cpu (6 paths)
+  path 1/6
+  path 6/6
+explore_block: or1200_cpu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_cpu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_cpu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_cpu (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_cpu (90 paths)
+  path 1/90
+  path 90/90
+explore_block: or1200_cpu (10 paths)
+  path 1/10
+  path 10/10
+explore_block: or1200_genpc (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_genpc (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_genpc (11 paths)
+  path 1/11
+  path 11/11
+explore_block: or1200_genpc (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_genpc (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_if (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_if (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_if (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_if (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_if (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_ctrl (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_ctrl (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_ctrl (10 paths)
+  path 1/10
+  path 10/10
+explore_block: or1200_ctrl (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_ctrl (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_ctrl (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_ctrl (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_ctrl (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_ctrl (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_ctrl (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_ctrl (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_ctrl (15 paths)
+  path 1/15
+  path 15/15
+explore_block: or1200_ctrl (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_ctrl (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_ctrl (16 paths)
+  path 1/16
+  path 16/16
+explore_block: or1200_ctrl (6 paths)
+  path 1/6
+  path 6/6
+explore_block: or1200_ctrl (15 paths)
+  path 1/15
+  path 15/15
+explore_block: or1200_ctrl (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_ctrl (6 paths)
+  path 1/6
+  path 6/6
+explore_block: or1200_ctrl (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_ctrl (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_ctrl (22 paths)
+  path 1/22
+  path 22/22
+explore_block: or1200_ctrl (11 paths)
+  path 1/11
+  path 11/11
+explore_block: or1200_ctrl (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_ctrl (10 paths)
+  path 1/10
+  path 10/10
+explore_block: or1200_ctrl (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_ctrl (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_ctrl (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_rf (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_rf (1 paths)
+  path 1/1
+explore_block: or1200_rf (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_rf (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_rf (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_rf (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_rf (2 paths)
+  path 1/2
+  path 2/2
+explore_block: rf_a (2 paths)
+  path 1/2
+  path 2/2
+explore_block: rf_a (2 paths)
+  path 1/2
+  path 2/2
+explore_block: rf_b (2 paths)
+  path 1/2
+  path 2/2
+explore_block: rf_b (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_operandmuxes (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_operandmuxes (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_operandmuxes (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_operandmuxes (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_alu (13 paths)
+  path 1/13
+  path 13/13
+explore_block: or1200_alu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_alu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_alu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_alu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_alu (7 paths)
+  path 1/7
+  path 7/7
+explore_block: or1200_alu (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_mult_mac (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_mult_mac (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_mult_mac (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_mult_mac (1 paths)
+  path 1/1
+explore_block: or1200_mult_mac (1 paths)
+  path 1/1
+explore_block: or1200_mult_mac (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_mult_mac (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_mult_mac (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_mult_mac (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_mult_mac (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_mult_mac (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_mult_mac (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_mult_mac (7 paths)
+  path 1/7
+  path 7/7
+explore_block: or1200_mult_mac (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_mult_mac (7 paths)
+  path 1/7
+  path 7/7
+explore_block: or1200_gmultp2_32x32 (1 paths)
+  path 1/1
+explore_block: or1200_gmultp2_32x32 (1 paths)
+  path 1/1
+explore_block: or1200_gmultp2_32x32 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_gmultp2_32x32 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_sprs (32 paths)
+  path 1/32
+  path 32/32
+explore_block: or1200_sprs (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_sprs (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_sprs (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_sprs (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_sprs (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_sprs (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_sprs (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_sprs (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_sprs (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_sprs (1 paths)
+  path 1/1
+explore_block: or1200_sprs (10 paths)
+  path 1/10
+  path 10/10
+explore_block: or1200_lsu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_lsu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_lsu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_lsu (15 paths)
+  path 1/15
+  path 15/15
+explore_block: or1200_lsu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_lsu (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_lsu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_lsu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_lsu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_lsu (1 paths)
+  path 1/1
+explore_block: or1200_mem2reg (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_mem2reg (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_reg2mem (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_reg2mem (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_reg2mem (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_reg2mem (1 paths)
+  path 1/1
+explore_block: or1200_wbmux (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_wbmux (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_freeze (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_freeze (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_freeze (6 paths)
+  path 1/6
+  path 6/6
+explore_block: or1200_except (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_except (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_except (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_except (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_except (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_except (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_except (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_except (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_except (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_except (90 paths)
+  path 1/90
+  path 90/90
+explore_block: or1200_cfgr (10 paths)
+  path 1/10
+  path 10/10
+explore_block: or1200_dmmu_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_dmmu_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_dmmu_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_dmmu_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_dmmu_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_dmmu_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_dmmu_tlb (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_dmmu_tlb (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_dmmu_tlb (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_dmmu_tlb (2 paths)
+  path 1/2
+  path 2/2
+explore_block: dtlb_ram (2 paths)
+  path 1/2
+  path 2/2
+explore_block: dtlb_ram (2 paths)
+  path 1/2
+  path 2/2
+explore_block: dtlb_tr_ram (2 paths)
+  path 1/2
+  path 2/2
+explore_block: dtlb_tr_ram (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_du (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_du (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_du (1 paths)
+  path 1/1
+explore_block: or1200_du (1 paths)
+  path 1/1
+explore_block: or1200_du (15 paths)
+  path 1/15
+  path 15/15
+explore_block: or1200_du (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_du (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_du (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_du (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_du (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_du (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_pic (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_pic (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_pic (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_tt (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_tt (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_tt (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_tpram_32x32 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_tpram_32x32 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_tpram_32x32 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_tpram_32x32 (3 paths)
+  path 1/3
+  path 3/3
+Phase: merge_block_results (per-module, Paper §4.3)
+  merge or1200_dc_fsm (1/79): 1 blocks
+    -> 25 feasible merged paths
+  merge or1200_dc_ram (2/79): 0 blocks
+    -> 1 feasible merged paths
+  merge or1200_dc_tag (3/79): 0 blocks
+    -> 1 feasible merged paths
+  merge or1200_dpram_256x32 (4/79): 2 blocks
+    merge or1200_dpram_256x32 group 0: block indices [0, 1], per-block outcome counts [3, 2], naive Cartesian size 6
+    -> 6 feasible merged paths
+  merge or1200_dpram_32x32 (5/79): 2 blocks
+    merge or1200_dpram_32x32 group 0: block indices [0, 1], per-block outcome counts [3, 2], naive Cartesian size 6
+    -> 6 feasible merged paths
+  merge or1200_fpu_arith (6/79): 41 blocks
+    merge or1200_fpu_arith: partitioned 41 blocks into 20 independent groups (full product would be 2,943,815,547,617,280,000)
+    merge or1200_fpu_arith group 2: block indices [2, 3, 6, 7, 8, 12, 13, 16, 17, 18, 19, 20, 22, 23, 26, 27, 30, 33, 34, 38, 39, 40], per-block outcome counts [4, 29, 28, 4, 2, 4, 3, 48, 49, 8, 2, 2, 25, 25, 4, 4, 2, 2, 28, 4, 4, 7], naive Cartesian size 2,943,815,547,617,280,000
+    [merge-heartbeat] or1200_fpu_arith_g2: 20.1s elapsed, stack_depth=22, top_level=21, yielded=77, combos_checked=111, pruned=0, cache_hits=110
+    [merge-heartbeat] or1200_fpu_arith_g2: 40.3s elapsed, stack_depth=22, top_level=21, yielded=164, combos_checked=214, pruned=0, cache_hits=213
+    [merge-heartbeat] or1200_fpu_arith_g2: 60.4s elapsed, stack_depth=21, top_level=20, yielded=252, combos_checked=319, pruned=0, cache_hits=318
+    [merge-heartbeat] or1200_fpu_arith_g2: 80.5s elapsed, stack_depth=22, top_level=21, yielded=336, combos_checked=417, pruned=0, cache_hits=416
+    [merge-heartbeat] or1200_fpu_arith_g2: 100.8s elapsed, stack_depth=22, top_level=21, yielded=420, combos_checked=517, pruned=0, cache_hits=516
+    [merge-heartbeat] or1200_fpu_arith_g2: 120.8s elapsed, stack_depth=22, top_level=21, yielded=508, combos_checked=623, pruned=0, cache_hits=622
+    [merge-heartbeat] or1200_fpu_arith_g2: 141.0s elapsed, stack_depth=22, top_level=21, yielded=597, combos_checked=729, pruned=0, cache_hits=728
+    [merge-heartbeat] or1200_fpu_arith_g2: 161.0s elapsed, stack_depth=22, top_level=21, yielded=682, combos_checked=830, pruned=0, cache_hits=829
+    [merge-heartbeat] or1200_fpu_arith_g2: 181.1s elapsed, stack_depth=22, top_level=21, yielded=763, combos_checked=925, pruned=0, cache_hits=924
+    [merge-heartbeat] or1200_fpu_arith_g2: 201.4s elapsed, stack_depth=22, top_level=21, yielded=851, combos_checked=1030, pruned=0, cache_hits=1029
+    [merge-heartbeat] or1200_fpu_arith_g2: 221.5s elapsed, stack_depth=22, top_level=21, yielded=940, combos_checked=1136, pruned=0, cache_hits=1135
+    [merge-heartbeat] or1200_fpu_arith_g2: 241.6s elapsed, stack_depth=22, top_level=21, yielded=1026, combos_checked=1238, pruned=0, cache_hits=1237
+    [merge-heartbeat] or1200_fpu_arith_g2: 261.6s elapsed, stack_depth=22, top_level=21, yielded=1108, combos_checked=1335, pruned=0, cache_hits=1334
+    [merge-heartbeat] or1200_fpu_arith_g2: 281.8s elapsed, stack_depth=22, top_level=21, yielded=1194, combos_checked=1437, pruned=0, cache_hits=1436
+
+=== TIMEOUT: Execution time limit exceeded ===
+  Elapsed time: 300.1782s
+  Paths explored (feasible): 0
+  Branch points explored: 0
+  Assertions checked: 0
+  Result: No violation found within time limit
+=======================================
+    [merge-heartbeat] or1200_fpu_arith_g2: 301.9s elapsed, stack_depth=22, top_level=21, yielded=1281, combos_checked=1541, pruned=0, cache_hits=1540
+    [merge-heartbeat] or1200_fpu_arith_g2: 321.9s elapsed, stack_depth=22, top_level=21, yielded=1369, combos_checked=1645, pruned=0, cache_hits=1644
+    [merge-heartbeat] or1200_fpu_arith_g2: 342.1s elapsed, stack_depth=22, top_level=21, yielded=1452, combos_checked=1743, pruned=0, cache_hits=1742
+    [merge-heartbeat] or1200_fpu_arith_g2: 362.3s elapsed, stack_depth=22, top_level=21, yielded=1536, combos_checked=1843, pruned=0, cache_hits=1842
+    [merge-heartbeat] or1200_fpu_arith_g2: 382.3s elapsed, stack_depth=22, top_level=21, yielded=1624, combos_checked=1949, pruned=0, cache_hits=1948
