@@ -7,6 +7,3 @@
 [submodule "designs/benchmarks/or1200/buggy-or1200"]
 	path = designs/benchmarks/or1200/buggy-or1200
 	url = git@github.com:HWSec-UNC/buggy-or1200.git
-[submodule "verification-benchmarks"]
-	path = verification-benchmarks
-	url = https://github.com/HWSec-UNC/verification-benchmarks.git
