@@ -3,7 +3,7 @@ from operator import indexOf
 import os
 import networkx as nx
 import matplotlib.pyplot as plt
-import pyslang as ps
+import pyslang.ast as ps_ast
 from .basic_block_visitor import BasicBlockVisitor
 from helpers.visitor_helpers import handles, build_lookup_table
 
@@ -88,7 +88,7 @@ class CFG:
         visitor = AlwaysBlockVisitor(
             self.always_blocks, self.always_comb_blocks, self.decls, self.comb,
         )
-        ast.visit(visitor)
+        ast.visit(lookup_table=visitor.lookup_table)
 
     def build_cfg(self, always_block):
         """Build networkx digraph / CFG for the Statement body of a ProceduralBlock symbol."""
@@ -97,7 +97,7 @@ class CFG:
         self.basic_block_visitor._scope = self._instance_body
 
         # finds all edges and partition points in the always block for the CFG
-        always_block.visit(self.basic_block_visitor)
+        always_block.visit(lookup_table=self.basic_block_visitor.lookup_table)
 
         # Partitions the nodes into basic blocks
         # The partition points are the first node in each basic block
@@ -322,12 +322,12 @@ class AlwaysBlockVisitor:
     """
 
     _COMB_KINDS = frozenset({
-        ps.ProceduralBlockKind.AlwaysComb,
-        ps.ProceduralBlockKind.AlwaysLatch,
+        ps_ast.ProceduralBlockKind.AlwaysComb,
+        ps_ast.ProceduralBlockKind.AlwaysLatch,
     })
     _SKIP_KINDS = frozenset({
-        ps.ProceduralBlockKind.Initial,
-        ps.ProceduralBlockKind.Final,
+        ps_ast.ProceduralBlockKind.Initial,
+        ps_ast.ProceduralBlockKind.Final,
     })
 
     def __init__(self, always_blocks, always_comb_blocks, decls, comb):
@@ -339,7 +339,7 @@ class AlwaysBlockVisitor:
 
     def __call__(self, node):
         """Visitor dispatcher called by pyslang. Only handles Symbol nodes."""
-        if not isinstance(node, ps.Symbol):
+        if not isinstance(node, ps_ast.Symbol):
             return
         handler = self.lookup_table.get(node.kind)
         if handler:
@@ -347,24 +347,24 @@ class AlwaysBlockVisitor:
 
     ### SYMBOL HANDLERS ###
 
-    @handles(ps.SymbolKind.ProceduralBlock)
-    def handle_procedural_block(self, node: ps.Symbol):
+    @handles(ps_ast.SymbolKind.ProceduralBlock)
+    def handle_procedural_block(self, node: ps_ast.Symbol):
         """Sort procedural blocks by kind: comb vs ff/always, skip initial/final."""
         kind = node.procedureKind
         if kind in self._SKIP_KINDS:
-            return ps.VisitAction.Skip
+            return ps_ast.VisitAction.Skip
         if kind in self._COMB_KINDS:
             self.always_comb_blocks.append(node)
         else:
             self.always_blocks.append(node)
-        return ps.VisitAction.Skip
+        return ps_ast.VisitAction.Skip
 
-    @handles(ps.SymbolKind.Variable, ps.SymbolKind.Net)
-    def handle_variable(self, node: ps.Symbol):
+    @handles(ps_ast.SymbolKind.Variable, ps_ast.SymbolKind.Net)
+    def handle_variable(self, node: ps_ast.Symbol):
         """Captures data declarations."""
         self.decls.append(node)
 
-    @handles(ps.SymbolKind.ContinuousAssign)
-    def handle_continuous_assign(self, node: ps.Symbol):
+    @handles(ps_ast.SymbolKind.ContinuousAssign)
+    def handle_continuous_assign(self, node: ps_ast.Symbol):
         """Captures continuous assignments (combinational logic)."""
         self.comb.append(node)

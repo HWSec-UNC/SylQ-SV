@@ -1,4 +1,4 @@
-import pyslang as ps
+import pyslang.ast as ps_ast
 from helpers.visitor_helpers import handles, build_lookup_table
 
 
@@ -70,7 +70,7 @@ class BasicBlockVisitor:
 
     ### STATEMENT HANDLERS ###
 
-    @handles(ps.StatementKind.Conditional)
+    @handles(ps_ast.StatementKind.Conditional)
     def handle_conditional(self, node):
         """Handle if/else and else-if chains with partition points."""
         cond_expr = node.conditions[0].expr if node.conditions else node
@@ -92,7 +92,7 @@ class BasicBlockVisitor:
         if_false = node.ifFalse
         if if_false is not None:
             self.edge_stack.clear()
-            if if_false.kind == ps.StatementKind.Conditional:
+            if if_false.kind == ps_ast.StatementKind.Conditional:
                 # else-if:
                 self.cfg.edgelist.append((parent_idx, self.cfg.curr_idx, "false"))
                 if_false.visit(self)
@@ -108,9 +108,9 @@ class BasicBlockVisitor:
         else:
             self.edge_stack.append((parent_idx, "false"))
 
-        return ps.VisitAction.Skip
+        return ps_ast.VisitAction.Skip
 
-    @handles(ps.StatementKind.Case)
+    @handles(ps_ast.StatementKind.Case)
     def handle_case(self, node):
         """Handle case/casez/casex statement with default support."""
         parent_idx = self._add_node(node.expr)
@@ -118,11 +118,11 @@ class BasicBlockVisitor:
 
         case_cond = getattr(node, 'condition', None)
         case_kind_str = ""
-        if case_cond == ps.CaseStatementCondition.WildcardJustZ:
+        if case_cond == ps_ast.CaseStatementCondition.WildcardJustZ:
             case_kind_str = "casez"
-        elif case_cond == ps.CaseStatementCondition.WildcardXOrZ:
+        elif case_cond == ps_ast.CaseStatementCondition.WildcardXOrZ:
             case_kind_str = "casex"
-        elif case_cond == ps.CaseStatementCondition.Inside:
+        elif case_cond == ps_ast.CaseStatementCondition.Inside:
             case_kind_str = "case inside"
 
         all_standard_exprs = []
@@ -154,16 +154,16 @@ class BasicBlockVisitor:
             self.edge_stack.clear()
 
         self.edge_stack = persisted_dangling_edge_stack
-        return ps.VisitAction.Skip
+        return ps_ast.VisitAction.Skip
 
-    @handles(ps.StatementKind.ForLoop)
+    @handles(ps_ast.StatementKind.ForLoop)
     def handle_for_loop(self, node):
         """Handle for-loop by statically unrolling it N times."""
         if self._scope is None:
             raise ValueError("No scope set; cannot unroll loop")
 
-        ast_ctx = ps.ASTContext(self._scope, ps.LookupLocation.max)
-        eval_ctx = ps.EvalContext(ast_ctx)
+        ast_ctx = ps_ast.ASTContext(self._scope, ps_ast.LookupLocation.max)
+        eval_ctx = ps_ast.EvalContext(ast_ctx)
 
         # emit initializers and get initial loop variable value
         if node.loopVars:
@@ -192,7 +192,7 @@ class BasicBlockVisitor:
             current_val += step_size
             unroll_count += 1
 
-        return ps.VisitAction.Skip
+        return ps_ast.VisitAction.Skip
 
     # @handles(ps.StatementKind.DoWhileLoop)
     # def handle_do_while(self, node):
@@ -205,15 +205,15 @@ class BasicBlockVisitor:
     #     ...
 
     @handles(
-        ps.StatementKind.ExpressionStatement,
-        ps.StatementKind.VariableDeclaration,
-        ps.StatementKind.ProceduralAssign,
+        ps_ast.StatementKind.ExpressionStatement,
+        ps_ast.StatementKind.VariableDeclaration,
+        ps_ast.StatementKind.ProceduralAssign,
     )
     def handle_leaf_statement(self, node):
         """Catch-all for leaf statements (assignments, declarations, etc.)."""
         idx = self._add_node(node)
         self.edge_stack.append((idx, None))
-        return ps.VisitAction.Skip
+        return ps_ast.VisitAction.Skip
 
     ### HELPERS ###
 
@@ -240,12 +240,12 @@ class BasicBlockVisitor:
     def _get_step_size(self, node, eval_ctx) -> int:
         """Return the signed integer step size for the first step expression."""
         step = node.steps[0]
-        if step.kind == ps.ExpressionKind.UnaryOp:
-            if step.op in (ps.UnaryOperator.Postincrement, ps.UnaryOperator.Preincrement):
+        if step.kind == ps_ast.ExpressionKind.UnaryOp:
+            if step.op in (ps_ast.UnaryOperator.Postincrement, ps_ast.UnaryOperator.Preincrement):
                 return 1
-            if step.op in (ps.UnaryOperator.Postdecrement, ps.UnaryOperator.Predecrement):
+            if step.op in (ps_ast.UnaryOperator.Postdecrement, ps_ast.UnaryOperator.Predecrement):
                 return -1
-        if step.kind == ps.ExpressionKind.Assignment:
+        if step.kind == ps_ast.ExpressionKind.Assignment:
             rhs = step.right
             arith_op = step.op if step.op is not None else getattr(rhs, 'op', None)
             if hasattr(rhs, 'right'):
@@ -256,18 +256,18 @@ class BasicBlockVisitor:
                     f"Cannot evaluate step delta as constant: {str(step.syntax)!r}"
                 )
             delta = int(cv.value)
-            if arith_op == ps.BinaryOperator.Add:
+            if arith_op == ps_ast.BinaryOperator.Add:
                 return delta
-            if arith_op == ps.BinaryOperator.Subtract:
+            if arith_op == ps_ast.BinaryOperator.Subtract:
                 return -delta
         raise ValueError(f"Unsupported loop step kind: {step.kind}, op: {getattr(step, 'op', '?')}")
 
     def _loop_guard_holds(self, curr: int, bound: int, op) -> bool:
         """Return True while the loop guard condition holds (loop should continue)."""
-        if op == ps.BinaryOperator.LessThan:            return curr < bound
-        if op == ps.BinaryOperator.LessThanEqual:       return curr <= bound
-        if op == ps.BinaryOperator.GreaterThan:         return curr > bound
-        if op == ps.BinaryOperator.GreaterThanEqual:    return curr >= bound
+        if op == ps_ast.BinaryOperator.LessThan:            return curr < bound
+        if op == ps_ast.BinaryOperator.LessThanEqual:       return curr <= bound
+        if op == ps_ast.BinaryOperator.GreaterThan:         return curr > bound
+        if op == ps_ast.BinaryOperator.GreaterThanEqual:    return curr >= bound
         raise ValueError(f"Unsupported loop guard operator: {op}")
 
     def _emit_step(self, node):

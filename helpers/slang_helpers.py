@@ -1,5 +1,6 @@
 """A library of helper functions for working with the PySlang AST."""
-import pyslang as ps
+import pyslang.ast as ps_ast
+import pyslang.syntax as ps_stx
 from helpers.utils import init_symbol
 from engine.execution_manager import ExecutionManager
 from engine.symbolic_state import SymbolicState
@@ -94,7 +95,7 @@ class SlangSymbolVisitor:
 
         kind = stmt.kind
 
-        if kind == ps.StatementKind.Conditional:
+        if kind == ps_ast.StatementKind.Conditional:
             self.branch_points += 1
             if stmt.conditions:
                 for cond in stmt.conditions:
@@ -108,7 +109,7 @@ class SlangSymbolVisitor:
             else:
                 self.paths += 1
 
-        elif kind == ps.StatementKind.Case:
+        elif kind == ps_ast.StatementKind.Case:
             self.branch_points += 1
             self.visit_expr(stmt.expr)
             for case in stmt.cases:
@@ -116,9 +117,9 @@ class SlangSymbolVisitor:
                     self.visit_expr(e)
                 self.visit_stmt(case.stmt)
 
-        elif kind in [ps.StatementKind.WhileLoop, ps.StatementKind.DoWhileLoop,
-                      ps.StatementKind.ForLoop, ps.StatementKind.ForeverLoop,
-                      ps.StatementKind.RepeatLoop, ps.StatementKind.ForeachLoop]:
+        elif kind in [ps_ast.StatementKind.WhileLoop, ps_ast.StatementKind.DoWhileLoop,
+                      ps_ast.StatementKind.ForLoop, ps_ast.StatementKind.ForeverLoop,
+                      ps_ast.StatementKind.RepeatLoop, ps_ast.StatementKind.ForeachLoop]:
             self.branch_points += 1
             if hasattr(stmt, 'cond'):
                 self.visit_expr(stmt.cond)
@@ -130,32 +131,32 @@ class SlangSymbolVisitor:
                 self.visit_stmt(stmt.incr)
             self.paths += 1  # conservative
 
-        elif kind == ps.StatementKind.List and hasattr(stmt, 'body'):
+        elif kind == ps_ast.StatementKind.List and hasattr(stmt, 'body'):
             for s in stmt.body:
                 self.visit_stmt(s)
 
-        elif kind == ps.StatementKind.Block and hasattr(stmt, 'body'):
+        elif kind == ps_ast.StatementKind.Block and hasattr(stmt, 'body'):
             for substmt in stmt.body:
                 self.visit_stmt(substmt)
 
-        elif kind in [ps.StatementKind.Return, ps.StatementKind.Break,
-                      ps.StatementKind.Continue, ps.StatementKind.Disable,
-                      ps.StatementKind.ForeverLoop]:
+        elif kind in [ps_ast.StatementKind.Return, ps_ast.StatementKind.Break,
+                      ps_ast.StatementKind.Continue, ps_ast.StatementKind.Disable,
+                      ps_ast.StatementKind.ForeverLoop]:
             self.paths += 1
 
-        elif kind == ps.StatementKind.Timed and hasattr(stmt, 'stmt'):
+        elif kind == ps_ast.StatementKind.Timed and hasattr(stmt, 'stmt'):
             self.visit_stmt(stmt.stmt)
 
-        elif kind in [ps.StatementKind.ImmediateAssertion, ps.StatementKind.ConcurrentAssertion,
-                      ps.StatementKind.Wait, ps.StatementKind.WaitFork, ps.StatementKind.WaitOrder,
-                      ps.StatementKind.RandCase, ps.StatementKind.RandSequence]:
+        elif kind in [ps_ast.StatementKind.ImmediateAssertion, ps_ast.StatementKind.ConcurrentAssertion,
+                      ps_ast.StatementKind.Wait, ps_ast.StatementKind.WaitFork, ps_ast.StatementKind.WaitOrder,
+                      ps_ast.StatementKind.RandCase, ps_ast.StatementKind.RandSequence]:
             if hasattr(stmt, 'stmt'):
                 self.visit_stmt(stmt.stmt)
 
-        elif kind in [ps.StatementKind.ExpressionStatement,
-                      ps.StatementKind.ProceduralAssign, ps.StatementKind.ProceduralDeassign,
-                      ps.StatementKind.DisableFork, ps.StatementKind.EventTrigger,
-                      ps.StatementKind.VariableDeclaration, ps.StatementKind.Empty]:
+        elif kind in [ps_ast.StatementKind.ExpressionStatement,
+                      ps_ast.StatementKind.ProceduralAssign, ps_ast.StatementKind.ProceduralDeassign,
+                      ps_ast.StatementKind.DisableFork, ps_ast.StatementKind.EventTrigger,
+                      ps_ast.StatementKind.VariableDeclaration, ps_ast.StatementKind.Empty]:
             pass  # no effect on path or branching
 
         else:
@@ -167,25 +168,25 @@ class SlangSymbolVisitor:
             return
 
         kind = expr.kind
-        if kind == ps.ExpressionKind.ConditionalOp:
+        if kind == ps_ast.ExpressionKind.ConditionalOp:
             self.branch_points += 1
             self.visit_expr(expr.predicate)
             self.visit_expr(expr.left)
             self.visit_expr(expr.right)
 
-        elif kind == ps.ExpressionKind.BinaryOp:
+        elif kind == ps_ast.ExpressionKind.BinaryOp:
             self.visit_expr(expr.left)
             self.visit_expr(expr.right)
 
-        elif kind == ps.ExpressionKind.UnaryOp:
+        elif kind == ps_ast.ExpressionKind.UnaryOp:
             self.visit_expr(expr.operand)
 
-        elif kind in [ps.ExpressionKind.Assignment,
-                      ps.ExpressionKind.NamedValue,
-                      ps.ExpressionKind.ElementSelect,
-                      ps.ExpressionKind.RangeSelect,
-                      ps.ExpressionKind.MemberAccess,
-                      ps.ExpressionKind.Call]:
+        elif kind in [ps_ast.ExpressionKind.Assignment,
+                      ps_ast.ExpressionKind.NamedValue,
+                      ps_ast.ExpressionKind.ElementSelect,
+                      ps_ast.ExpressionKind.RangeSelect,
+                      ps_ast.ExpressionKind.MemberAccess,
+                      ps_ast.ExpressionKind.Call]:
             if hasattr(expr, 'left'):
                 self.visit_expr(expr.left)
             if hasattr(expr, 'right'):
@@ -193,12 +194,12 @@ class SlangSymbolVisitor:
             if hasattr(expr, 'value'):
                 self.visit_expr(expr.value)
 
-        elif kind in [ps.ExpressionKind.Concatenation, ps.ExpressionKind.Replication,
-                      ps.ExpressionKind.SimpleAssignmentPattern,
-                      ps.ExpressionKind.StructuredAssignmentPattern,
-                      ps.ExpressionKind.ReplicatedAssignmentPattern,
-                      ps.ExpressionKind.List, ps.ExpressionKind.Pattern,
-                      ps.ExpressionKind.StructurePattern]:
+        elif kind in [ps_ast.ExpressionKind.Concatenation, ps_ast.ExpressionKind.Replication,
+                      ps_ast.ExpressionKind.SimpleAssignmentPattern,
+                      ps_ast.ExpressionKind.StructuredAssignmentPattern,
+                      ps_ast.ExpressionKind.ReplicatedAssignmentPattern,
+                      ps_ast.ExpressionKind.List, ps_ast.ExpressionKind.Pattern,
+                      ps_ast.ExpressionKind.StructurePattern]:
             for e in getattr(expr, 'elements', getattr(expr, 'operands', [])):
                 if hasattr(e, 'value'):
                     self.visit_expr(e.value)
@@ -216,7 +217,7 @@ class SlangSymbolVisitor:
                         if hasattr(item, "kind"):
                             self.visit(item)
                 else:
-                    if hasattr(val, "kind") or isinstance(val, ps.Symbol):
+                    if hasattr(val, "kind") or isinstance(val, ps_ast.Symbol):
                         self.visit(val)
     
     def visit(self, symbol):
@@ -226,7 +227,7 @@ class SlangSymbolVisitor:
                 self.visit(s)
             return
 
-        if not isinstance(symbol, ps.Symbol):
+        if not isinstance(symbol, ps_ast.Symbol):
             # Not every AST node in Slang is a ps.Symbol, so therefore I added a traversal here which traveres through their .members attribute because they might contian Statements there such as Compilation root, Definition objects, etc.
             if hasattr(symbol, "members"):
                 for m in getattr(symbol, "members"):
@@ -240,17 +241,17 @@ class SlangSymbolVisitor:
         #     # root symbol
         #     ...
         # Root / Compilation unit: recurse into members
-        if symbol.kind in (ps.SymbolKind.Root, ps.SymbolKind.CompilationUnit):
+        if symbol.kind in (ps_ast.SymbolKind.Root, ps_ast.SymbolKind.CompilationUnit):
             self._recurse_if_present(symbol, "members", "items", "declarations")
             return
         
-        elif symbol.kind == ps.SymbolKind.Definition:
+        elif symbol.kind == ps_ast.SymbolKind.Definition:
             # definitions can contain members, etc.
             self._recurse_if_present(symbol, "members", "declarations", "items", "body", "syntax")
             return
         
         # Procedural block: count branches by delegating to visit_stmt
-        if symbol.kind == ps.SymbolKind.ProceduralBlock:
+        if symbol.kind == ps_ast.SymbolKind.ProceduralBlock:
             # some procedural blocks expose `.body` or `.statement`
             body = getattr(symbol, "body", getattr(symbol, "statement", None))
             if body is not None:
@@ -263,7 +264,7 @@ class SlangSymbolVisitor:
                 self._recurse_if_present(symbol, "members")
             return
         
-        elif symbol.kind == ps.SymbolKind.ContinuousAssign:
+        elif symbol.kind == ps_ast.SymbolKind.ContinuousAssign:
             try:
                 assign = getattr(symbol, "assignment", None)
                 if assign is not None:
@@ -273,7 +274,7 @@ class SlangSymbolVisitor:
             self._recurse_if_present(symbol, "members", "children")
             return
         
-        elif symbol.kind == ps.SymbolKind.Instance:
+        elif symbol.kind == ps_ast.SymbolKind.Instance:
             # instance.name is a common attribute
             try:
                 instance_name = getattr(symbol, "name", None)
@@ -283,12 +284,12 @@ class SlangSymbolVisitor:
             return
         
         # Instance Body / Instance Array: recurse into members/statements
-        elif symbol.kind in (ps.SymbolKind.InstanceBody, ps.SymbolKind.InstanceArray):
+        elif symbol.kind in (ps_ast.SymbolKind.InstanceBody, ps_ast.SymbolKind.InstanceArray):
             self._recurse_if_present(symbol, "members", "statements", "items")
             return
         
 
-        elif symbol.kind in (ps.SymbolKind.Port, ps.SymbolKind.Variable, ps.SymbolKind.Net, ps.SymbolKind.Parameter):
+        elif symbol.kind in (ps_ast.SymbolKind.Port, ps_ast.SymbolKind.Variable, ps_ast.SymbolKind.Net, ps_ast.SymbolKind.Parameter):
             # If there is an initializer or assignment expression, visit it
             init_expr = getattr(symbol, "initializer", None) or getattr(symbol, "assignment", None)
             if init_expr is not None:
@@ -323,7 +324,7 @@ class SymbolicDFS:
 
     def dfs(self, symbol):
         """Main DFS traversal of symbols"""
-        if not isinstance(symbol, ps.Symbol):
+        if not isinstance(symbol, ps_ast.Symbol):
             return
 
         if symbol is None or symbol in self.visited:
@@ -332,35 +333,35 @@ class SymbolicDFS:
 
         # Update symbolic store for variables, parameters, etc.
         if hasattr(symbol, "name") and symbol.kind in (
-            ps.SymbolKind.Variable,
-            ps.SymbolKind.Parameter,
-            ps.SymbolKind.Port,
+            ps_ast.SymbolKind.Variable,
+            ps_ast.SymbolKind.Parameter,
+            ps_ast.SymbolKind.Port,
         ):
             self.symbolic_store[symbol.name] = symbol
 
         # Update path condition for conditional statements
-        if symbol.kind == ps.SymbolKind.ProceduralBlock and hasattr(symbol, "body"):
+        if symbol.kind == ps_ast.SymbolKind.ProceduralBlock and hasattr(symbol, "body"):
             self.dfs_stmt(symbol.body)
-        elif symbol.kind == ps.SymbolKind.ContinuousAssign and hasattr(symbol, "assignment"):
+        elif symbol.kind == ps_ast.SymbolKind.ContinuousAssign and hasattr(symbol, "assignment"):
             self.dfs_expr(symbol.assignment)
 
         # Recursively visit children if available
         if hasattr(symbol, "members"):
             for member in symbol.members:
                 self.dfs(member)
-        if hasattr(symbol, "body") and symbol.kind != ps.SymbolKind.ProceduralBlock:
+        if hasattr(symbol, "body") and symbol.kind != ps_ast.SymbolKind.ProceduralBlock:
             self.dfs(symbol.body)
 
     def dfs_stmt(self, stmt):
         """DFS traversal of statements"""
         if stmt is None:
             return
-        if stmt.kind == ps.StatementKind.ExpressionStatement:
+        if stmt.kind == ps_ast.StatementKind.ExpressionStatement:
             self.dfs_expr(stmt.expr)
-        elif stmt.kind == ps.StatementKind.Block:
+        elif stmt.kind == ps_ast.StatementKind.Block:
             if hasattr(stmt, "body"):
                 self.dfs_stmt(stmt.body)
-        elif stmt.kind == ps.StatementKind.Conditional:
+        elif stmt.kind == ps_ast.StatementKind.Conditional:
             cond_expr = stmt.conditions[0].expr if stmt.conditions else None
             if cond_expr:
                 self.dfs_expr(cond_expr)
@@ -371,7 +372,7 @@ class SymbolicDFS:
                 self.dfs_stmt(stmt.ifFalse)
             if cond_expr:
                 self.path_condition.pop()
-        elif stmt.kind == ps.StatementKind.List:
+        elif stmt.kind == ps_ast.StatementKind.List:
             for s in stmt.body:
                 self.dfs_stmt(s)
 
@@ -394,22 +395,22 @@ class SymbolicDFS:
 
         kind = expr.kind
 
-        if kind == ps.ExpressionKind.NamedValue:
+        if kind == ps_ast.ExpressionKind.NamedValue:
             return s.store[m.curr_module].get(expr.symbol.name, init_symbol())
 
-        elif kind == ps.ExpressionKind.BinaryOp:
+        elif kind == ps_ast.ExpressionKind.BinaryOp:
             self.visit_expr(m, s, expr.left)
             self.visit_expr(m, s, expr.right)
 
-        elif kind == ps.ExpressionKind.UnaryOp:
+        elif kind == ps_ast.ExpressionKind.UnaryOp:
             self.visit_expr(m, s, expr.operand)
 
-        elif kind == ps.ExpressionKind.ConditionalOp:
+        elif kind == ps_ast.ExpressionKind.ConditionalOp:
             self.visit_expr(m, s, expr.predicate)
             self.visit_expr(m, s, expr.left)
             self.visit_expr(m, s, expr.right)
 
-        elif kind == ps.ExpressionKind.Assignment:
+        elif kind == ps_ast.ExpressionKind.Assignment:
             # Semantic assignment from CFG basic blocks (covers both blocking
             # and non-blocking since pyslang's semantic model merges them).
             lhs_sym = getattr(getattr(expr, 'left', None), 'symbol', None)
@@ -420,7 +421,7 @@ class SymbolicDFS:
                 if rhs_sym is not None:
                     rhs_val = s.store[m.curr_module].get(rhs_sym.name, init_symbol())
                     s.store[m.curr_module][lhs_name] = rhs_val
-                elif getattr(rhs, 'kind', None) == ps.ExpressionKind.IntegerLiteral:
+                elif getattr(rhs, 'kind', None) == ps_ast.ExpressionKind.IntegerLiteral:
                     s.store[m.curr_module][lhs_name] = str(rhs.value)
                 else:
                     try:
@@ -432,7 +433,7 @@ class SymbolicDFS:
                     except Exception:
                         pass
 
-        elif kind == ps.SyntaxKind.AssignmentExpression:
+        elif kind == ps_stx.SyntaxKind.AssignmentExpression:
             if hasattr(expr.left, "identifier") and hasattr(expr.right, "identifier"):
                 if expr.right.identifier.value in s.store[m.curr_module]:
                     s.store[m.curr_module][expr.left.identifier.value] = s.store[m.curr_module][expr.right.identifier.value]
@@ -441,7 +442,7 @@ class SymbolicDFS:
                 #  RHS is likely a literal
                 if getattr(m, "debug", False):
                     print(expr.right.kind)
-                if expr.right.kind == ps.SyntaxKind.ConcatenationExpression:
+                if expr.right.kind == ps_stx.SyntaxKind.ConcatenationExpression:
                     # Handle concatenation on RHS
                     parts = [str(operand.value) for operand in expr.right.expressions if hasattr(operand, "value")]
                     s.store[m.curr_module][expr.left.identifier.value] = "".join(parts)
@@ -451,12 +452,12 @@ class SymbolicDFS:
                 # LHS or RHS doesn't have an identifier attribute-skip for now
                 ...
 
-        elif kind == ps.SyntaxKind.NonblockingAssignmentExpression: 
-            if expr.left.kind == ps.IdentifierNameSyntax:
+        elif kind == ps_stx.SyntaxKind.NonblockingAssignmentExpression: 
+            if expr.left.kind == ps_stx.IdentifierNameSyntax:
                 if expr.left.identifier.value in s.store: 
                     s.store[m.curr_module][expr.left.identifier.value] = s.store[m.curr_module][expr.right.identifier.value]
             else:
-                if expr.right.kind == ps.SyntaxKind.ConcatenationExpression:
+                if expr.right.kind == ps_stx.SyntaxKind.ConcatenationExpression:
                     # Handle concatenation on RHS
                     concat_value = ""
                     for operand in expr.right.expressions:
@@ -466,54 +467,54 @@ class SymbolicDFS:
                 else:
                     ...
 
-        elif kind ==ps.ExpressionKind.Concatenation:
+        elif kind ==ps_ast.ExpressionKind.Concatenation:
             for e in expr.operands:
                 self.visit_expr(m, s, e)
 
-        elif kind == ps.ExpressionKind.Call:
+        elif kind == ps_ast.ExpressionKind.Call:
             for arg in expr.arguments:
                 self.visit_expr(m, s, arg)
 
-        elif kind == ps.ExpressionKind.ElementSelect:
+        elif kind == ps_ast.ExpressionKind.ElementSelect:
             self.visit_expr(m, s, expr.value)
             self.visit_expr(m, s, expr.selector)
 
-        elif kind == ps.ExpressionKind.RangeSelect:
+        elif kind == ps_ast.ExpressionKind.RangeSelect:
             self.visit_expr(m, s, expr.value)
             self.visit_expr(m, s, expr.left)
             self.visit_expr(m, s, expr.right)
 
-        elif kind in [ps.ExpressionKind.MemberAccess, ps.ExpressionKind.Streaming,
-                    ps.ExpressionKind.Replication, ps.ExpressionKind.TaggedUnion,
-                    ps.ExpressionKind.Conversion, ps.ExpressionKind.CopyClass,
-                    ps.ExpressionKind.Streaming]:
+        elif kind in [ps_ast.ExpressionKind.MemberAccess, ps_ast.ExpressionKind.Streaming,
+                    ps_ast.ExpressionKind.Replication, ps_ast.ExpressionKind.TaggedUnion,
+                    ps_ast.ExpressionKind.Conversion, ps_ast.ExpressionKind.CopyClass,
+                    ps_ast.ExpressionKind.Streaming]:
             self.visit_expr(m, s, expr.value)
 
-        elif kind in [ps.ExpressionKind.SimpleAssignmentPattern]:
+        elif kind in [ps_ast.ExpressionKind.SimpleAssignmentPattern]:
             for e in expr.elements:
                 self.visit_expr(m, s, e)
 
-        elif kind in [ps.ExpressionKind.StructuredAssignmentPattern, ps.ExpressionKind.ReplicatedAssignmentPattern]:
+        elif kind in [ps_ast.ExpressionKind.StructuredAssignmentPattern, ps_ast.ExpressionKind.ReplicatedAssignmentPattern]:
             for e in expr.elements:
                 self.visit_expr(m, s, e.value)
 
-        elif kind in [ps.ExpressionKind.MinTypMax]:
+        elif kind in [ps_ast.ExpressionKind.MinTypMax]:
             self.visit_expr(m, s, expr.min)
             self.visit_expr(m, s, expr.typ)
             self.visit_expr(m, s, expr.max)
 
 
         # Ignore literals and null
-        elif kind in [ps.ExpressionKind.IntegerLiteral, ps.ExpressionKind.RealLiteral,
-                    ps.ExpressionKind.TimeLiteral, ps.ExpressionKind.NullLiteral,
-                    ps.ExpressionKind.StringLiteral, ps.ExpressionKind.UnbasedUnsizedIntegerLiteral,
-                    ps.UnboundedLiteral]:
+        elif kind in [ps_ast.ExpressionKind.IntegerLiteral, ps_ast.ExpressionKind.RealLiteral,
+                    ps_ast.ExpressionKind.TimeLiteral, ps_ast.ExpressionKind.NullLiteral,
+                    ps_ast.ExpressionKind.StringLiteral, ps_ast.ExpressionKind.UnbasedUnsizedIntegerLiteral,
+                    ps_ast.UnboundedLiteral]:
             pass
 
         # Ignore misc. nodes in syntax tree 
-        elif kind in [ps.TokenKind.IntegerLiteral, ps.SyntaxKind.IntegerVectorExpression, 
-                      ps.SyntaxKind.ConcatenationExpression, ps.SyntaxKind.IdentifierName,
-                      ps.SyntaxKind.IdentifierSelectName, ps.TokenKind.Comma, ps.SyntaxKind.IntegerLiteralExpression]:
+        elif kind in [ps_stx.TokenKind.IntegerLiteral, ps_stx.SyntaxKind.IntegerVectorExpression, 
+                      ps_stx.SyntaxKind.ConcatenationExpression, ps_stx.SyntaxKind.IdentifierName,
+                      ps_stx.SyntaxKind.IdentifierSelectName, ps_stx.TokenKind.Comma, ps_stx.SyntaxKind.IntegerLiteralExpression]:
             pass
 
         else:
@@ -597,7 +598,7 @@ class SymbolicDFS:
 
                 if isinstance(case_body, (list, tuple)):
                     body_iter = case_body
-                elif hasattr(case_body, "__iter__") and not isinstance(case_body, ps.StatementSyntax):
+                elif hasattr(case_body, "__iter__") and not isinstance(case_body, ps_stx.StatementSyntax):
                     body_iter = list(case_body)
                 else:
                     body_iter = [case_body]
@@ -640,18 +641,18 @@ class SymbolicDFS:
 
         # Expression nodes (e.g. condition expressions stored in CFG basic
         # blocks) aren't Statements -- route them through visit_expr directly.
-        if isinstance(kind, ps.ExpressionKind):
+        if isinstance(kind, ps_ast.ExpressionKind):
             self.visit_expr(m, s, stmt)
             return
 
-        if kind == ps.StatementKind.ExpressionStatement:
+        if kind == ps_ast.StatementKind.ExpressionStatement:
             self.visit_expr(m, s, stmt.expr)
 
-        elif kind == ps.StatementKind.Block and hasattr(stmt, "body"):
+        elif kind == ps_ast.StatementKind.Block and hasattr(stmt, "body"):
             for substmt in stmt.body:
                 self.visit_stmt(m, s, substmt, modules, direction)
 
-        elif kind == ps.StatementKind.Conditional or isinstance(stmt, ps.ConditionalStatementSyntax):
+        elif kind == ps_ast.StatementKind.Conditional or isinstance(stmt, ps_stx.ConditionalStatementSyntax):
             m.branch_count += 1
             # PySlang 7.0 uses conditions list, not predicate attribute
             # Pattern matches usage in dfs_stmt() method (line 550)
@@ -702,12 +703,12 @@ class SymbolicDFS:
             if cond_expr:
                 s.pc.pop()
 
-        elif kind == ps.StatementKind.List:
+        elif kind == ps_ast.StatementKind.List:
             
             for s_sub in stmt.body:
                 self.visit_stmt(m, s, s_sub, modules, direction)
 
-        elif kind == ps.StatementKind.ForLoop:
+        elif kind == ps_ast.StatementKind.ForLoop:
             if hasattr(stmt, "init"):
                 self.visit_stmt(m, s, stmt.init, modules, direction)
             if hasattr(stmt, "cond"):
@@ -717,7 +718,7 @@ class SymbolicDFS:
             if hasattr(stmt, "incr"):
                 self.visit_stmt(m, s, stmt.incr, modules, direction)
 
-        elif kind == ps.StatementKind.WhileLoop:
+        elif kind == ps_ast.StatementKind.WhileLoop:
             print("whileloop")
             m.branch_count += 1
             if hasattr(stmt, "cond"):
@@ -760,7 +761,7 @@ class SymbolicDFS:
             if hasattr(stmt, "cond"):
                 s.pc.pop()
 
-        elif kind == ps.StatementKind.DoWhileLoop:
+        elif kind == ps_ast.StatementKind.DoWhileLoop:
             print("dowhile")
             m.branch_count += 1
             if hasattr(stmt, "body"):
@@ -768,7 +769,7 @@ class SymbolicDFS:
             if hasattr(stmt, "cond"):
                 self.visit_expr(m, s, stmt.cond)
 
-        elif kind in [ps.StatementKind.ProceduralAssign]:
+        elif kind in [ps_ast.StatementKind.ProceduralAssign]:
             self.visit_expr(m, s, stmt.left)
             self.visit_expr(m, s, stmt.right)
             if hasattr(stmt.left, 'symbol') and hasattr(stmt.right, 'symbol'):
@@ -782,11 +783,11 @@ class SymbolicDFS:
         # elif kind == ps.StatementKind.ProcedureCall:
         #     self.visit_expr(m, s, stmt.expr)
 
-        elif kind in [ps.StatementKind.Block,
-                    ps.StatementKind.Timed]:
+        elif kind in [ps_ast.StatementKind.Block,
+                    ps_ast.StatementKind.Timed]:
             self.visit_stmt(m, s, stmt.body, modules, direction)
 
-        elif kind == ps.StatementKind.ImmediateAssertion:
+        elif kind == ps_ast.StatementKind.ImmediateAssertion:
             # Handle immediate assertions: assert(expr)
             # Assertions are collected once in the engine's phase (_collect_assertions +
             # _eval_assertion_expr); do not append here to avoid duplicate entries per path.
@@ -806,7 +807,7 @@ class SymbolicDFS:
             if hasattr(stmt, 'elseBody'):
                 self.visit_stmt(m, s, stmt.elseBody, modules, direction)
 
-        elif kind == ps.StatementKind.ConcurrentAssertion:
+        elif kind == ps_ast.StatementKind.ConcurrentAssertion:
             # Handle concurrent assertions: assert property (...)
             # Assertions are collected once in the engine's phase; do not append here.
             expr_node = None
@@ -830,10 +831,10 @@ class SymbolicDFS:
             if hasattr(stmt, 'elseBody'):
                 self.visit_stmt(m, s, stmt.elseBody, modules, direction)
 
-        elif kind == ps.StatementKind.Return and hasattr(stmt, "expr"):
+        elif kind == ps_ast.StatementKind.Return and hasattr(stmt, "expr"):
             self.visit_expr(m, s, stmt.expr)
         
-        elif kind == ps.StatementKind.ExpressionStatement:
+        elif kind == ps_ast.StatementKind.ExpressionStatement:
             self.visit_expr(m, s, stmt.expr)
 
 

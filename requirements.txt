@@ -1,0 +1,7 @@
+./slang
+redis
+z3-solver
+jinja2
+ply
+networkx
+matplotlib

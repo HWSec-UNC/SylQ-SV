@@ -2,7 +2,7 @@
 
 import z3
 from z3 import Solver, BitVec, BitVecRef, If, BitVecVal, And, Or, Not, ULT, UGT, BoolRef
-import pyslang as ps
+import pyslang.ast as ps_ast
 
 
 SOLVE_PC_TIMEOUT_MS = 10000
@@ -48,45 +48,45 @@ def _parse_svint(sv) -> int:
 
 
 _BINOP_MAP = {
-    ps.BinaryOperator.Add:                lambda a, b: a + b,
-    ps.BinaryOperator.Subtract:           lambda a, b: a - b,
-    ps.BinaryOperator.Multiply:           lambda a, b: a * b,
-    ps.BinaryOperator.BinaryAnd:          lambda a, b: a & b,
-    ps.BinaryOperator.BinaryOr:           lambda a, b: a | b,
-    ps.BinaryOperator.BinaryXor:          lambda a, b: a ^ b,
-    ps.BinaryOperator.BinaryXnor:         lambda a, b: ~(a ^ b),
-    ps.BinaryOperator.Equality:           lambda a, b: a == b,
-    ps.BinaryOperator.Inequality:         lambda a, b: a != b,
-    ps.BinaryOperator.CaseEquality:       lambda a, b: a == b,
-    ps.BinaryOperator.CaseInequality:     lambda a, b: a != b,
-    ps.BinaryOperator.WildcardEquality:   lambda a, b: a == b,
-    ps.BinaryOperator.WildcardInequality: lambda a, b: a != b,
-    ps.BinaryOperator.LessThan:           lambda a, b: ULT(a, b),
-    ps.BinaryOperator.LessThanEqual:      lambda a, b: z3.ULE(a, b),
-    ps.BinaryOperator.GreaterThan:        lambda a, b: UGT(a, b),
-    ps.BinaryOperator.GreaterThanEqual:   lambda a, b: z3.UGE(a, b),
-    ps.BinaryOperator.LogicalAnd:         lambda a, b: And(a != 0, b != 0)
+    ps_ast.BinaryOperator.Add:                lambda a, b: a + b,
+    ps_ast.BinaryOperator.Subtract:           lambda a, b: a - b,
+    ps_ast.BinaryOperator.Multiply:           lambda a, b: a * b,
+    ps_ast.BinaryOperator.BinaryAnd:          lambda a, b: a & b,
+    ps_ast.BinaryOperator.BinaryOr:           lambda a, b: a | b,
+    ps_ast.BinaryOperator.BinaryXor:          lambda a, b: a ^ b,
+    ps_ast.BinaryOperator.BinaryXnor:         lambda a, b: ~(a ^ b),
+    ps_ast.BinaryOperator.Equality:           lambda a, b: a == b,
+    ps_ast.BinaryOperator.Inequality:         lambda a, b: a != b,
+    ps_ast.BinaryOperator.CaseEquality:       lambda a, b: a == b,
+    ps_ast.BinaryOperator.CaseInequality:     lambda a, b: a != b,
+    ps_ast.BinaryOperator.WildcardEquality:   lambda a, b: a == b,
+    ps_ast.BinaryOperator.WildcardInequality: lambda a, b: a != b,
+    ps_ast.BinaryOperator.LessThan:           lambda a, b: ULT(a, b),
+    ps_ast.BinaryOperator.LessThanEqual:      lambda a, b: z3.ULE(a, b),
+    ps_ast.BinaryOperator.GreaterThan:        lambda a, b: UGT(a, b),
+    ps_ast.BinaryOperator.GreaterThanEqual:   lambda a, b: z3.UGE(a, b),
+    ps_ast.BinaryOperator.LogicalAnd:         lambda a, b: And(a != 0, b != 0)
                                                         if not isinstance(a, BoolRef)
                                                         else And(a, b if isinstance(b, BoolRef) else b != 0),
-    ps.BinaryOperator.LogicalOr:          lambda a, b: Or(a != 0, b != 0)
+    ps_ast.BinaryOperator.LogicalOr:          lambda a, b: Or(a != 0, b != 0)
                                                         if not isinstance(a, BoolRef)
                                                         else Or(a, b if isinstance(b, BoolRef) else b != 0),
-    ps.BinaryOperator.LogicalShiftLeft:   lambda a, b: a << b,
-    ps.BinaryOperator.LogicalShiftRight:  lambda a, b: z3.LShR(a, b),
-    ps.BinaryOperator.ArithmeticShiftLeft:  lambda a, b: a << b,
-    ps.BinaryOperator.ArithmeticShiftRight: lambda a, b: a >> b,
+    ps_ast.BinaryOperator.LogicalShiftLeft:   lambda a, b: a << b,
+    ps_ast.BinaryOperator.LogicalShiftRight:  lambda a, b: z3.LShR(a, b),
+    ps_ast.BinaryOperator.ArithmeticShiftLeft:  lambda a, b: a << b,
+    ps_ast.BinaryOperator.ArithmeticShiftRight: lambda a, b: a >> b,
 }
 
 _UNOP_MAP = {
-    ps.UnaryOperator.LogicalNot:  lambda a: a == BitVecVal(0, a.size()) if isinstance(a, BitVecRef) else Not(a),
-    ps.UnaryOperator.BitwiseNot:  lambda a: ~a,
-    ps.UnaryOperator.Plus:        lambda a: a,
-    ps.UnaryOperator.Minus:       lambda a: -a,
-    ps.UnaryOperator.BitwiseAnd:  lambda a: z3.BVRedAnd(a),
-    ps.UnaryOperator.BitwiseOr:   lambda a: z3.BVRedOr(a),
-    ps.UnaryOperator.BitwiseXor:  None,  # no single Z3 call
-    ps.UnaryOperator.BitwiseNand: lambda a: ~z3.BVRedAnd(a),
-    ps.UnaryOperator.BitwiseNor:  lambda a: ~z3.BVRedOr(a),
+    ps_ast.UnaryOperator.LogicalNot:  lambda a: a == BitVecVal(0, a.size()) if isinstance(a, BitVecRef) else Not(a),
+    ps_ast.UnaryOperator.BitwiseNot:  lambda a: ~a,
+    ps_ast.UnaryOperator.Plus:        lambda a: a,
+    ps_ast.UnaryOperator.Minus:       lambda a: -a,
+    ps_ast.UnaryOperator.BitwiseAnd:  lambda a: z3.BVRedAnd(a),
+    ps_ast.UnaryOperator.BitwiseOr:   lambda a: z3.BVRedOr(a),
+    ps_ast.UnaryOperator.BitwiseXor:  None,  # no single Z3 call
+    ps_ast.UnaryOperator.BitwiseNand: lambda a: ~z3.BVRedAnd(a),
+    ps_ast.UnaryOperator.BitwiseNor:  lambda a: ~z3.BVRedOr(a),
 }
 
 
@@ -106,7 +106,7 @@ def semantic_expr_to_z3(expr, store: dict, module: str, width_hint: int = 32):
     w = getattr(expr, 'effectiveWidth', None) or width_hint
 
     # --- Leaf nodes --------------------------------------------------------
-    if kind == ps.ExpressionKind.NamedValue:
+    if kind == ps_ast.ExpressionKind.NamedValue:
         name = expr.symbol.name
         sym = store.get(name, name)
         if isinstance(sym, (BitVecRef, BoolRef, z3.ArithRef)):
@@ -116,14 +116,14 @@ def semantic_expr_to_z3(expr, store: dict, module: str, width_hint: int = 32):
             return BitVecVal(int(sym_str), w)
         return BitVec(sym_str, w)
 
-    if kind == ps.ExpressionKind.IntegerLiteral:
+    if kind == ps_ast.ExpressionKind.IntegerLiteral:
         return BitVecVal(_parse_svint(expr.value), w)
 
-    if kind == ps.ExpressionKind.UnbasedUnsizedIntegerLiteral:
+    if kind == ps_ast.ExpressionKind.UnbasedUnsizedIntegerLiteral:
         return BitVecVal(_parse_svint(expr.value), w)
 
     # --- Conversion (width cast / sign cast) --------------------------------
-    if kind == ps.ExpressionKind.Conversion:
+    if kind == ps_ast.ExpressionKind.Conversion:
         inner = semantic_expr_to_z3(expr.operand, store, module, w)
         if inner is None:
             return None
@@ -137,7 +137,7 @@ def semantic_expr_to_z3(expr, store: dict, module: str, width_hint: int = 32):
         return inner
 
     # --- Binary operators ---------------------------------------------------
-    if kind == ps.ExpressionKind.BinaryOp:
+    if kind == ps_ast.ExpressionKind.BinaryOp:
         op = expr.op
         lhs = semantic_expr_to_z3(expr.left, store, module, w)
         rhs = semantic_expr_to_z3(expr.right, store, module, w)
@@ -161,7 +161,7 @@ def semantic_expr_to_z3(expr, store: dict, module: str, width_hint: int = 32):
         return None
 
     # --- Unary operators ----------------------------------------------------
-    if kind == ps.ExpressionKind.UnaryOp:
+    if kind == ps_ast.ExpressionKind.UnaryOp:
         inner = semantic_expr_to_z3(expr.operand, store, module, w)
         if inner is None:
             return None
@@ -171,7 +171,7 @@ def semantic_expr_to_z3(expr, store: dict, module: str, width_hint: int = 32):
         return None
 
     # --- Range select  (e.g. id_insn[31:26]) --------------------------------
-    if kind == ps.ExpressionKind.RangeSelect:
+    if kind == ps_ast.ExpressionKind.RangeSelect:
         base = semantic_expr_to_z3(expr.value, store, module, width_hint)
         if base is None:
             return None
@@ -193,7 +193,7 @@ def semantic_expr_to_z3(expr, store: dict, module: str, width_hint: int = 32):
         return None
 
     # --- Element select  (e.g. sig[idx]) ------------------------------------
-    if kind == ps.ExpressionKind.ElementSelect:
+    if kind == ps_ast.ExpressionKind.ElementSelect:
         base = semantic_expr_to_z3(expr.value, store, module, width_hint)
         bw = base.size() if isinstance(base, BitVecRef) else width_hint
         idx_expr = semantic_expr_to_z3(expr.selector, store, module, bw)
@@ -209,7 +209,7 @@ def semantic_expr_to_z3(expr, store: dict, module: str, width_hint: int = 32):
         return None
 
     # --- Ternary  (cond ? a : b) --------------------------------------------
-    if kind == ps.ExpressionKind.ConditionalOp:
+    if kind == ps_ast.ExpressionKind.ConditionalOp:
         pred = semantic_expr_to_z3(expr.predicate, store, module, w)
         t_val = semantic_expr_to_z3(expr.left, store, module, w)
         f_val = semantic_expr_to_z3(expr.right, store, module, w)
@@ -220,7 +220,7 @@ def semantic_expr_to_z3(expr, store: dict, module: str, width_hint: int = 32):
         return If(pred, t_val, f_val)
 
     # --- Concatenation  ({a, b, c}) -----------------------------------------
-    if kind == ps.ExpressionKind.Concatenation:
+    if kind == ps_ast.ExpressionKind.Concatenation:
         parts = []
         for op_expr in expr.operands:
             p = semantic_expr_to_z3(op_expr, store, module, width_hint)
@@ -234,7 +234,7 @@ def semantic_expr_to_z3(expr, store: dict, module: str, width_hint: int = 32):
         return z3.Concat(*parts)
 
     # --- Replication  ({N{expr}}) -------------------------------------------
-    if kind == ps.ExpressionKind.Replication:
+    if kind == ps_ast.ExpressionKind.Replication:
         count_expr = expr.count
         inner = semantic_expr_to_z3(expr.concat, store, module, width_hint)
         if inner is None:

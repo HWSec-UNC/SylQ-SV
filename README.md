@@ -11,14 +11,10 @@ Clone the repo, including the submodules:
 `git clone --recurse-submodules https://github.com/HWSec-UNC/SylQ-SV.git`
 
 Install dependencies:
-* pySlang 7.0: `python3 -m pip install pyslang`
-* Redis 7.4: run `python3 -m pip install redis`
-* z3: run `python3 -m pip install z3-solver`
-* Icarus Verilog: 10.1 or later: run `sudo apt install iverilog`
-* Jinja 2.10 or later: run `python3 -m pip install jinja2`
-* PLY 3.4 or later: run `python3 -m pip install ply`
-* networkx: run `python3 -m pip install networkx`
-* matplotlib: run `python3 -m pip install matplotlib`
+1. Install Icarus Verilog: 10.1 or later: run `sudo apt install iverilog`
+2. Clone slang 10.x source code `git clone https://github.com/MikePopoloski/slang.git`
+3. Create a venv `python3 -m venv venv` 
+4. Install python libraries `python3 -m pip install -r requirements.txt`
 
 ## Kick the Tires
 Goal: Run SylQ-SV on the OR1200 for 1 clock cycle for 5 minutes with query caching enabled, and inspect the number of symbolic paths and solver queries generated.

@@ -7,17 +7,17 @@ from .symbolic_state import SymbolicState
 from helpers.utils import init_symbol
 from typing import Optional
 # import pkg_resources
-import pyslang as ps
+import pyslang.syntax as ps_stx
 
 # Using this as a reference for conditionals:
 # https://sv-lang.com/structslang_1_1syntax_1_1_statement_syntax.html
 CONDITIONALS = (
-    ps.ConditionalStatementSyntax,
-    ps.CaseStatementSyntax,
-    ps.ForeachLoopStatementSyntax,
-    ps.ForLoopStatementSyntax,
-    ps.LoopStatementSyntax,
-    ps.DoWhileStatementSyntax
+    ps_stx.ConditionalStatementSyntax,
+    ps_stx.CaseStatementSyntax,
+    ps_stx.ForeachLoopStatementSyntax,
+    ps_stx.ForLoopStatementSyntax,
+    ps_stx.LoopStatementSyntax,
+    ps_stx.DoWhileStatementSyntax
 )
 
 class ExecutionManager:
@@ -102,7 +102,7 @@ class ExecutionManager:
                         else:
                             state.store[key][key2] = store[key][key2]
 
-    def init_run(self, m: ExecutionManager, module: ps.ModuleDeclarationSyntax) -> None:
+    def init_run(self, m: ExecutionManager, module: ps_stx.ModuleDeclarationSyntax) -> None:
         """Initalize run for a module"""
         m.init_run_flag = True
         self.count_conditionals(m, module.members)
@@ -114,7 +114,7 @@ class ExecutionManager:
     def count_conditionals(self, m: "ExecutionManager", items):
         """Recursively count all conditional statements in the AST (pyslang version)"""
         stmts = items
-        if isinstance(items, ps.BlockStatementSyntax):
+        if isinstance(items, ps_stx.BlockStatementSyntax):
             # PySlang uses .items, not .statements for BlockStatementSyntax
             stmts = getattr(items, 'items', getattr(items, 'statements', items))
         # If stmts is iterable, traverse each statement
@@ -123,40 +123,40 @@ class ExecutionManager:
                 self.count_conditionals(m, item)
         elif items is not None:
             # Check for each conditional type and recurse into their bodies
-            if isinstance(items, ps.ConditionalStatementSyntax):
+            if isinstance(items, ps_stx.ConditionalStatementSyntax):
                 m.num_paths += 1
                 self.count_conditionals(m, items.ifTrue)
                 if items.ifFalse is not None:
                     self.count_conditionals(m, items.ifFalse)
-            elif isinstance(items, ps.CaseStatementSyntax):
+            elif isinstance(items, ps_stx.CaseStatementSyntax):
                 m.num_paths += 1
                 for case in items.items:
                     # Case items may have .statements or .statement attribute
                     case_body = getattr(case, 'statements', getattr(case, 'statement', None))
                     self.count_conditionals(m, case_body)
-            elif isinstance(items, ps.ForLoopStatementSyntax):
+            elif isinstance(items, ps_stx.ForLoopStatementSyntax):
                 m.num_paths += 1
                 self.count_conditionals(m, items.body)
-            elif hasattr(ps, "ForeachLoopStatementSyntax") and isinstance(items, ps.ForeachLoopStatementSyntax):
+            elif hasattr(ps_stx, "ForeachLoopStatementSyntax") and isinstance(items, ps_stx.ForeachLoopStatementSyntax):
                 m.num_paths += 1
                 self.count_conditionals(m, items.body)
-            elif hasattr(ps, "WhileLoopStatementSyntax") and isinstance(items, ps.WhileLoopStatementSyntax):
+            elif hasattr(ps_stx, "WhileLoopStatementSyntax") and isinstance(items, ps_stx.WhileLoopStatementSyntax):
                 m.num_paths += 1
                 self.count_conditionals(m, items.body)
-            elif hasattr(ps, "DoWhileLoopStatementSyntax") and isinstance(items, ps.DoWhileLoopStatementSyntax):
+            elif hasattr(ps_stx, "DoWhileLoopStatementSyntax") and isinstance(items, ps_stx.DoWhileLoopStatementSyntax):
                 m.num_paths += 1
                 self.count_conditionals(m, items.body)
-            elif hasattr(ps, "RepeatLoopStatementSyntax") and isinstance(items, ps.RepeatLoopStatementSyntax):
+            elif hasattr(ps_stx, "RepeatLoopStatementSyntax") and isinstance(items, ps_stx.RepeatLoopStatementSyntax):
                 m.num_paths += 1
                 self.count_conditionals(m, items.body)
-            elif isinstance(items, ps.BlockStatementSyntax):
+            elif isinstance(items, ps_stx.BlockStatementSyntax):
                 # PySlang uses .items, not .statements for BlockStatementSyntax
                 self.count_conditionals(m, items.items)
-            elif hasattr(ps, "AlwaysConstructSyntax") and isinstance(items, ps.AlwaysConstructSyntax):
+            elif hasattr(ps_stx, "AlwaysConstructSyntax") and isinstance(items, ps_stx.AlwaysConstructSyntax):
                 self.count_conditionals(m, items.statement)
-            elif hasattr(ps, "InitialConstructSyntax") and isinstance(items, ps.InitialConstructSyntax):
+            elif hasattr(ps_stx, "InitialConstructSyntax") and isinstance(items, ps_stx.InitialConstructSyntax):
                 self.count_conditionals(m, items.statement)
-            elif hasattr(ps, "CaseItemSyntax") and isinstance(items, ps.CaseItemSyntax):
+            elif hasattr(ps_stx, "CaseItemSyntax") and isinstance(items, ps_stx.CaseItemSyntax):
                 # CaseItemSyntax may have .statements or .statement attribute
                 case_body = getattr(items, 'statements', getattr(items, 'statement', None))
                 self.count_conditionals(m, case_body)
@@ -164,7 +164,7 @@ class ExecutionManager:
     def count_conditionals_2(self, m:ExecutionManager, items) -> int:
         """(Alternative conditional counter) Rewrite to actually return an int"""
         stmts = items
-        if isinstance(items, ps.BlockStatementSyntax):
+        if isinstance(items, ps_stx.BlockStatementSyntax):
             # PySlang uses .items, not .statements for BlockStatementSyntax
             stmts = items.items
             # items.cname = "Block"
@@ -172,22 +172,22 @@ class ExecutionManager:
         if hasattr(stmts, '__iter__'):
             for item in stmts:
                 if isinstance(item, CONDITIONALS):
-                    if isinstance(item, ps.ConditionalStatementSyntax) or isinstance(item, ps.CaseStatementSyntax):
-                        if isinstance(item, ps.ConditionalStatementSyntax):
+                    if isinstance(item, ps_stx.ConditionalStatementSyntax) or isinstance(item, ps_stx.CaseStatementSyntax):
+                        if isinstance(item, ps_stx.ConditionalStatementSyntax):
                             return self.count_conditionals_2(m, item.ifTrue) + self.count_conditionals_2(m, item.ifFalse)  + 1
-                        if isinstance(items, ps.CaseStatementSyntax):
+                        if isinstance(items, ps_stx.CaseStatementSyntax):
                             return self.count_conditionals_2(m, items.items) + 1
-                if isinstance(item, ps.BlockStatementSyntax):
+                if isinstance(item, ps_stx.BlockStatementSyntax):
                     return self.count_conditionals_2(m, item.statements)
-                elif hasattr(ps, "AlwaysConstructSyntax") and isinstance(item, ps.AlwaysConstructSyntax):
+                elif hasattr(ps_stx, "AlwaysConstructSyntax") and isinstance(item, ps_stx.AlwaysConstructSyntax):
                     return self.count_conditionals_2(m, item.statement)             
-                elif hasattr(ps, "InitialConstructSyntax") and isinstance(item, ps.InitialConstructSyntax):
+                elif hasattr(ps_stx, "InitialConstructSyntax") and isinstance(item, ps_stx.InitialConstructSyntax):
                     return self.count_conditionals_2(m, item.statement)
         elif items is not None:
-            if isinstance(items, ps.ConditionalStatementSyntax):
+            if isinstance(items, ps_stx.ConditionalStatementSyntax):
                 return  ( self.count_conditionals_2(m, items.ifTrue) + 
                 self.count_conditionals_2(m, items.ifFalse)) + 1
-            if isinstance(items, ps.CaseStatementSyntax):
+            if isinstance(items, ps_stx.CaseStatementSyntax):
                 return self.count_conditionals_2(m, items.items) + 1
         return 0
 

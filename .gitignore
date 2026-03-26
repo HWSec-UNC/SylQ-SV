@@ -8,3 +8,5 @@ out.txt
 __pycache__/
 designs/*
 venv
+
+slang

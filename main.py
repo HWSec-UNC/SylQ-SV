@@ -8,7 +8,7 @@ import time
 import logging
 import gc
 from engine.execution_engine import ExecutionEngine
-import pyslang as ps
+import pyslang.driver as ps_driver
 from helpers.slang_helpers import SlangSymbolVisitor, SymbolicDFS
 import redis
 import threading
@@ -149,7 +149,7 @@ def main():
     
     if options.sv:
         start = time.process_time()
-        driver = ps.Driver()
+        driver = ps_driver.Driver()
         driver.addStandardArgs()
         driver.processCommandFiles(filelist[0], True, True)
         driver.processOptions()

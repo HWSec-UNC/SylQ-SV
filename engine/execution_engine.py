@@ -12,17 +12,18 @@ from operator import mul
 import time
 import gc
 from helpers.utils import to_binary
-import pyslang as ps
+import pyslang.syntax as ps_stx
+import pyslang.ast as ps_ast
 from helpers.slang_helpers import get_module_name, init_state
 
 # Tuple of PySlang AST node types that represent conditional/loop statements
 CONDITIONALS = (
-    ps.ConditionalStatementSyntax,
-    ps.CaseStatementSyntax,
-    ps.ForeachLoopStatementSyntax,
-    ps.ForLoopStatementSyntax,
-    ps.LoopStatementSyntax,
-    ps.DoWhileStatementSyntax
+    ps_stx.ConditionalStatementSyntax,
+    ps_stx.CaseStatementSyntax,
+    ps_stx.ForeachLoopStatementSyntax,
+    ps_stx.ForLoopStatementSyntax,
+    ps_stx.LoopStatementSyntax,
+    ps_stx.DoWhileStatementSyntax
 )
 class ExecutionEngine:
     # Drives the entire symbolic execution process
@@ -78,14 +79,14 @@ class ExecutionEngine:
             return True
         return False
 
-    def collect_all_instances(self, instance: ps.Symbol, out: list) -> None:
+    def collect_all_instances(self, instance: ps_ast.Symbol, out: list) -> None:
         """Recursively collect this Instance symbol and all nested sub-instances depth-first."""
         out.append(instance)
         body = getattr(instance, 'body', getattr(instance, 'instanceBody', None))
         if body is None:
             return
         for member in body:
-            if member.kind == ps.SymbolKind.Instance:
+            if member.kind == ps_ast.SymbolKind.Instance:
                 self.collect_all_instances(member, out)
 
 
@@ -180,7 +181,7 @@ class ExecutionEngine:
             # Execute statements in this BB (skip bare condition Expression nodes)
             basic_block = cfg.basic_block_list[bb_idx]
             for stmt in basic_block:
-                if isinstance(stmt, ps.Expression):
+                if isinstance(stmt, ps_ast.Expression):
                     continue
                 manager._pc_ref = path_state.pc
                 try:
@@ -218,7 +219,7 @@ class ExecutionEngine:
         source_bb = cfg.basic_block_list[source_bb_idx]
         cond_expr_node = None
         for node in source_bb:
-            if isinstance(node, ps.Expression):
+            if isinstance(node, ps_ast.Expression):
                 cond_expr_node = node
                 break
         if cond_expr_node is None:
@@ -331,7 +332,7 @@ class ExecutionEngine:
             return
 
         # Recurse into known container types
-        if isinstance(ast, ps.ModuleDeclarationSyntax):
+        if isinstance(ast, ps_stx.ModuleDeclarationSyntax):
             for mem in ast.members:
                 self._collect_assertions(mem, module_name, assertions_list)
             return
@@ -345,7 +346,7 @@ class ExecutionEngine:
                     self._collect_assertions(item, module_name, assertions_list)
         if hasattr(ast, 'members'):
             members = getattr(ast, 'members')
-            if hasattr(members, '__iter__') and not isinstance(ast, ps.ModuleDeclarationSyntax):
+            if hasattr(members, '__iter__') and not isinstance(ast, ps_stx.ModuleDeclarationSyntax):
                 for mem in members:
                     self._collect_assertions(mem, module_name, assertions_list)
         if hasattr(ast, 'body'):
@@ -362,7 +363,7 @@ class ExecutionEngine:
         found = []
 
         def _visitor(node):
-            if getattr(node, 'kind', None) == ps.StatementKind.ImmediateAssertion:
+            if getattr(node, 'kind', None) == ps_ast.StatementKind.ImmediateAssertion:
                 cond = getattr(node, 'cond', None)
                 source_range = getattr(node, 'sourceRange', None)
                 source = str(source_range) if source_range else '<unknown>'
