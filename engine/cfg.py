@@ -337,15 +337,12 @@ class AlwaysBlockVisitor:
         self.comb = comb
         self.lookup_table = build_lookup_table(self)
 
-    def __call__(self, node):
-        """Visitor dispatcher called by pyslang. Only handles Symbol nodes."""
-        if not isinstance(node, ps_ast.Symbol):
-            return
-        handler = self.lookup_table.get(node.kind)
-        if handler:
-            return handler(node)
-
     ### SYMBOL HANDLERS ###
+
+    @handles(ps_ast.SymbolKind.Instance)
+    def handle_instance(self, node: ps_ast.Symbol):
+        """Skip visiting the body of instances while finding always blocks for a module."""
+        return ps_ast.VisitAction.Skip
 
     @handles(ps_ast.SymbolKind.ProceduralBlock)
     def handle_procedural_block(self, node: ps_ast.Symbol):

@@ -62,12 +62,6 @@ class BasicBlockVisitor:
         self._scope = None  # Set by CFG.build_cfg before visiting
         self.lookup_table = build_lookup_table(self)
 
-    def __call__(self, node):
-        """Visitor dispatcher called by pyslang."""
-        handler = self.lookup_table.get(node.kind)
-        if handler:
-            return handler(node)
-
     ### STATEMENT HANDLERS ###
 
     @handles(ps_ast.StatementKind.Conditional)
@@ -81,7 +75,7 @@ class BasicBlockVisitor:
         then_start_idx = self.cfg.curr_idx
         self.cfg.partition_points.add(then_start_idx)
         if node.ifTrue is not None:
-            node.ifTrue.visit(self)
+            node.ifTrue.visit(lookup_table=self.lookup_table)
         self.cfg.edgelist.append((parent_idx, then_start_idx, "true"))
 
         # Preserve true-branch dangling edges so they reconnect after the
@@ -95,12 +89,12 @@ class BasicBlockVisitor:
             if if_false.kind == ps_ast.StatementKind.Conditional:
                 # else-if:
                 self.cfg.edgelist.append((parent_idx, self.cfg.curr_idx, "false"))
-                if_false.visit(self)
+                if_false.visit(lookup_table=self.lookup_table)
             else:
                 #  else
                 else_start_idx = self.cfg.curr_idx
                 self.cfg.partition_points.add(else_start_idx)
-                if_false.visit(self)
+                if_false.visit(lookup_table=self.lookup_table)
                 self.cfg.edgelist.append((parent_idx, else_start_idx, "false"))
             # Restore both branches' dangling edges so the next statement
             # after the if/else connects to both.
@@ -136,7 +130,7 @@ class BasicBlockVisitor:
             branch_exprs.case_kind = case_kind_str
             all_standard_exprs.extend(branch_exprs)
 
-            item.stmt.visit(self)
+            item.stmt.visit(lookup_table=self.lookup_table)
             self.cfg.edgelist.append((parent_idx, case_start_idx, branch_exprs))
 
             persisted_dangling_edge_stack.extend(self.edge_stack)
@@ -147,7 +141,7 @@ class BasicBlockVisitor:
             case_start_idx = self.cfg.curr_idx
             self.cfg.partition_points.add(case_start_idx)
 
-            node.defaultCase.visit(self)
+            node.defaultCase.visit(lookup_table=self.lookup_table)
             self.cfg.edgelist.append((parent_idx, case_start_idx, DefaultLabel(all_standard_exprs)))
 
             persisted_dangling_edge_stack.extend(self.edge_stack)
@@ -173,7 +167,7 @@ class BasicBlockVisitor:
             self.edge_stack.append((idx, None))
         else:
             for init_stmt in node.initializers:
-                init_stmt.visit(self)
+                init_stmt.visit(lookup_table=self.lookup_table)
             init_val = int(node.initializers[0].right.eval(eval_ctx).value)
 
         # Evaluate constant bound
@@ -187,7 +181,7 @@ class BasicBlockVisitor:
         current_val = init_val
         unroll_count = 0
         while self._loop_guard_holds(current_val, bound_val, stop.op):
-            node.body.visit(self)
+            node.body.visit(lookup_table=self.lookup_table)
             self._emit_step(node)
             current_val += step_size
             unroll_count += 1

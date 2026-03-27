@@ -389,7 +389,7 @@ class SymbolicDFS:
     def visit_expr(self, m: ExecutionManager, s: SymbolicState, expr):
         """Visits expressions"""
         if getattr(m, "debug", False):
-            print(expr.__class__.__name__, dir(expr))
+            print(expr.__class__.__name__)
         if expr is None:
             return
 
