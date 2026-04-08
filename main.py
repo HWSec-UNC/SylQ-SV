@@ -190,8 +190,12 @@ def main():
 
             engine.execute_sv(my_visitor_for_symbol, top_instances, None, num_cycles)
             symbol_visitor.visit(top_instances)
-            print(symbol_visitor.branch_points, flush=True)
-            print(symbol_visitor.paths, flush=True)
+            print(
+                "  AST scan (SlangSymbolVisitor): branch_points={} paths={}".format(
+                    symbol_visitor.branch_points, symbol_visitor.paths
+                ),
+                flush=True,
+            )
 
         end = time.process_time()
         elapsed = end - start

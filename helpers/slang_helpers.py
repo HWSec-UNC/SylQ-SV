@@ -88,7 +88,6 @@ class SlangSymbolVisitor:
     
     def visit_stmt(self, stmt):
         """Visits statements, counts branches (conditionals, cases, loops)"""
-        print("visiting stmt!")
         if stmt is None:
             self.paths += 1
             return
@@ -389,7 +388,7 @@ class SymbolicDFS:
     def visit_expr(self, m: ExecutionManager, s: SymbolicState, expr):
         """Visits expressions"""
         if getattr(m, "debug", False):
-            print(expr.__class__.__name__)
+            print(expr.__class__.__name__, flush=True)
         if expr is None:
             return
 
@@ -441,7 +440,7 @@ class SymbolicDFS:
                 # Only LHS has an identifier attribute
                 #  RHS is likely a literal
                 if getattr(m, "debug", False):
-                    print(expr.right.kind)
+                    print(expr.right.kind, flush=True)
                 if expr.right.kind == ps_stx.SyntaxKind.ConcatenationExpression:
                     # Handle concatenation on RHS
                     parts = [str(operand.value) for operand in expr.right.expressions if hasattr(operand, "value")]
@@ -484,10 +483,13 @@ class SymbolicDFS:
             self.visit_expr(m, s, expr.left)
             self.visit_expr(m, s, expr.right)
 
+        elif kind == ps_ast.ExpressionKind.Conversion:
+            # Sized literals (e.g. 5'd9) are ConversionExpression; operand holds the inner expr.
+            self.visit_expr(m, s, expr.operand)
+
         elif kind in [ps_ast.ExpressionKind.MemberAccess, ps_ast.ExpressionKind.Streaming,
                     ps_ast.ExpressionKind.Replication, ps_ast.ExpressionKind.TaggedUnion,
-                    ps_ast.ExpressionKind.Conversion, ps_ast.ExpressionKind.CopyClass,
-                    ps_ast.ExpressionKind.Streaming]:
+                    ps_ast.ExpressionKind.CopyClass]:
             self.visit_expr(m, s, expr.value)
 
         elif kind in [ps_ast.ExpressionKind.SimpleAssignmentPattern]:
@@ -519,13 +521,13 @@ class SymbolicDFS:
 
         else:
             if getattr(m, "debug", False):
-                print(f"Unsupported Expression: {expr} of kind {kind}")
+                print(f"Unsupported Expression: {expr} of kind {kind}", flush=True)
 
     def _visit_case_stmt(self, m: ExecutionManager, s: SymbolicState, stmt, modules=None, direction=None):
         """Case statement handling; called by visit_stmt without reading stmt.kind."""
         if getattr(m, "debug", False):
-            print("_visit_case_stmt")
-            print("case")
+            print("_visit_case_stmt", flush=True)
+            print("case", flush=True)
         m.branch_count += 1
         # Avoid reading stmt.expr if it can hang; use getattr with None default.
         case_expr = getattr(stmt, "expr", None)
@@ -614,26 +616,30 @@ class SymbolicDFS:
         """Visits statements"""
         # Progress indicator: every 10k statements print one line.
         m.visit_count = getattr(m, "visit_count", 0) + 1
-        if m.visit_count % 10000 == 0:
-            msg = "... {} statements visited".format(m.visit_count)
-            print(msg, flush=True)
+        if getattr(m, "debug", False) and m.visit_count % 10000 == 0:
+            print("... {} statements visited".format(m.visit_count), flush=True)
 
         cls_name = stmt.__class__.__name__
         # Handle case/binary by class name first - never read m.ignore or stmt.kind for these.
         if "CaseStatement" in cls_name:
             if getattr(m, "debug", False):
-                print("visit:", cls_name)
+                print("visit:", cls_name, flush=True)
             self._visit_case_stmt(m, s, stmt, modules, direction)
             return
         if cls_name == "BinaryExpressionSyntax":
             if getattr(m, "debug", False):
-                print("visit:", cls_name)
+                print("visit:", cls_name, flush=True)
             self.visit_expr(m, s, stmt)
             return
 
         # For other nodes, print with kind then check ignore (only when debug).
         if getattr(m, "debug", False):
-            print("visit:", cls_name, getattr(getattr(stmt, "kind", None), "name", getattr(stmt, "kind", None)))
+            print(
+                "visit:",
+                cls_name,
+                getattr(getattr(stmt, "kind", None), "name", getattr(stmt, "kind", None)),
+                flush=True,
+            )
         if stmt is None or m.ignore:
             return
 
@@ -719,7 +725,8 @@ class SymbolicDFS:
                 self.visit_stmt(m, s, stmt.incr, modules, direction)
 
         elif kind == ps_ast.StatementKind.WhileLoop:
-            print("whileloop")
+            if getattr(m, "debug", False):
+                print("whileloop", flush=True)
             m.branch_count += 1
             if hasattr(stmt, "cond"):
                 self.visit_expr(m, s, stmt.cond)
@@ -762,7 +769,8 @@ class SymbolicDFS:
                 s.pc.pop()
 
         elif kind == ps_ast.StatementKind.DoWhileLoop:
-            print("dowhile")
+            if getattr(m, "debug", False):
+                print("dowhile", flush=True)
             m.branch_count += 1
             if hasattr(stmt, "body"):
                 self.visit_stmt(m, s, stmt.body, modules, direction)

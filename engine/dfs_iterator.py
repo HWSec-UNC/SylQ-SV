@@ -23,7 +23,6 @@ from z3 import Solver, ExprRef
 from z3 import z3util
 from dataclasses import dataclass, field
 from collections import OrderedDict, defaultdict
-from itertools import product as itertools_product
 from functools import reduce
 from operator import mul
 
@@ -142,44 +141,91 @@ def partition_blocks(block_result_lists: List[List[dict]]) -> List[List[int]]:
     return list(groups.values())
 
 
+class ReplayableMergeResults:
+    """Lazily merges per-block outcome lists via DFSMergeIterator without materializing.
+
+    Each call to ``iter(self)`` starts a fresh DFS merge over the same block lists.
+    That is required when the same module's merged paths are iterated multiple times
+    (e.g. DFSCrossModuleIterator with num_cycles > 1).
+    """
+
+    def __init__(
+        self,
+        block_result_lists: List[List[dict]],
+        module_name: str = "",
+        manager: Any = None,
+    ):
+        self._block_result_lists = block_result_lists
+        self._module_name = module_name
+        self._manager = manager
+
+    def __iter__(self) -> Iterator[dict]:
+        return iter(
+            DFSMergeIterator(
+                block_result_lists=self._block_result_lists,
+                module_name=self._module_name,
+                manager=self._manager,
+                enable_early_pruning=True,
+                enable_caching=True,
+            )
+        )
+
+
 class LazyProduct:
     """Lazily produces the Cartesian product of disjoint component groups.
     
     When blocks within a module are partitioned into independent groups (no shared
     variables), we can avoid materializing the full product. Instead, we:
     1. Merge within each group (small, since group members share variables)
-    2. Store per-group merged results (small lists)
-    3. Lazily iterate over the Cartesian product of groups
+    2. Store per-group merged results (small lists) OR ReplayableMergeResults for lazy merge
+    3. Lazily iterate over the Cartesian product of groups via nested DFS (not itertools.product),
+       so replayable merge axes get a fresh iterator for each outer combination.
     
     For or1200_ctrl with 28 disjoint blocks: instead of materializing 109M+ combos,
     we store ~28 small lists and produce combos one at a time via __iter__.
     
-    This class is a drop-in replacement for List[dict] in the interface - it supports
-    __len__, __iter__, and __getitem__ (the latter materializes on demand).
+    Iterable protocol: ``__iter__`` streams the product; ``__len__`` / ``logical_size`` are
+    only precise when every component is a materialized list (no lazy merge axis).
     """
     
-    def __init__(self, component_results: List[List[dict]]):
+    def __init__(self, component_results: List):
         """
         Args:
-            component_results: List of per-component merged result lists.
-                Each inner list contains feasible {pc, store} dicts for one
-                independent group of blocks.
+            component_results: List of per-component sources: each is either a list of
+                {pc, store} dicts or a ReplayableMergeResults.
         """
         self.component_results = component_results
         self._len: Optional[int] = None
+        self._try_compute_len()
+
+    def _try_compute_len(self) -> None:
+        """Set _len to product of component lengths if every component has known len."""
+        if not self.component_results:
+            self._len = 1
+            return
+        sizes: List[int] = []
+        for g in self.component_results:
+            if isinstance(g, ReplayableMergeResults):
+                self._len = None
+                return
+            try:
+                sizes.append(len(g))
+            except TypeError:
+                self._len = None
+                return
+        self._len = reduce(mul, sizes, 1)
     
     @property
-    def logical_size(self) -> int:
-        """Total Cartesian-product size as an arbitrary-precision Python int."""
-        if self._len is None:
-            if not self.component_results:
-                self._len = 1
-            else:
-                self._len = reduce(mul, (len(g) for g in self.component_results), 1)
+    def logical_size(self) -> Optional[int]:
+        """Total Cartesian-product size if known; None if any axis is a lazy merge."""
+        if self._len is None and self.component_results:
+            self._try_compute_len()
         return self._len
 
     def __len__(self) -> int:
         n = self.logical_size
+        if n is None:
+            return sys.maxsize
         if n > sys.maxsize:
             return sys.maxsize
         return n
@@ -193,30 +239,47 @@ class LazyProduct:
         if len(self.component_results) == 1:
             yield from self.component_results[0]
             return
-        
-        # Lazy Cartesian product over independent groups
-        for combo in itertools_product(*self.component_results):
-            all_pcs: list = []
-            all_stores: dict = {}
-            for r in combo:
-                all_pcs.extend(r["pc"])
-                all_stores.update(r["store"])
-            yield {"pc": all_pcs, "store": all_stores}
+
+        def rec(i: int, acc_pc: list, acc_store: dict) -> Iterator[dict]:
+            if i == len(self.component_results):
+                yield {"pc": acc_pc, "store": dict(acc_store)}
+                return
+            for r in self.component_results[i]:
+                yield from rec(i + 1, acc_pc + r["pc"], {**acc_store, **r["store"]})
+
+        yield from rec(0, [], {})
     
     def __bool__(self) -> bool:
-        return self.logical_size > 0
+        ls = self.logical_size
+        if ls is not None:
+            return ls > 0
+        return bool(self.component_results)
     
     @property
     def n_components(self) -> int:
         return len(self.component_results)
     
     @property
-    def component_sizes(self) -> List[int]:
-        return [len(g) for g in self.component_results]
+    def component_sizes(self) -> List[str]:
+        """Human-readable size per component; lazy merge axes show as 'lazy'."""
+        out: List[str] = []
+        for g in self.component_results:
+            if isinstance(g, ReplayableMergeResults):
+                out.append("lazy")
+            else:
+                out.append(str(len(g)))
+        return out
     
     def total_stored(self) -> int:
-        """Total number of results actually stored in memory (sum of component sizes)."""
-        return sum(len(g) for g in self.component_results)
+        """Sum of materialized list lengths; lazy merge groups contribute input block path counts."""
+        total = 0
+        for g in self.component_results:
+            if isinstance(g, ReplayableMergeResults):
+                for bl in g._block_result_lists:
+                    total += len(bl)
+            else:
+                total += len(g)
+        return total
 
 
 class DFSMergeIterator:
