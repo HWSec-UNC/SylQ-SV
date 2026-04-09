@@ -41,7 +41,21 @@ def timeout_exit():
         except Exception:
             pass
         mgr = _engine_ref._last_manager
-        print(f"  Paths explored (feasible): {mgr.path_count}", flush=True)
+        if getattr(mgr, "estimated_global_combinations", None) is not None:
+            print(
+                f"  Paths explored (feasible): {mgr.estimated_global_combinations:,} "
+                f"(estimated global product; no cross-module assertion pass)",
+                flush=True,
+            )
+        elif getattr(mgr, "feasible_paths_unknown", False):
+            print(
+                "  Paths explored (feasible): not summarized as one number (lazy merge — "
+                "global product not computed without iterating). See per-module "
+                "'feasible merged paths' / merge lines above.",
+                flush=True,
+            )
+        else:
+            print(f"  Paths explored (feasible): {mgr.path_count}", flush=True)
         print(f"  Branch points explored: {mgr.branch_count}", flush=True)
         n_assertions = len(mgr.assertions) if hasattr(mgr, 'assertions') else 0
         print(f"  Assertions checked: {n_assertions}", flush=True)
@@ -94,6 +108,22 @@ def main():
     optparser.add_option("--use_cache", action="store_true", dest="use_cache",
                          default=False, help="Use the query caching, Default=False")
     optparser.add_option("--explore_time", help="Time to explore in seconds", dest="explore_time")
+    optparser.add_option(
+        "--enumerate-cross-module",
+        action="store_true",
+        dest="enumerate_cross_module",
+        default=False,
+        help="When there are no assertions, still run DFSCrossModuleIterator over merged modules "
+             "(full global enumeration; can be huge — use --max-cross-module-paths or --explore_time)",
+    )
+    optparser.add_option(
+        "--max-cross-module-paths",
+        type="int",
+        dest="max_cross_module_paths",
+        default=None,
+        help="Stop after N global path combinations (with --enumerate-cross-module). "
+             "Omit for no limit (risky on large designs)",
+    )
     (options, args) = optparser.parse_args()
 
 
@@ -188,7 +218,14 @@ def main():
             _engine_ref = engine
             _start_time_ref = start
 
-            engine.execute_sv(my_visitor_for_symbol, top_instances, None, num_cycles)
+            engine.execute_sv(
+                my_visitor_for_symbol,
+                top_instances,
+                None,
+                num_cycles,
+                enumerate_cross_module=options.enumerate_cross_module,
+                max_cross_module_paths=options.max_cross_module_paths,
+            )
             symbol_visitor.visit(top_instances)
             print(
                 "  AST scan (SlangSymbolVisitor): branch_points={} paths={}".format(
@@ -205,7 +242,20 @@ def main():
         print(f"  Elapsed time: {elapsed:.4f}s", flush=True)
         if hasattr(engine, '_last_manager'):
             mgr = engine._last_manager
-            print(f"  Paths explored (feasible): {mgr.path_count}", flush=True)
+            if getattr(mgr, "estimated_global_combinations", None) is not None:
+                print(
+                    f"  Paths explored (feasible): {mgr.estimated_global_combinations:,} "
+                    f"(estimated global product; no cross-module assertion pass)",
+                    flush=True,
+                )
+            elif getattr(mgr, "feasible_paths_unknown", False):
+                print(
+                    "  Paths explored (feasible): not summarized as one number (lazy merge — "
+                    "see log above for per-module feasible merged paths).",
+                    flush=True,
+                )
+            else:
+                print(f"  Paths explored (feasible): {mgr.path_count}", flush=True)
             print(f"  Branch points explored: {mgr.branch_count}", flush=True)
             n_assertions = len(mgr.assertions) if hasattr(mgr, 'assertions') else 0
             print(f"  Assertions found: {n_assertions}", flush=True)
@@ -214,6 +264,14 @@ def main():
                 print("  Result: ASSERTION VIOLATION FOUND", flush=True)
             elif n_assertions > 0:
                 print("  Result: All paths explored, no violations", flush=True)
+            elif getattr(mgr, "cross_module_stopped_reason", "") == "complete":
+                print("  Result: Cross-module enumeration finished (exhausted feasible combinations)",
+                      flush=True)
+            elif getattr(mgr, "cross_module_stopped_reason", "") == "max_paths":
+                print("  Result: Cross-module enumeration stopped at --max-cross-module-paths limit",
+                      flush=True)
+            elif getattr(mgr, "cross_module_stopped_reason", "") == "timeout":
+                print("  Result: Cross-module enumeration interrupted (timeout)", flush=True)
             else:
                 print("  Result: Exploratory run complete (no assertions in design)", flush=True)
         print("=========================", flush=True)

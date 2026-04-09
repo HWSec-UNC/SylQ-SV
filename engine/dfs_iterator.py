@@ -32,7 +32,8 @@ VARS_EXCLUDED_FROM_DISJOINT = frozenset(
     {"rst", "clk", "rst_n", "rst_ni", "clk_i", "rst_i", "reset", "clock"}
 )
 
-# Progress while merge DFS runs (set 0 to disable heartbeat)
+# Progress while *intra-module* merge DFS runs (set 0 to disable). Can still appear
+# during cross-module enumeration when a module's merged result is produced lazily.
 _MERGE_HEARTBEAT_SEC = float(os.environ.get("SYLQ_MERGE_HEARTBEAT_SEC", "20"))
 # Log individual SAT checks slower than this (seconds); 0 disables
 _SLOW_SAT_WARN_SEC = float(os.environ.get("SYLQ_SLOW_SAT_WARN_SEC", "5"))
@@ -517,10 +518,10 @@ class DFSMergeIterator:
                     depth = len(self.stack)
                     top_lv = frame.level
                     print(
-                        f"    [merge-heartbeat] {self.module_name}: "
+                        f"    [intramodule-merge-heartbeat] {self.module_name}: "
                         f"{now - merge_t0:.1f}s elapsed, stack_depth={depth}, "
                         f"top_level={top_lv}, yielded={yielded_count}, "
-                        f"combos_checked={self.combos_checked}, pruned={self.combos_pruned}, "
+                        f"merge_steps={self.combos_checked}, pruned={self.combos_pruned}, "
                         f"cache_hits={self.cache_hits}",
                         flush=True,
                     )
@@ -634,7 +635,8 @@ class DFSCrossModuleIterator:
         
         self._local_cache = LRUCache(maxsize=10000)
         
-        # Statistics
+        # Statistics (cross-module DFS: combos_checked = successful inner next() calls,
+        # including exploration before each full global yield — not the same as completed paths)
         self.combos_checked = 0
         self.combos_pruned = 0
         self.cache_hits = 0

@@ -525,7 +525,16 @@ class ExecutionEngine:
                   f"logical_size=unknown until iteration (lazy merge axis)", flush=True)
         return lazy
 
-    def execute_sv(self, visitor, modules, manager: Optional[ExecutionManager], num_cycles: int) -> None:
+    def execute_sv(
+        self,
+        visitor,
+        modules,
+        manager: Optional[ExecutionManager],
+        num_cycles: int,
+        *,
+        enumerate_cross_module: bool = False,
+        max_cross_module_paths: Optional[int] = None,
+    ) -> None:
         """Main entry point for PySlang execution
         Drives symbolic execution for SystemVerilog designs."""
         gc.collect()
@@ -540,6 +549,9 @@ class ExecutionEngine:
         if hasattr(self, "cache"):
             manager.cache = self.cache
         manager.sv = True
+        manager.enumerate_cross_module = enumerate_cross_module
+        manager.max_cross_module_paths = max_cross_module_paths
+        manager.cross_module_stopped_reason = ""
         # Store manager ref so main.py timeout handler can access stats
         self._last_manager = manager
         # Initialize Quick-Union for query slicing (Paper §4.2.2)
@@ -740,13 +752,16 @@ class ExecutionEngine:
 
         valid_assertions = [a for a in manager.assertions
                             if a.get("z3_expr") is not None]
-        if not valid_assertions:
+        # Fast path: no assertions and user did not request full cross-module enumeration
+        if not valid_assertions and not enumerate_cross_module:
             print("Phase: cross-module path iteration — SKIPPED (no assertions to check)",
                   flush=True)
             print(f"  {len(manager.assertions)} assertion(s) collected, "
                   f"0 with valid Z3 expressions", flush=True)
             print(f"  Per-module merged results available for "
                   f"{len(merged_by_module)} modules.", flush=True)
+            print("  Hint: use --enumerate-cross-module to run DFSCrossModuleIterator anyway.",
+                  flush=True)
             total_logical = 1
             product_known = True
             for m, res in merged_by_module.items():
@@ -762,17 +777,39 @@ class ExecutionEngine:
                 else:
                     total_logical *= max(len(res), 1)
             if product_known:
-                print(f"  Cross-module product would have been {total_logical:,} paths — "
-                      f"all skipped.", flush=True)
+                manager.estimated_global_combinations = total_logical
+                manager.feasible_paths_unknown = False
+                print(f"  Cross-module product would have been {total_logical:,} path combinations — "
+                      f"not iterated (no assertions to drive cross-module DFS).", flush=True)
             else:
+                manager.feasible_paths_unknown = True
                 print("  Cross-module product size not precomputed (lazy merge); skipped.", flush=True)
             print("Branch points explored: {}".format(manager.branch_count), flush=True)
-            print("Paths explored (feasible): 0 (no assertions)", flush=True)
+            if product_known:
+                print(
+                    f"Paths explored (feasible): {total_logical:,} — estimated full-design combinations "
+                    f"(product of per-module merges; cross-module DFS not run without assertions).",
+                    flush=True,
+                )
+            else:
+                print(
+                    "Paths explored (feasible): not totaled globally — cross-module product unknown "
+                    "(lazy merge). See per-module lines above for each module's feasible merged paths.",
+                    flush=True,
+                )
             self.module_depth -= 1
             return
 
         print("Phase: cross-module path iteration (DFS)", flush=True)
-        print(f"  Checking {len(valid_assertions)} assertion(s)", flush=True)
+        if valid_assertions:
+            print(f"  Checking {len(valid_assertions)} assertion(s)", flush=True)
+        else:
+            print("  Mode: no assertions — enumerating all feasible global path combinations "
+                  "(path_count and DFS stats updated)", flush=True)
+            print(f"  Per-module merged results: {len(merged_by_module)} module(s)", flush=True)
+            if max_cross_module_paths is not None:
+                print(f"  Stopping after {max_cross_module_paths:,} global path combination(s).",
+                      flush=True)
         dfs_xmod = DFSCrossModuleIterator(
             per_module_results=merged_by_module,
             num_cycles=int(num_cycles),
@@ -780,9 +817,11 @@ class ExecutionEngine:
             enable_early_pruning=True,
             enable_caching=True,
         )
-        
+
+        cross_stop: Optional[str] = None
         for path_combo, all_pcs, all_stores in dfs_xmod:
             if getattr(self, "timeout", False):
+                cross_stop = "timeout"
                 break
             manager.path_count += 1
             stats = dfs_xmod.get_stats()
@@ -792,7 +831,9 @@ class ExecutionEngine:
             )
             if sparse or frequent:
                 print(
-                    "  cross-module: {} path(s) checked (DFS checked {}, pruned {}, cache hits {})".format(
+                    "  cross-module: {} global path(s) completed; "
+                    "xmod_inner_steps {} (per-level iterator advances, not merge-only), "
+                    "pruned {}, cache_hits {}".format(
                         manager.path_count,
                         stats["combos_checked"],
                         stats["combos_pruned"],
@@ -801,27 +842,53 @@ class ExecutionEngine:
                     flush=True,
                 )
 
-            violation = self._check_assertions_on_path(
-                manager, visitor, all_pcs, all_stores, modules_dict)
-            if violation:
-                stats = dfs_xmod.get_stats()
+            if valid_assertions:
+                violation = self._check_assertions_on_path(
+                    manager, visitor, all_pcs, all_stores, modules_dict)
+                if violation:
+                    stats = dfs_xmod.get_stats()
+                    manager.cross_module_stopped_reason = "violation"
+                    print(
+                        "Phase: cross-module iteration stopped (assertion violation). "
+                        "paths_checked={} branch_points={} DFS(checked/pruned/cache_hits)={}/{}/{}".format(
+                            manager.path_count,
+                            manager.branch_count,
+                            stats["combos_checked"],
+                            stats["combos_pruned"],
+                            stats["cache_hits"],
+                        ),
+                        flush=True,
+                    )
+                    self.module_depth -= 1
+                    return
+
+            if (
+                max_cross_module_paths is not None
+                and max_cross_module_paths > 0
+                and manager.path_count >= max_cross_module_paths
+            ):
                 print(
-                    "Phase: cross-module iteration stopped (assertion violation). "
-                    "paths_checked={} branch_points={} DFS(checked/pruned/cache_hits)={}/{}/{}".format(
-                        manager.path_count,
-                        manager.branch_count,
-                        stats["combos_checked"],
-                        stats["combos_pruned"],
-                        stats["cache_hits"],
-                    ),
+                    f"Phase: cross-module iteration stopped — --max-cross-module-paths "
+                    f"({max_cross_module_paths:,}) reached after {manager.path_count:,} path(s).",
                     flush=True,
                 )
-                self.module_depth -= 1
-                return
-        
+                cross_stop = "max_paths"
+                break
+
         stats = dfs_xmod.get_stats()
         timed_out = getattr(self, "timeout", False)
-        status = "interrupted (timeout)" if timed_out else "complete"
+        if cross_stop == "timeout":
+            status = "interrupted (timeout)"
+            manager.cross_module_stopped_reason = "timeout"
+        elif cross_stop == "max_paths":
+            status = "stopped (max-cross-module-paths)"
+            manager.cross_module_stopped_reason = "max_paths"
+        elif timed_out:
+            status = "interrupted (timeout)"
+            manager.cross_module_stopped_reason = "timeout"
+        else:
+            status = "complete (exhausted iterator)"
+            manager.cross_module_stopped_reason = "complete"
         print(
             "Phase: cross-module iteration {} — paths_checked={} branch_points={} "
             "DFS(checked/pruned/cache_hits)={}/{}/{}".format(

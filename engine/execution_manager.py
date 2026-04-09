@@ -80,6 +80,17 @@ class ExecutionManager:
     cache = None
     path_count = 0
     branch_count = 0
+    # Set when cross-module DFS is skipped (no assertions): product of per-module
+    # merged path counts, when computable (not LazyProduct with unknown size).
+    estimated_global_combinations: Optional[int] = None
+    # True when no assertions and at least one module merge is lazy / unknown size,
+    # so the full cross-module product cannot be multiplied without iterating.
+    feasible_paths_unknown: bool = False
+    # CLI: --enumerate-cross-module / --max-cross-module-paths
+    enumerate_cross_module: bool = False
+    max_cross_module_paths: Optional[int] = None
+    # Why cross-module DFS ended: "", "complete", "max_paths", "timeout", "violation"
+    cross_module_stopped_reason: str = ""
     # Quick-Union for query slicing (Paper §4.2.2)
     # Initialized lazily; separate instances for path exploration and merge
     qu_path = None   # QuickUnion for path-exploration queries
