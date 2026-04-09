@@ -44,7 +44,7 @@ def timeout_exit():
         if getattr(mgr, "estimated_global_combinations", None) is not None:
             print(
                 f"  Paths explored (feasible): {mgr.estimated_global_combinations:,} "
-                f"(estimated global product; no cross-module assertion pass)",
+                f"(estimated global product from per-module merge sizes)",
                 flush=True,
             )
         elif getattr(mgr, "feasible_paths_unknown", False):
@@ -59,6 +59,9 @@ def timeout_exit():
         print(f"  Branch points explored: {mgr.branch_count}", flush=True)
         n_assertions = len(mgr.assertions) if hasattr(mgr, 'assertions') else 0
         print(f"  Assertions checked: {n_assertions}", flush=True)
+        print(f"  Solver time: {getattr(mgr, 'solver_time', 0):.4f}s", flush=True)
+        if hasattr(mgr, "feasibility_stats_line"):
+            print(f"  {mgr.feasibility_stats_line()}", flush=True)
         if mgr.assertion_violation:
             print("  Result: VIOLATION FOUND (see above)", flush=True)
         else:
@@ -109,20 +112,12 @@ def main():
                          default=False, help="Use the query caching, Default=False")
     optparser.add_option("--explore_time", help="Time to explore in seconds", dest="explore_time")
     optparser.add_option(
-        "--enumerate-cross-module",
-        action="store_true",
-        dest="enumerate_cross_module",
-        default=False,
-        help="When there are no assertions, still run DFSCrossModuleIterator over merged modules "
-             "(full global enumeration; can be huge — use --max-cross-module-paths or --explore_time)",
-    )
-    optparser.add_option(
         "--max-cross-module-paths",
         type="int",
         dest="max_cross_module_paths",
         default=None,
-        help="Stop after N global path combinations (with --enumerate-cross-module). "
-             "Omit for no limit (risky on large designs)",
+        help="Stop cross-module DFS after N global path combinations. "
+             "Omit for no limit (can be very slow on large designs; use --explore_time to cap wall time)",
     )
     (options, args) = optparser.parse_args()
 
@@ -223,7 +218,6 @@ def main():
                 top_instances,
                 None,
                 num_cycles,
-                enumerate_cross_module=options.enumerate_cross_module,
                 max_cross_module_paths=options.max_cross_module_paths,
             )
             symbol_visitor.visit(top_instances)
@@ -245,7 +239,7 @@ def main():
             if getattr(mgr, "estimated_global_combinations", None) is not None:
                 print(
                     f"  Paths explored (feasible): {mgr.estimated_global_combinations:,} "
-                    f"(estimated global product; no cross-module assertion pass)",
+                    f"(estimated global product from per-module merge sizes)",
                     flush=True,
                 )
             elif getattr(mgr, "feasible_paths_unknown", False):
@@ -260,6 +254,8 @@ def main():
             n_assertions = len(mgr.assertions) if hasattr(mgr, 'assertions') else 0
             print(f"  Assertions found: {n_assertions}", flush=True)
             print(f"  Solver time: {mgr.solver_time:.4f}s", flush=True)
+            if hasattr(mgr, "feasibility_stats_line"):
+                print(f"  {mgr.feasibility_stats_line()}", flush=True)
             if mgr.assertion_violation:
                 print("  Result: ASSERTION VIOLATION FOUND", flush=True)
             elif n_assertions > 0:

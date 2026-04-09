@@ -393,28 +393,130 @@ Phase: cross-module path iteration (DFS)
   cross-module: 1 global path(s) completed; outcome_pulls=79 (each pull = next merged outcome for one module in this search; not intra-module merge steps), pruned 0, cache_hits 15
   cross-module: 2 global path(s) completed; outcome_pulls=80 (each pull = next merged outcome for one module in this search; not intra-module merge steps), pruned 0, cache_hits 15
   cross-module: 3 global path(s) completed; outcome_pulls=81 (each pull = next merged outcome for one module in this search; not intra-module merge steps), pruned 0, cache_hits 15
-    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 20.2s elapsed, stack_depth=4, top_level=3, yielded=12, merge_steps=19, pruned=0, cache_hits=0
-    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 41.8s elapsed, stack_depth=4, top_level=3, yielded=25, merge_steps=39, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 20.6s elapsed, stack_depth=4, top_level=3, yielded=12, merge_steps=19, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 41.7s elapsed, stack_depth=4, top_level=3, yielded=24, merge_steps=37, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 62.3s elapsed, stack_depth=4, top_level=3, yielded=36, merge_steps=54, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tt_g0: 64.7s elapsed, stack_depth=3, top_level=2, yielded=1, merge_steps=3, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 20.4s elapsed, stack_depth=4, top_level=3, yielded=12, merge_steps=19, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 41.0s elapsed, stack_depth=4, top_level=3, yielded=24, merge_steps=37, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 61.6s elapsed, stack_depth=4, top_level=3, yielded=36, merge_steps=54, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tt_g0: 128.7s elapsed, stack_depth=3, top_level=2, yielded=2, merge_steps=4, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 20.8s elapsed, stack_depth=4, top_level=3, yielded=12, merge_steps=19, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 41.9s elapsed, stack_depth=4, top_level=3, yielded=24, merge_steps=37, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 62.7s elapsed, stack_depth=4, top_level=3, yielded=36, merge_steps=54, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tt_g0: 193.8s elapsed, stack_depth=3, top_level=2, yielded=3, merge_steps=6, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 20.8s elapsed, stack_depth=4, top_level=3, yielded=12, merge_steps=19, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 41.5s elapsed, stack_depth=4, top_level=3, yielded=24, merge_steps=37, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 62.3s elapsed, stack_depth=4, top_level=3, yielded=36, merge_steps=54, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tt_g0: 258.6s elapsed, stack_depth=3, top_level=2, yielded=4, merge_steps=7, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 20.9s elapsed, stack_depth=4, top_level=3, yielded=12, merge_steps=19, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 41.9s elapsed, stack_depth=4, top_level=3, yielded=24, merge_steps=37, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 62.7s elapsed, stack_depth=4, top_level=3, yielded=36, merge_steps=54, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tt_g0: 323.8s elapsed, stack_depth=3, top_level=2, yielded=5, merge_steps=9, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 20.9s elapsed, stack_depth=4, top_level=3, yielded=12, merge_steps=19, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 41.9s elapsed, stack_depth=4, top_level=3, yielded=24, merge_steps=37, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 62.8s elapsed, stack_depth=4, top_level=3, yielded=36, merge_steps=54, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tt_g0: 389.1s elapsed, stack_depth=3, top_level=2, yielded=6, merge_steps=10, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 21.1s elapsed, stack_depth=4, top_level=3, yielded=12, merge_steps=19, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 42.1s elapsed, stack_depth=4, top_level=3, yielded=24, merge_steps=37, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 62.9s elapsed, stack_depth=4, top_level=3, yielded=36, merge_steps=54, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tt_g0: 454.5s elapsed, stack_depth=3, top_level=2, yielded=7, merge_steps=12, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 20.9s elapsed, stack_depth=4, top_level=3, yielded=12, merge_steps=19, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 41.9s elapsed, stack_depth=4, top_level=3, yielded=24, merge_steps=37, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 62.9s elapsed, stack_depth=4, top_level=3, yielded=36, merge_steps=54, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tt_g0: 520.2s elapsed, stack_depth=3, top_level=2, yielded=8, merge_steps=13, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 20.9s elapsed, stack_depth=4, top_level=3, yielded=12, merge_steps=19, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 41.9s elapsed, stack_depth=4, top_level=3, yielded=24, merge_steps=37, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 63.0s elapsed, stack_depth=4, top_level=3, yielded=36, merge_steps=54, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tt_g0: 585.7s elapsed, stack_depth=3, top_level=2, yielded=9, merge_steps=15, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 20.7s elapsed, stack_depth=4, top_level=3, yielded=12, merge_steps=19, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 41.9s elapsed, stack_depth=4, top_level=3, yielded=24, merge_steps=37, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 62.9s elapsed, stack_depth=4, top_level=3, yielded=36, merge_steps=54, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tt_g0: 651.0s elapsed, stack_depth=3, top_level=2, yielded=10, merge_steps=16, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 20.9s elapsed, stack_depth=4, top_level=3, yielded=12, merge_steps=19, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 41.8s elapsed, stack_depth=4, top_level=3, yielded=24, merge_steps=37, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 62.8s elapsed, stack_depth=4, top_level=3, yielded=36, merge_steps=54, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tt_g0: 716.3s elapsed, stack_depth=3, top_level=2, yielded=11, merge_steps=19, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 20.9s elapsed, stack_depth=4, top_level=3, yielded=12, merge_steps=19, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 42.1s elapsed, stack_depth=4, top_level=3, yielded=24, merge_steps=37, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 63.0s elapsed, stack_depth=4, top_level=3, yielded=36, merge_steps=54, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tt_g0: 781.7s elapsed, stack_depth=3, top_level=2, yielded=12, merge_steps=20, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 20.7s elapsed, stack_depth=4, top_level=3, yielded=12, merge_steps=19, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 41.5s elapsed, stack_depth=4, top_level=3, yielded=24, merge_steps=37, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 62.4s elapsed, stack_depth=4, top_level=3, yielded=36, merge_steps=54, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tt_g0: 846.7s elapsed, stack_depth=3, top_level=2, yielded=13, merge_steps=22, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 20.5s elapsed, stack_depth=4, top_level=3, yielded=12, merge_steps=19, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 41.5s elapsed, stack_depth=4, top_level=3, yielded=24, merge_steps=37, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 62.3s elapsed, stack_depth=4, top_level=3, yielded=36, merge_steps=54, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tt_g0: 911.4s elapsed, stack_depth=3, top_level=2, yielded=14, merge_steps=23, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 21.1s elapsed, stack_depth=4, top_level=3, yielded=12, merge_steps=19, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 42.2s elapsed, stack_depth=4, top_level=3, yielded=24, merge_steps=37, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 63.3s elapsed, stack_depth=4, top_level=3, yielded=36, merge_steps=54, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tt_g0: 977.3s elapsed, stack_depth=3, top_level=2, yielded=15, merge_steps=25, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 21.9s elapsed, stack_depth=4, top_level=3, yielded=12, merge_steps=19, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 43.6s elapsed, stack_depth=4, top_level=3, yielded=24, merge_steps=37, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 64.9s elapsed, stack_depth=4, top_level=3, yielded=36, merge_steps=54, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tt_g0: 1044.8s elapsed, stack_depth=3, top_level=2, yielded=16, merge_steps=26, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 20.1s elapsed, stack_depth=4, top_level=3, yielded=11, merge_steps=18, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 41.4s elapsed, stack_depth=4, top_level=3, yielded=23, merge_steps=36, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 62.9s elapsed, stack_depth=4, top_level=3, yielded=35, merge_steps=53, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tt_g0: 1112.0s elapsed, stack_depth=3, top_level=2, yielded=17, merge_steps=28, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 21.3s elapsed, stack_depth=4, top_level=3, yielded=12, merge_steps=19, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 42.6s elapsed, stack_depth=4, top_level=3, yielded=24, merge_steps=37, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 64.0s elapsed, stack_depth=4, top_level=3, yielded=36, merge_steps=54, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tt_g0: 1178.6s elapsed, stack_depth=3, top_level=2, yielded=18, merge_steps=29, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 21.5s elapsed, stack_depth=4, top_level=3, yielded=12, merge_steps=19, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 42.7s elapsed, stack_depth=4, top_level=3, yielded=24, merge_steps=37, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 64.3s elapsed, stack_depth=4, top_level=3, yielded=36, merge_steps=54, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tt_g0: 1245.5s elapsed, stack_depth=3, top_level=2, yielded=19, merge_steps=31, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 21.3s elapsed, stack_depth=4, top_level=3, yielded=12, merge_steps=19, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 42.7s elapsed, stack_depth=4, top_level=3, yielded=24, merge_steps=37, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 64.0s elapsed, stack_depth=4, top_level=3, yielded=36, merge_steps=54, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tt_g0: 1312.0s elapsed, stack_depth=3, top_level=2, yielded=20, merge_steps=32, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 21.3s elapsed, stack_depth=4, top_level=3, yielded=12, merge_steps=19, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 42.7s elapsed, stack_depth=4, top_level=3, yielded=24, merge_steps=37, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 62.9s elapsed, stack_depth=4, top_level=3, yielded=35, merge_steps=53, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tt_g0: 1379.2s elapsed, stack_depth=3, top_level=2, yielded=21, merge_steps=35, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 21.2s elapsed, stack_depth=4, top_level=3, yielded=12, merge_steps=19, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 42.6s elapsed, stack_depth=4, top_level=3, yielded=24, merge_steps=37, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 63.8s elapsed, stack_depth=4, top_level=3, yielded=36, merge_steps=54, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tt_g0: 1445.5s elapsed, stack_depth=3, top_level=2, yielded=22, merge_steps=36, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 21.3s elapsed, stack_depth=4, top_level=3, yielded=12, merge_steps=19, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 42.5s elapsed, stack_depth=4, top_level=3, yielded=24, merge_steps=37, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 63.8s elapsed, stack_depth=4, top_level=3, yielded=36, merge_steps=54, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tt_g0: 1511.9s elapsed, stack_depth=3, top_level=2, yielded=23, merge_steps=38, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 21.5s elapsed, stack_depth=4, top_level=3, yielded=12, merge_steps=19, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 42.7s elapsed, stack_depth=4, top_level=3, yielded=24, merge_steps=37, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 63.7s elapsed, stack_depth=4, top_level=3, yielded=36, merge_steps=54, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tt_g0: 1578.1s elapsed, stack_depth=3, top_level=2, yielded=24, merge_steps=39, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 21.2s elapsed, stack_depth=4, top_level=3, yielded=12, merge_steps=19, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 42.8s elapsed, stack_depth=4, top_level=3, yielded=24, merge_steps=37, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 64.3s elapsed, stack_depth=4, top_level=3, yielded=36, merge_steps=54, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tt_g0: 1645.1s elapsed, stack_depth=3, top_level=2, yielded=25, merge_steps=41, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 21.6s elapsed, stack_depth=4, top_level=3, yielded=12, merge_steps=19, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 41.7s elapsed, stack_depth=4, top_level=3, yielded=23, merge_steps=36, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tpram_32x32_g0: 61.9s elapsed, stack_depth=4, top_level=3, yielded=34, merge_steps=52, pruned=0, cache_hits=0
+    [intramodule-merge-heartbeat] or1200_tt_g0: 1713.1s elapsed, stack_depth=3, top_level=2, yielded=26, merge_steps=42, pruned=0, cache_hits=0
 
 === TIMEOUT: Execution time limit exceeded ===
-  Elapsed time: 120.2130s
-  Paths explored (feasible): 26
+  Elapsed time: 1800.3407s
+  Paths explored (feasible): 940
   Branch points explored: 0
   Assertions checked: 0
-  Solver time: 1.1648s
-  Feasibility: Z3_checks=306, disjoint_skip_merge=0, disjoint_skip_cross=0, pruned_merge=0, pruned_lazy_product=0, pruned_cross_module=0
+  Solver time: 16.0581s
+  Feasibility: Z3_checks=2606 (merge=1562 lazy_product=16 cross_module=1028), disjoint_skip_merge=0, disjoint_skip_cross=0, pruned_merge=0, pruned_lazy_product=0, pruned_cross_module=0
   Result: No violation found within time limit
 =======================================
-Phase: cross-module iteration interrupted (timeout) — paths_checked=26 branch_points=0 DFS(pulls/pruned/cache_hits)=105/0/15
+Phase: cross-module iteration interrupted (timeout) — paths_checked=940 branch_points=0 DFS(pulls/pruned/cache_hits)=1071/0/41
   AST scan (SlangSymbolVisitor): branch_points=0 paths=0
 
 === EXECUTION SUMMARY ===
-  Elapsed time: 121.5971s
-  Paths explored (feasible): 26
+  Elapsed time: 1801.7973s
+  Paths explored (feasible): 940
   Branch points explored: 0
   Assertions found: 0
-  Solver time: 1.1775s
-  Feasibility: Z3_checks=307, disjoint_skip_merge=0, disjoint_skip_cross=0, pruned_merge=0, pruned_lazy_product=0, pruned_cross_module=0
+  Solver time: 16.0716s
+  Feasibility: Z3_checks=2607 (merge=1562 lazy_product=16 cross_module=1029), disjoint_skip_merge=0, disjoint_skip_cross=0, pruned_merge=0, pruned_lazy_product=0, pruned_cross_module=0
   Result: Cross-module enumeration interrupted (timeout)
 =========================
 Top level design units:

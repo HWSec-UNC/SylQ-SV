@@ -12,8 +12,6 @@ from .dfs_iterator import (
     partition_blocks,
 )
 from typing import Optional, List
-from functools import reduce
-from operator import mul
 import time
 import gc
 from helpers.utils import to_binary
@@ -477,28 +475,11 @@ class ExecutionEngine:
 
         groups = partition_blocks(block_result_lists)
         n_groups = len(groups)
-        
-        if n_groups > 1:
-            total_product = 1
-            for bl in block_result_lists:
-                total_product *= max(len(bl), 1)
-            print(f"    merge {module_name}: partitioned {len(block_result_lists)} blocks "
-                  f"into {n_groups} independent groups (full product would be {total_product:,})",
-                  flush=True)
-        
+
         component_results: List = []
         for group_idx, block_indices in enumerate(groups):
             group_block_lists = [block_result_lists[i] for i in block_indices]
-            sizes = [max(len(bl), 1) for bl in group_block_lists]
-            group_naive = reduce(mul, sizes, 1)
-            if len(group_block_lists) > 1:
-                print(
-                    f"    merge {module_name} group {group_idx}: block indices {block_indices}, "
-                    f"per-block outcome counts {sizes}, naive Cartesian size {group_naive:,} "
-                    f"(merge streamed lazily)",
-                    flush=True,
-                )
-            
+
             if len(group_block_lists) == 1:
                 component_results.append(group_block_lists[0])
             else:
@@ -512,18 +493,12 @@ class ExecutionEngine:
         
         if n_groups == 1:
             return component_results[0]
-        
-        lazy = LazyProduct(component_results)
-        ls = lazy.logical_size
-        if ls is not None:
-            print(f"    merge {module_name}: LazyProduct of {n_groups} groups, "
-                  f"sizes={lazy.component_sizes}, stored={lazy.total_stored()}, "
-                  f"logical_size={ls:,}", flush=True)
-        else:
-            print(f"    merge {module_name}: LazyProduct of {n_groups} groups, "
-                  f"sizes={lazy.component_sizes}, stored={lazy.total_stored()} (input paths), "
-                  f"logical_size=unknown until iteration (lazy merge axis)", flush=True)
-        return lazy
+
+        return LazyProduct(
+            component_results,
+            manager=manager,
+            solver_timeout_ms=10000,
+        )
 
     def execute_sv(
         self,
@@ -532,7 +507,6 @@ class ExecutionEngine:
         manager: Optional[ExecutionManager],
         num_cycles: int,
         *,
-        enumerate_cross_module: bool = False,
         max_cross_module_paths: Optional[int] = None,
     ) -> None:
         """Main entry point for PySlang execution
@@ -549,7 +523,6 @@ class ExecutionEngine:
         if hasattr(self, "cache"):
             manager.cache = self.cache
         manager.sv = True
-        manager.enumerate_cross_module = enumerate_cross_module
         manager.max_cross_module_paths = max_cross_module_paths
         manager.cross_module_stopped_reason = ""
         # Store manager ref so main.py timeout handler can access stats
@@ -641,19 +614,18 @@ class ExecutionEngine:
 
         # --- Piecewise composition (sole execution mode) ---
         manager.prev_store = state.store
-        print("Phase: init_state and module traversal", flush=True)
+        print("Phase: init_state", flush=True)
         init_state(state, manager.prev_store, first_module, visitor)
         for module_name in manager.names_list:
-            print("Phase: traversing module {}".format(module_name), flush=True)
             manager.curr_module = module_name
             visitor.dfs(modules_dict[module_name])
+        print(f"Phase: hierarchy traversal — {len(manager.names_list)} module(s)", flush=True)
         base_store = {}
         # --- always_comb look-up table (Paper §4.4) ---
         # On first pass, evaluate decls and comb nodes; store results in a look-up
         # table so they can be reused at end of cycle without re-walking the AST.
         comb_lookup = {}  # module_name -> snapshot of combinational logic results
         for module_name in keys:
-            print("Phase: base_store for module {}".format(module_name), flush=True)
             manager.curr_module = module_name
             for c in cfgs_by_module[module_name]:
                 for node in c.decls:
@@ -662,11 +634,10 @@ class ExecutionEngine:
                         state.store[module_name][node.name] = node.name
                 for node in c.comb:
                     visitor.dfs(node)
-            n_signals = len(state.store[module_name])
-            if n_signals:
-                print("  {} signal(s) initialized in store".format(n_signals), flush=True)
             base_store[module_name] = state.snapshot(module_name)
             comb_lookup[module_name] = state.snapshot(module_name)
+
+        print(f"Phase: base_store — {len(keys)} module(s)", flush=True)
 
         # Count sequential vs combinational CFGs for reporting
         n_seq = sum(1 for m in keys for c in cfgs_by_module[m] if not c.is_combinational)
@@ -702,21 +673,8 @@ class ExecutionEngine:
         n_concurrent = n_total - n_immediate
         print(f"  Found {n_total} assertion(s) ({n_immediate} immediate, {n_concurrent} concurrent), "
               f"{n_with_z3} with Z3 expressions", flush=True)
-        if n_total > n_with_z3:
-            print(
-                f"  Note: {n_total - n_with_z3} assertion(s) skipped (no Z3) — often visit_expr/expr_to_z3 "
-                f"gap or wrong module context; check errors.log for debug lines.",
-                flush=True,
-            )
-        if n_total == 0 and len(keys) > 0:
-            print(
-                "  Hint: procedural assert(...) lives under the module instance that contains it; "
-                "if you use --top <name>, other top-level cells (e.g. a bind-on-top assertion wrapper) "
-                "are not in the hierarchy and their assertions are never collected.",
-                flush=True,
-            )
 
-        print("Phase: explore_block (per-module)", flush=True)
+        print("Phase: explore_block", flush=True)
         # Per paper §3.3: explore full path tree per always block; materialize list per block
         block_results = {}
         for module_name in keys:
@@ -726,79 +684,26 @@ class ExecutionEngine:
                 for cfg in cfgs_by_module[module_name]
             ]
 
-        print("Phase: merge_block_results (per-module, Paper §4.3)", flush=True)
+        print("Phase: merge_block_results", flush=True)
         merged_by_module = {}
         for idx, module_name in enumerate(keys):
             n_blocks = len(block_results[module_name])
-            print(f"  merge {module_name} ({idx+1}/{len(keys)}): {n_blocks} blocks", flush=True)
             merged_by_module[module_name] = self.merge_block_results(
                 block_results[module_name], module_name, manager=manager)
             merged = merged_by_module[module_name]
             if isinstance(merged, LazyProduct):
-                ls = merged.logical_size
-                if ls is not None:
-                    print(f"    -> {ls:,} feasible merged paths "
-                          f"(lazy: {merged.n_components} groups, {merged.total_stored()} stored)",
-                          flush=True)
-                else:
-                    print(f"    -> lazy product over {merged.n_components} groups "
-                          f"({merged.total_stored()} stored input paths; merged count at iteration)",
-                          flush=True)
+                tail = f"LazyProduct×{merged.n_components} groups"
             elif isinstance(merged, ReplayableMergeResults):
-                print("    -> lazy intragroup merge (feasible count determined during cross-module DFS)",
-                      flush=True)
+                tail = "lazy merge (streamed)"
             else:
-                print(f"    -> {len(merged)} feasible merged paths", flush=True)
+                tail = f"{len(merged)} paths"
+            print(
+                f"  merge {module_name} ({idx+1}/{len(keys)}): {n_blocks} blocks → {tail}",
+                flush=True,
+            )
 
         valid_assertions = [a for a in manager.assertions
                             if a.get("z3_expr") is not None]
-        # Fast path: no assertions and user did not request full cross-module enumeration
-        if not valid_assertions and not enumerate_cross_module:
-            print("Phase: cross-module path iteration — SKIPPED (no assertions to check)",
-                  flush=True)
-            print(f"  {len(manager.assertions)} assertion(s) collected, "
-                  f"0 with valid Z3 expressions", flush=True)
-            print(f"  Per-module merged results available for "
-                  f"{len(merged_by_module)} modules.", flush=True)
-            print("  Hint: use --enumerate-cross-module to run DFSCrossModuleIterator anyway.",
-                  flush=True)
-            total_logical = 1
-            product_known = True
-            for m, res in merged_by_module.items():
-                if isinstance(res, LazyProduct):
-                    c = res.logical_size
-                    if c is None:
-                        product_known = False
-                        break
-                    total_logical *= max(c, 1)
-                elif isinstance(res, ReplayableMergeResults):
-                    product_known = False
-                    break
-                else:
-                    total_logical *= max(len(res), 1)
-            if product_known:
-                manager.estimated_global_combinations = total_logical
-                manager.feasible_paths_unknown = False
-                print(f"  Cross-module product would have been {total_logical:,} path combinations — "
-                      f"not iterated (no assertions to drive cross-module DFS).", flush=True)
-            else:
-                manager.feasible_paths_unknown = True
-                print("  Cross-module product size not precomputed (lazy merge); skipped.", flush=True)
-            print("Branch points explored: {}".format(manager.branch_count), flush=True)
-            if product_known:
-                print(
-                    f"Paths explored (feasible): {total_logical:,} — estimated full-design combinations "
-                    f"(product of per-module merges; cross-module DFS not run without assertions).",
-                    flush=True,
-                )
-            else:
-                print(
-                    "Paths explored (feasible): not totaled globally — cross-module product unknown "
-                    "(lazy merge). See per-module lines above for each module's feasible merged paths.",
-                    flush=True,
-                )
-            self.module_depth -= 1
-            return
 
         print("Phase: cross-module path iteration (DFS)", flush=True)
         if valid_assertions:
@@ -816,6 +721,7 @@ class ExecutionEngine:
             manager=manager,
             enable_early_pruning=True,
             enable_caching=True,
+            structural_module_graph=getattr(manager, "structural_module_graph", None),
         )
 
         cross_stop: Optional[str] = None
@@ -832,7 +738,8 @@ class ExecutionEngine:
             if sparse or frequent:
                 print(
                     "  cross-module: {} global path(s) completed; "
-                    "xmod_inner_steps {} (per-level iterator advances, not merge-only), "
+                    "outcome_pulls={} (each pull = next merged outcome for one module in this search; "
+                    "not intra-module merge steps), "
                     "pruned {}, cache_hits {}".format(
                         manager.path_count,
                         stats["combos_checked"],
@@ -850,7 +757,7 @@ class ExecutionEngine:
                     manager.cross_module_stopped_reason = "violation"
                     print(
                         "Phase: cross-module iteration stopped (assertion violation). "
-                        "paths_checked={} branch_points={} DFS(checked/pruned/cache_hits)={}/{}/{}".format(
+                        "paths_checked={} branch_points={} DFS(pulls/pruned/cache_hits)={}/{}/{}".format(
                             manager.path_count,
                             manager.branch_count,
                             stats["combos_checked"],
@@ -891,7 +798,7 @@ class ExecutionEngine:
             manager.cross_module_stopped_reason = "complete"
         print(
             "Phase: cross-module iteration {} — paths_checked={} branch_points={} "
-            "DFS(checked/pruned/cache_hits)={}/{}/{}".format(
+            "DFS(pulls/pruned/cache_hits)={}/{}/{}".format(
                 status,
                 manager.path_count,
                 manager.branch_count,

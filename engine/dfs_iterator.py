@@ -19,18 +19,92 @@ import os
 import sys
 import time
 from typing import List, Dict, Iterator, Optional, Any, Callable, Tuple
-from z3 import Solver, ExprRef
+from z3 import Solver, ExprRef, sat, unsat
 from z3 import z3util
+
+try:
+    from z3 import unknown as z3_unknown
+except Exception:  # pragma: no cover
+    z3_unknown = None
 from dataclasses import dataclass, field
 from collections import OrderedDict, defaultdict
 from functools import reduce
 from operator import mul
 
-# Disjoint = (varsA \ EXCLUDE) ∩ (varsB \ EXCLUDE) == {} (professor's definition)
-# So blocks that only share rst/clk are still considered disjoint.
-VARS_EXCLUDED_FROM_DISJOINT = frozenset(
-    {"rst", "clk", "rst_n", "rst_ni", "clk_i", "rst_i", "reset", "clock"}
+from .feasibility_independence import (
+    canonical_var_set,
+    may_disjoint_skip_cross_module,
+    may_disjoint_skip_merge,
 )
+
+# Soundness: clock/reset (and all other names) count toward overlap. Excluding them
+# caused false "disjoint" merges when rst/clk were the only shared symbols.
+
+_SAT_UNKNOWN_LOGGED = False
+
+
+def sat_check_full_pc(
+    constraints: List[ExprRef],
+    solver_timeout_ms: int = 10000,
+    manager: Any = None,
+    *,
+    z3_kind: Optional[str] = None,
+) -> bool:
+    """Return True iff Z3 reports *sat* on the full constraint list.
+
+    *unsat* and *unknown* (e.g. timeout) return False — safe for sound feasibility
+    (do not emit paths not proven satisfiable). Accumulates wall time on *manager*.
+
+    *z3_kind* — if *manager* is set, bucket the check for stats: ``"merge"``,
+    ``"lazy_product"``, or ``"cross_module"`` (joint SAT on combined PCs in each phase).
+    """
+    global _SAT_UNKNOWN_LOGGED
+    if not constraints:
+        return True
+    t0 = time.monotonic()
+    s = Solver()
+    try:
+        s.set("timeout", solver_timeout_ms)
+    except Exception:
+        pass
+    for c in constraints:
+        s.add(c)
+    r = s.check()
+    if manager is not None:
+        manager.feasibility_z3_checks += 1
+        if z3_kind == "merge":
+            manager.feasibility_z3_at_merge += 1
+        elif z3_kind == "lazy_product":
+            manager.feasibility_z3_at_lazy_product += 1
+        elif z3_kind == "cross_module":
+            manager.feasibility_z3_at_cross_module += 1
+    dt = time.monotonic() - t0
+    if manager is not None:
+        manager.solver_time += dt
+    if r == sat:
+        return True
+    if r == unsat:
+        return False
+    if z3_unknown is not None and r == z3_unknown:
+        if not _SAT_UNKNOWN_LOGGED:
+            print(
+                "[sylq] Z3 returned unknown (timeout/incomplete); "
+                "treating as infeasible for feasibility checks (sound, may lose complete paths).",
+                flush=True,
+            )
+            _SAT_UNKNOWN_LOGGED = True
+        return False
+    # Fallback for older Z3 APIs
+    rs = str(r)
+    if rs == "unknown":
+        if not _SAT_UNKNOWN_LOGGED:
+            print(
+                "[sylq] Z3 returned unknown; treating as infeasible for feasibility checks.",
+                flush=True,
+            )
+            _SAT_UNKNOWN_LOGGED = True
+        return False
+    return False
 
 # Progress while *intra-module* merge DFS runs (set 0 to disable). Can still appear
 # during cross-module enumeration when a module's merged result is produced lazily.
@@ -52,6 +126,8 @@ class DFSFrame:
     partial_store: Dict[str, Any]       # Accumulated store up to this level
     partial_vars: set                   # Set of variable names in partial_pc
     is_feasible: bool = True            # Whether the partial merge is still SAT
+    # Cross-module DFS only: RTL modules already present in partial_pc (for structural coupling).
+    partial_modules: set = field(default_factory=set)
 
 
 class LRUCache:
@@ -128,10 +204,10 @@ def partition_blocks(block_result_lists: List[List[dict]]) -> List[List[int]]:
         size[ra] += size[rb]
     
     for i in range(n):
-        vi = block_vars[i] - VARS_EXCLUDED_FROM_DISJOINT
+        vi = block_vars[i]
         for j in range(i + 1, n):
-            vj = block_vars[j] - VARS_EXCLUDED_FROM_DISJOINT
-            if vi & vj:
+            vj = block_vars[j]
+            if canonical_var_set(vi) & canonical_var_set(vj):
                 union(i, j)
     
     # Group block indices by component
@@ -173,29 +249,30 @@ class ReplayableMergeResults:
 
 
 class LazyProduct:
-    """Lazily produces the Cartesian product of disjoint component groups.
-    
-    When blocks within a module are partitioned into independent groups (no shared
-    variables), we can avoid materializing the full product. Instead, we:
-    1. Merge within each group (small, since group members share variables)
-    2. Store per-group merged results (small lists) OR ReplayableMergeResults for lazy merge
-    3. Lazily iterate over the Cartesian product of groups via nested DFS (not itertools.product),
-       so replayable merge axes get a fresh iterator for each outer combination.
-    
-    For or1200_ctrl with 28 disjoint blocks: instead of materializing 109M+ combos,
-    we store ~28 small lists and produce combos one at a time via __iter__.
-    
-    Iterable protocol: ``__iter__`` streams the product; ``__len__`` / ``logical_size`` are
-    only precise when every component is a materialized list (no lazy merge axis).
+    """Lazily produces the Cartesian product of component groups from partition_blocks.
+
+    Partitioning uses shared variable names (including clk/rst). Each group is merged
+    with DFSMergeIterator; across groups we take a Cartesian product. For soundness,
+    each combined ``pc`` is checked with Z3 on the **full** conjunction before yield
+    when *manager* is set (drops jointly UNSAT combinations).
     """
     
-    def __init__(self, component_results: List):
+    def __init__(
+        self,
+        component_results: List,
+        manager: Any = None,
+        solver_timeout_ms: int = 10000,
+    ):
         """
         Args:
             component_results: List of per-component sources: each is either a list of
                 {pc, store} dicts or a ReplayableMergeResults.
+            manager: If set, full-PC SAT is run on each product before yield.
+            solver_timeout_ms: Z3 timeout for those checks.
         """
         self.component_results = component_results
+        self.manager = manager
+        self.solver_timeout_ms = solver_timeout_ms
         self._len: Optional[int] = None
         self._try_compute_len()
 
@@ -243,6 +320,15 @@ class LazyProduct:
 
         def rec(i: int, acc_pc: list, acc_store: dict) -> Iterator[dict]:
             if i == len(self.component_results):
+                if self.manager is not None and acc_pc:
+                    if not sat_check_full_pc(
+                        acc_pc,
+                        self.solver_timeout_ms,
+                        self.manager,
+                        z3_kind="lazy_product",
+                    ):
+                        self.manager.feasibility_pruned_lazy_product += 1
+                        return
                 yield {"pc": acc_pc, "store": dict(acc_store)}
                 return
             for r in self.component_results[i]:
@@ -361,33 +447,22 @@ class DFSMergeIterator:
         return out
     
     def _default_sat_check(self, constraints: List[ExprRef]) -> bool:
-        """Default SAT checking using Z3 solver."""
+        """Full-PC SAT; *unknown* is not satisfiable for feasibility purposes."""
         if not constraints:
             return True
         t0 = time.monotonic()
-        s = Solver()
-        try:
-            s.set("timeout", self.solver_timeout)
-        except Exception:
-            pass
-        for c in constraints:
-            s.add(c)
-        out = str(s.check()) == "sat"
+        out = sat_check_full_pc(
+            constraints, self.solver_timeout, self.manager, z3_kind="merge"
+        )
         dt = time.monotonic() - t0
         if _SLOW_SAT_WARN_SEC > 0 and dt >= _SLOW_SAT_WARN_SEC:
             print(
                 f"    [merge-slow-sat] {self.module_name}: {dt:.1f}s for "
-                f"{len(constraints)} constraint(s), result={'sat' if out else 'unsat'}",
+                f"{len(constraints)} constraint(s), result={'sat' if out else 'unsat/unknown'}",
                 flush=True,
             )
         return out
-    
-    def _check_disjoint(self, vars1: set, vars2: set) -> bool:
-        """Disjoint = (vars1 \\ {rst,clk}) ∩ (vars2 \\ {rst,clk}) == {}."""
-        v1 = vars1 - VARS_EXCLUDED_FROM_DISJOINT
-        v2 = vars2 - VARS_EXCLUDED_FROM_DISJOINT
-        return not (v1 & v2)
-    
+
     def _get_cache_key(self, constraints: List[ExprRef]) -> str:
         """Generate a cache key for a set of constraints."""
         try:
@@ -434,59 +509,34 @@ class DFSMergeIterator:
         partial_vars: set,
         new_pc: List[ExprRef],
     ) -> Tuple[bool, List[ExprRef], set]:
-        """Check if merging new_pc with partial_pc is feasible.
-        
-        Implements Paper §4.3: slice → normalize → cache for merge queries.
-        
-        Returns:
-            (is_feasible, combined_pc, combined_vars)
+        """Merge feasibility: full conjunction SAT on *combined_pc* when vars overlap.
+
+        If variable sets are disjoint, satisfiability of the conjunction follows from
+        each branch's feasibility (independent theories over disjoint signatures).
         """
         new_vars = self._vars_in_pcs(new_pc)
         combined_pc = partial_pc + new_pc
         combined_vars = partial_vars | new_vars
-        
-        # Disjoint skip: if no variable overlap, no need for SAT check
-        if self._check_disjoint(partial_vars, new_vars):
-            return (True, combined_pc, combined_vars)
-        
-        # Need SAT check
+
         if not combined_pc:
             return (True, combined_pc, combined_vars)
-        
-        # Paper §4.3: slice → normalize → cache
-        # Overlapping vars (excluding rst/clk) are the "branch" for merge queries
-        overlapping_vars = (partial_vars - VARS_EXCLUDED_FROM_DISJOINT) & (
-            new_vars - VARS_EXCLUDED_FROM_DISJOINT
-        )
-        
-        # Slice the query to only constraints relevant to overlapping variables
-        sliced_pc = combined_pc
-        if self.manager and hasattr(self.manager, 'qu_merge') and self.manager.qu_merge is not None:
-            try:
-                from .query_slicing import slice_query
-                # Register constraints first
-                for c in combined_pc:
-                    self.manager.qu_merge.register_constraint(c)
-                # Then slice
-                if overlapping_vars:
-                    sliced_pc = slice_query(self.manager.qu_merge, combined_pc, overlapping_vars)
-            except Exception:
-                sliced_pc = combined_pc
-        
-        # Check cache with sliced (and normalized) query
+
+        if may_disjoint_skip_merge(partial_vars, new_vars, partial_pc, new_pc):
+            if self.manager is not None:
+                self.manager.feasibility_disjoint_skip_merge += 1
+            return (True, combined_pc, combined_vars)
+
         if self.enable_caching:
-            cache_key = self._get_cache_key(sliced_pc)
+            cache_key = self._get_cache_key(combined_pc)
             cached_result = self._check_cached(cache_key)
             if cached_result is not None:
                 return (cached_result, combined_pc, combined_vars)
-        
-        # Perform SAT check on sliced constraints (more efficient)
-        is_sat = self.check_sat_callback(sliced_pc)
-        
-        # Store in cache
+
+        is_sat = self.check_sat_callback(combined_pc)
+
         if self.enable_caching:
-            self._store_cached(cache_key, is_sat)
-        
+            self._store_cached(self._get_cache_key(combined_pc), is_sat)
+
         return (is_sat, combined_pc, combined_vars)
     
     def __iter__(self) -> Iterator[dict]:
@@ -538,8 +588,8 @@ class DFSMergeIterator:
             
             self.combos_checked += 1
             
-            # Check feasibility of partial merge
-            if self.enable_early_pruning and frame.level > 0:
+            # Full-conjunction feasibility for partial merges (sound default)
+            if frame.level > 0:
                 is_feasible, new_pc, new_vars = self._check_partial_feasibility(
                     frame.partial_pc,
                     frame.partial_vars,
@@ -547,6 +597,8 @@ class DFSMergeIterator:
                 )
                 if not is_feasible:
                     self.combos_pruned += 1
+                    if self.manager is not None:
+                        self.manager.feasibility_pruned_merge += 1
                     continue
             else:
                 new_pc = frame.partial_pc + result["pc"]
@@ -577,6 +629,7 @@ class DFSMergeIterator:
             partial_pc=partial_pc,
             partial_store=partial_store,
             partial_vars=partial_vars,
+            partial_modules=set(),
         )
         self.stack.append(frame)
     
@@ -604,6 +657,7 @@ class DFSCrossModuleIterator:
         enable_early_pruning: bool = True,
         enable_caching: bool = True,
         solver_timeout: int = 10000,
+        structural_module_graph: Any = None,
     ):
         """Initialize the cross-module DFS iterator.
         
@@ -614,6 +668,9 @@ class DFSCrossModuleIterator:
             enable_early_pruning: If True, prune when partial combination is UNSAT.
             enable_caching: If True, cache SAT results.
             solver_timeout: Timeout for Z3 solver in milliseconds.
+            structural_module_graph: Optional undirected map ``module -> set(neighbor_modules)``
+                from elaboration. If ``None``, distinct modules are assumed to may share
+                hidden nets (conservative: no disjoint-skip across modules unless relaxed via env).
         """
         self.module_names = list(per_module_results.keys())
         self.per_module_results = per_module_results
@@ -622,6 +679,7 @@ class DFSCrossModuleIterator:
         self.enable_early_pruning = enable_early_pruning
         self.enable_caching = enable_caching
         self.solver_timeout = solver_timeout
+        self._structural_module_graph = structural_module_graph
         
         # Build the list of (module, cycle) combinations to traverse
         # Each level in the DFS is one (module, cycle) pair
@@ -635,8 +693,8 @@ class DFSCrossModuleIterator:
         
         self._local_cache = LRUCache(maxsize=10000)
         
-        # Statistics (cross-module DFS: combos_checked = successful inner next() calls,
-        # including exploration before each full global yield — not the same as completed paths)
+        # Statistics (cross-module DFS: combos_checked = each successful next() on a
+        # per-module merged iterator — "outcome_pulls" in logs; includes work between full yields)
         self.combos_checked = 0
         self.combos_pruned = 0
         self.cache_hits = 0
@@ -653,17 +711,10 @@ class DFSCrossModuleIterator:
         return out
     
     def _sat_check(self, constraints: List[ExprRef]) -> bool:
-        """Check SAT using Z3 solver."""
-        if not constraints:
-            return True
-        s = Solver()
-        try:
-            s.set("timeout", self.solver_timeout)
-        except Exception:
-            pass
-        for c in constraints:
-            s.add(c)
-        return str(s.check()) == "sat"
+        """Full-conjunction SAT; unknown counts as not feasible."""
+        return sat_check_full_pc(
+            constraints, self.solver_timeout, self.manager, z3_kind="cross_module"
+        )
     
     def _get_cache_key(self, constraints: List[ExprRef]) -> str:
         """Generate a cache key for a set of constraints."""
@@ -708,50 +759,41 @@ class DFSCrossModuleIterator:
         partial_pc: List[ExprRef],
         partial_vars: set,
         new_pc: List[ExprRef],
+        partial_modules: set,
+        next_module: str,
     ) -> Tuple[bool, List[ExprRef], set]:
-        """Check if merging is feasible.
-        
-        Implements slice → normalize → cache for cross-module queries.
-        """
+        """Cross-module partial merge: full *combined_pc* SAT when variable sets overlap."""
         new_vars = self._vars_in_pcs(new_pc)
         combined_pc = partial_pc + new_pc
         combined_vars = partial_vars | new_vars
-        
-        # Disjoint skip: (varsA \ {rst,clk}) ∩ (varsB \ {rst,clk}) == {}
-        overlapping_vars = (partial_vars - VARS_EXCLUDED_FROM_DISJOINT) & (
-            new_vars - VARS_EXCLUDED_FROM_DISJOINT
-        )
-        if not overlapping_vars:
-            return (True, combined_pc, combined_vars)
-        
+
         if not combined_pc:
             return (True, combined_pc, combined_vars)
-        
-        # Slice the query to constraints relevant to overlapping variables
-        sliced_pc = combined_pc
-        if self.manager and hasattr(self.manager, 'qu_merge') and self.manager.qu_merge is not None:
-            try:
-                from .query_slicing import slice_query
-                # Register constraints
-                for c in combined_pc:
-                    self.manager.qu_merge.register_constraint(c)
-                # Slice
-                sliced_pc = slice_query(self.manager.qu_merge, combined_pc, overlapping_vars)
-            except Exception:
-                sliced_pc = combined_pc
-        
-        # Check cache with sliced query
+
+        if may_disjoint_skip_cross_module(
+            partial_vars,
+            new_vars,
+            partial_pc,
+            new_pc,
+            partial_modules,
+            next_module,
+            self._structural_module_graph,
+        ):
+            if self.manager is not None:
+                self.manager.feasibility_disjoint_skip_cross += 1
+            return (True, combined_pc, combined_vars)
+
         if self.enable_caching:
-            cache_key = self._get_cache_key(sliced_pc)
+            cache_key = self._get_cache_key(combined_pc)
             cached_result = self._check_cached(cache_key)
             if cached_result is not None:
                 return (cached_result, combined_pc, combined_vars)
-        
-        is_sat = self._sat_check(sliced_pc)
-        
+
+        is_sat = self._sat_check(combined_pc)
+
         if self.enable_caching:
-            self._store_cached(cache_key, is_sat)
-        
+            self._store_cached(self._get_cache_key(combined_pc), is_sat)
+
         return (is_sat, combined_pc, combined_vars)
     
     def __iter__(self) -> Iterator[Tuple[Dict[str, List[dict]], List[ExprRef], Dict[str, Any]]]:
@@ -790,15 +832,18 @@ class DFSCrossModuleIterator:
             
             self.combos_checked += 1
             
-            # Check partial feasibility
-            if self.enable_early_pruning and frame.level > 0:
+            if frame.level > 0:
                 is_feasible, new_pc, new_vars = self._check_partial_feasibility(
                     frame.partial_pc,
                     frame.partial_vars,
                     result["pc"],
+                    frame.partial_modules,
+                    module_name,
                 )
                 if not is_feasible:
                     self.combos_pruned += 1
+                    if self.manager is not None:
+                        self.manager.feasibility_pruned_cross_module += 1
                     continue
             else:
                 new_pc = frame.partial_pc + result["pc"]
@@ -818,7 +863,13 @@ class DFSCrossModuleIterator:
                 yield (new_combo, new_pc, new_store)
             else:
                 # Push next level
-                self._push_level(frame.level + 1, new_pc, new_store, new_vars, new_combo)
+                self._push_level(
+                    frame.level + 1,
+                    new_pc,
+                    new_store,
+                    new_vars,
+                    new_combo,
+                )
     
     def _push_level(
         self,
@@ -830,6 +881,7 @@ class DFSCrossModuleIterator:
     ) -> None:
         """Push a new level onto the DFS stack."""
         module_name, cycle = self.levels[level]
+        partial_modules = {self.levels[i][0] for i in range(level)}
         
         frame = DFSFrame(
             level=level,
@@ -838,6 +890,7 @@ class DFSCrossModuleIterator:
             partial_pc=partial_pc,
             partial_store=partial_store,
             partial_vars=partial_vars,
+            partial_modules=partial_modules,
         )
         # Store combo state in frame (extend DFSFrame for this)
         frame.partial_combo = partial_combo  # type: ignore

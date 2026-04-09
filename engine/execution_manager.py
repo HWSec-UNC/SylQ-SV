@@ -5,7 +5,7 @@ a lot of this information will probably be useful when working in a specific sea
 from __future__ import annotations
 from .symbolic_state import SymbolicState
 from helpers.utils import init_symbol
-from typing import Optional
+from typing import Dict, Optional, Set
 # import pkg_resources
 import pyslang.syntax as ps_stx
 
@@ -76,6 +76,20 @@ class ExecutionManager:
     instances_seen = {}
     instances_loc = {}
     solver_time = 0
+    # Optional undirected RTL adjacency (module -> neighbor modules). If None, cross-module
+    # disjoint-skip is conservative (no skip across distinct modules); see feasibility_independence.
+    structural_module_graph: Optional[Dict[str, Set[str]]] = None
+    # Feasibility accounting (merge / LazyProduct / cross-module); see sat_check_full_pc & dfs_iterator
+    # feasibility_z3_checks = merge + lazy_product + cross_module (joint full-PC SAT calls)
+    feasibility_z3_checks: int = 0
+    feasibility_z3_at_merge: int = 0
+    feasibility_z3_at_lazy_product: int = 0
+    feasibility_z3_at_cross_module: int = 0
+    feasibility_disjoint_skip_merge: int = 0
+    feasibility_disjoint_skip_cross: int = 0
+    feasibility_pruned_merge: int = 0
+    feasibility_pruned_lazy_product: int = 0
+    feasibility_pruned_cross_module: int = 0
     sv = False
     cache = None
     path_count = 0
@@ -86,8 +100,7 @@ class ExecutionManager:
     # True when no assertions and at least one module merge is lazy / unknown size,
     # so the full cross-module product cannot be multiplied without iterating.
     feasible_paths_unknown: bool = False
-    # CLI: --enumerate-cross-module / --max-cross-module-paths
-    enumerate_cross_module: bool = False
+    # CLI: --max-cross-module-paths
     max_cross_module_paths: Optional[int] = None
     # Why cross-module DFS ended: "", "complete", "max_paths", "timeout", "violation"
     cross_module_stopped_reason: str = ""
@@ -95,6 +108,19 @@ class ExecutionManager:
     # Initialized lazily; separate instances for path exploration and merge
     qu_path = None   # QuickUnion for path-exploration queries
     qu_merge = None  # QuickUnion for merge queries (separate per §4.3)
+
+    def feasibility_stats_line(self) -> str:
+        """One-line summary of feasibility checks (Z3, disjoint skips, pruned paths)."""
+        return (
+            f"Feasibility: Z3_checks={self.feasibility_z3_checks} "
+            f"(merge={self.feasibility_z3_at_merge} lazy_product={self.feasibility_z3_at_lazy_product} "
+            f"cross_module={self.feasibility_z3_at_cross_module}), "
+            f"disjoint_skip_merge={self.feasibility_disjoint_skip_merge}, "
+            f"disjoint_skip_cross={self.feasibility_disjoint_skip_cross}, "
+            f"pruned_merge={self.feasibility_pruned_merge}, "
+            f"pruned_lazy_product={self.feasibility_pruned_lazy_product}, "
+            f"pruned_cross_module={self.feasibility_pruned_cross_module}"
+        )
 
     def merge_states(self, state: SymbolicState, store, flag, module_name=""):
         """Merges two states. The flag is for when we are just merging a particular module"""
