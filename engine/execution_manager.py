@@ -76,6 +76,8 @@ class ExecutionManager:
     instances_seen = {}
     instances_loc = {}
     solver_time = 0
+    # Wall time in _check_assertions_on_path (PC ∧ ¬assertion); not included in solver_time above
+    assertion_solver_time: float = 0
     # Optional undirected RTL adjacency (module -> neighbor modules). If None, cross-module
     # disjoint-skip is conservative (no skip across distinct modules); see feasibility_independence.
     structural_module_graph: Optional[Dict[str, Set[str]]] = None

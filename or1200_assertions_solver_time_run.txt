@@ -1,0 +1,456 @@
+Executing for 1 clock cycle(s)
+Phase: init_state
+Phase: hierarchy traversal — 80 module(s)
+Phase: base_store — 80 module(s)
+Phase: collecting SVA assertions
+  Found 8 assertion(s) (8 immediate, 0 concurrent), 8 with Z3 expressions
+Phase: explore_block
+explore_block: or1200_dc_fsm (38 paths)
+explore_block: or1200_dpram_256x32 (3 paths)
+explore_block: or1200_dpram_256x32 (2 paths)
+explore_block: or1200_dpram_32x32 (3 paths)
+explore_block: or1200_dpram_32x32 (2 paths)
+explore_block: or1200_fpu_arith (1 paths)
+explore_block: or1200_fpu_arith (1 paths)
+explore_block: or1200_fpu_arith (4 paths)
+explore_block: or1200_fpu_arith (4 paths)
+explore_block: or1200_fpu_arith (7 paths)
+explore_block: fpu_prenorm_addsub (1 paths)
+explore_block: fpu_prenorm_addsub (1 paths)
+explore_block: fpu_prenorm_addsub (4 paths)
+explore_block: fpu_prenorm_addsub (29 paths)
+explore_block: fpu_addsub (1 paths)
+explore_block: fpu_postnorm_addsub (1 paths)
+explore_block: fpu_postnorm_addsub (28 paths)
+explore_block: fpu_postnorm_addsub (4 paths)
+explore_block: fpu_postnorm_addsub (2 paths)
+explore_block: fpu_pre_norm_mul (1 paths)
+explore_block: fpu_mul (1 paths)
+explore_block: fpu_mul (1 paths)
+explore_block: fpu_mul (4 paths)
+explore_block: fpu_mul (3 paths)
+explore_block: fpu_post_norm_mul (1 paths)
+explore_block: fpu_post_norm_mul (1 paths)
+explore_block: fpu_post_norm_mul (48 paths)
+explore_block: fpu_post_norm_mul (49 paths)
+explore_block: fpu_post_norm_mul (8 paths)
+explore_block: fpu_post_norm_mul (2 paths)
+explore_block: fpu_post_norm_mul (2 paths)
+explore_block: fpu_pre_norm_div (1 paths)
+explore_block: fpu_pre_norm_div (25 paths)
+explore_block: fpu_pre_norm_div (25 paths)
+explore_block: fpu_pre_norm_div (1 paths)
+explore_block: fpu_div (1 paths)
+explore_block: fpu_div (4 paths)
+explore_block: fpu_div (4 paths)
+explore_block: fpu_post_norm_div (1 paths)
+explore_block: fpu_post_norm_div (1 paths)
+explore_block: fpu_post_norm_div (2 paths)
+explore_block: fpu_post_norm_div (1 paths)
+explore_block: fpu_post_norm_div (1 paths)
+explore_block: fpu_post_norm_div (2 paths)
+explore_block: fpu_post_norm_div (28 paths)
+explore_block: fpu_post_norm_div (1 paths)
+explore_block: or1200_fpu_fcmp (28 paths)
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+explore_block: or1200_fpu_intfloat_conv (2 paths)
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+explore_block: u0 (1 paths)
+explore_block: u0 (1 paths)
+explore_block: u0 (1 paths)
+explore_block: u0 (1 paths)
+explore_block: u0 (1 paths)
+explore_block: u0 (1 paths)
+explore_block: u0 (1 paths)
+explore_block: u0 (1 paths)
+explore_block: u0 (1 paths)
+explore_block: u0 (1 paths)
+explore_block: u0 (1 paths)
+explore_block: u0 (1 paths)
+explore_block: u0 (1 paths)
+explore_block: u0 (1 paths)
+explore_block: u0 (1 paths)
+explore_block: u0 (1 paths)
+explore_block: u0 (1 paths)
+explore_block: u0 (1 paths)
+explore_block: u0 (1 paths)
+explore_block: u0 (1 paths)
+explore_block: u0 (1 paths)
+explore_block: u0 (1 paths)
+explore_block: u0 (1 paths)
+explore_block: u0 (1 paths)
+explore_block: u4 (48 paths)
+explore_block: u4 (1 paths)
+explore_block: u4 (1 paths)
+explore_block: u4 (1 paths)
+explore_block: u4 (3 paths)
+explore_block: u4 (3 paths)
+explore_block: or1200_rfram_generic (34 paths)
+explore_block: or1200_rfram_generic (3 paths)
+explore_block: or1200_rfram_generic (32 paths)
+explore_block: or1200_rfram_generic (3 paths)
+explore_block: or1200_rfram_generic (32 paths)
+explore_block: or1200_sb_fifo (18 paths)
+explore_block: or1200_security_assertions (2 paths)
+explore_block: or1200_security_assertions (2 paths)
+explore_block: or1200_security_assertions (2 paths)
+explore_block: or1200_security_assertions (2 paths)
+explore_block: or1200_security_assertions (2 paths)
+explore_block: or1200_security_assertions (2 paths)
+explore_block: or1200_security_assertions (2 paths)
+explore_block: or1200_security_assertions (2 paths)
+explore_block: or1200_security_assertions (2 paths)
+explore_block: or1200_spram_1024x32 (3 paths)
+explore_block: or1200_spram_1024x32 (2 paths)
+explore_block: or1200_spram_1024x32_bw (3 paths)
+explore_block: or1200_spram_1024x32_bw (2 paths)
+explore_block: or1200_spram_1024x32_bw (2 paths)
+explore_block: or1200_spram_1024x32_bw (2 paths)
+explore_block: or1200_spram_1024x32_bw (2 paths)
+explore_block: or1200_spram_1024x8 (3 paths)
+explore_block: or1200_spram_1024x8 (2 paths)
+explore_block: or1200_spram_128x32 (3 paths)
+explore_block: or1200_spram_128x32 (2 paths)
+explore_block: or1200_spram_2048x32 (3 paths)
+explore_block: or1200_spram_2048x32 (2 paths)
+explore_block: or1200_spram_2048x32_bw (3 paths)
+explore_block: or1200_spram_2048x32_bw (2 paths)
+explore_block: or1200_spram_2048x32_bw (2 paths)
+explore_block: or1200_spram_2048x32_bw (2 paths)
+explore_block: or1200_spram_2048x32_bw (2 paths)
+explore_block: or1200_spram_2048x8 (3 paths)
+explore_block: or1200_spram_2048x8 (2 paths)
+explore_block: or1200_spram_256x21 (3 paths)
+explore_block: or1200_spram_256x21 (2 paths)
+explore_block: or1200_spram_32_bw (2 paths)
+explore_block: or1200_spram_32_bw (17 paths)
+explore_block: or1200_spram_32x24 (3 paths)
+explore_block: or1200_spram_32x24 (2 paths)
+explore_block: or1200_spram_512x20 (3 paths)
+explore_block: or1200_spram_512x20 (2 paths)
+explore_block: or1200_spram_64x14 (3 paths)
+explore_block: or1200_spram_64x14 (2 paths)
+explore_block: or1200_spram_64x22 (3 paths)
+explore_block: or1200_spram_64x22 (2 paths)
+explore_block: or1200_spram_64x24 (3 paths)
+explore_block: or1200_spram_64x24 (2 paths)
+explore_block: iwb_biu (2 paths)
+explore_block: iwb_biu (4 paths)
+explore_block: iwb_biu (8 paths)
+explore_block: iwb_biu (49 paths)
+explore_block: iwb_biu (28 paths)
+explore_block: iwb_biu (55 paths)
+explore_block: dwb_biu (2 paths)
+explore_block: dwb_biu (4 paths)
+explore_block: dwb_biu (8 paths)
+explore_block: dwb_biu (49 paths)
+explore_block: dwb_biu (28 paths)
+explore_block: dwb_biu (55 paths)
+explore_block: or1200_immu_top (3 paths)
+explore_block: or1200_immu_top (2 paths)
+explore_block: or1200_immu_top (2 paths)
+explore_block: or1200_immu_top (4 paths)
+explore_block: or1200_immu_top (4 paths)
+explore_block: or1200_immu_top (2 paths)
+explore_block: or1200_immu_top (3 paths)
+explore_block: itlb_mr_ram (2 paths)
+explore_block: itlb_mr_ram (2 paths)
+explore_block: itlb_tr_ram (2 paths)
+explore_block: itlb_tr_ram (2 paths)
+explore_block: or1200_ic_top (2 paths)
+explore_block: or1200_ic_top (2 paths)
+explore_block: or1200_ic_fsm (48 paths)
+explore_block: or1200_cpu (1 paths)
+explore_block: or1200_cpu (3 paths)
+explore_block: or1200_cpu (4 paths)
+explore_block: or1200_genpc (4 paths)
+explore_block: or1200_genpc (3 paths)
+explore_block: or1200_genpc (11 paths)
+explore_block: or1200_genpc (5 paths)
+explore_block: or1200_genpc (2 paths)
+explore_block: or1200_if (2 paths)
+explore_block: or1200_if (5 paths)
+explore_block: or1200_if (5 paths)
+explore_block: or1200_if (5 paths)
+explore_block: or1200_if (5 paths)
+explore_block: or1200_ctrl (5 paths)
+explore_block: or1200_ctrl (3 paths)
+explore_block: or1200_ctrl (10 paths)
+explore_block: or1200_ctrl (3 paths)
+explore_block: or1200_ctrl (4 paths)
+explore_block: or1200_ctrl (3 paths)
+explore_block: or1200_ctrl (4 paths)
+explore_block: or1200_ctrl (2 paths)
+explore_block: or1200_ctrl (5 paths)
+explore_block: or1200_ctrl (5 paths)
+explore_block: or1200_ctrl (3 paths)
+explore_block: or1200_ctrl (15 paths)
+explore_block: or1200_ctrl (4 paths)
+explore_block: or1200_ctrl (3 paths)
+explore_block: or1200_ctrl (16 paths)
+explore_block: or1200_ctrl (6 paths)
+explore_block: or1200_ctrl (15 paths)
+explore_block: or1200_ctrl (4 paths)
+explore_block: or1200_ctrl (6 paths)
+explore_block: or1200_ctrl (3 paths)
+explore_block: or1200_ctrl (4 paths)
+explore_block: or1200_ctrl (22 paths)
+explore_block: or1200_ctrl (11 paths)
+explore_block: or1200_ctrl (4 paths)
+explore_block: or1200_ctrl (10 paths)
+explore_block: or1200_ctrl (4 paths)
+explore_block: or1200_ctrl (4 paths)
+explore_block: or1200_ctrl (4 paths)
+explore_block: or1200_rf (2 paths)
+explore_block: or1200_rf (1 paths)
+explore_block: or1200_rf (3 paths)
+explore_block: rf_a (2 paths)
+explore_block: rf_a (2 paths)
+explore_block: rf_b (2 paths)
+explore_block: rf_b (2 paths)
+explore_block: or1200_operandmuxes (5 paths)
+explore_block: or1200_operandmuxes (5 paths)
+explore_block: or1200_operandmuxes (3 paths)
+explore_block: or1200_operandmuxes (4 paths)
+explore_block: or1200_alu (13 paths)
+explore_block: or1200_alu (2 paths)
+explore_block: or1200_alu (3 paths)
+explore_block: or1200_alu (2 paths)
+explore_block: or1200_alu (3 paths)
+explore_block: or1200_alu (7 paths)
+explore_block: or1200_alu (5 paths)
+explore_block: or1200_mult_mac (2 paths)
+explore_block: or1200_mult_mac (5 paths)
+explore_block: or1200_mult_mac (4 paths)
+explore_block: or1200_mult_mac (2 paths)
+explore_block: or1200_mult_mac (3 paths)
+explore_block: or1200_mult_mac (2 paths)
+explore_block: or1200_mult_mac (2 paths)
+explore_block: or1200_mult_mac (2 paths)
+explore_block: or1200_mult_mac (7 paths)
+explore_block: or1200_mult_mac (2 paths)
+explore_block: or1200_mult_mac (7 paths)
+explore_block: or1200_gmultp2_32x32 (1 paths)
+explore_block: or1200_gmultp2_32x32 (1 paths)
+explore_block: or1200_gmultp2_32x32 (2 paths)
+explore_block: or1200_gmultp2_32x32 (2 paths)
+explore_block: or1200_sprs (32 paths)
+explore_block: or1200_sprs (3 paths)
+explore_block: or1200_sprs (3 paths)
+explore_block: or1200_sprs (3 paths)
+explore_block: or1200_sprs (3 paths)
+explore_block: or1200_sprs (3 paths)
+explore_block: or1200_sprs (3 paths)
+explore_block: or1200_sprs (3 paths)
+explore_block: or1200_sprs (5 paths)
+explore_block: or1200_sprs (4 paths)
+explore_block: or1200_sprs (1 paths)
+explore_block: or1200_sprs (10 paths)
+explore_block: or1200_lsu (4 paths)
+explore_block: or1200_lsu (3 paths)
+explore_block: or1200_lsu (4 paths)
+explore_block: or1200_lsu (15 paths)
+explore_block: or1200_mem2reg (4 paths)
+explore_block: or1200_mem2reg (5 paths)
+explore_block: or1200_reg2mem (3 paths)
+explore_block: or1200_reg2mem (2 paths)
+explore_block: or1200_reg2mem (2 paths)
+explore_block: or1200_reg2mem (1 paths)
+explore_block: or1200_wbmux (3 paths)
+explore_block: or1200_wbmux (5 paths)
+explore_block: or1200_freeze (4 paths)
+explore_block: or1200_freeze (4 paths)
+explore_block: or1200_freeze (6 paths)
+explore_block: or1200_except (2 paths)
+explore_block: or1200_except (2 paths)
+explore_block: or1200_except (3 paths)
+explore_block: or1200_except (3 paths)
+explore_block: or1200_except (4 paths)
+explore_block: or1200_except (3 paths)
+explore_block: or1200_except (3 paths)
+explore_block: or1200_except (5 paths)
+explore_block: or1200_except (3 paths)
+explore_block: or1200_except (90 paths)
+explore_block: or1200_cfgr (10 paths)
+explore_block: or1200_dmmu_top (3 paths)
+explore_block: or1200_dmmu_top (2 paths)
+explore_block: dtlb_ram (2 paths)
+explore_block: dtlb_ram (2 paths)
+explore_block: dtlb_tr_ram (2 paths)
+explore_block: dtlb_tr_ram (2 paths)
+explore_block: or1200_du (3 paths)
+explore_block: or1200_du (2 paths)
+explore_block: or1200_du (1 paths)
+explore_block: or1200_du (1 paths)
+explore_block: or1200_du (15 paths)
+explore_block: or1200_du (3 paths)
+explore_block: or1200_du (3 paths)
+explore_block: or1200_du (3 paths)
+explore_block: or1200_du (3 paths)
+explore_block: or1200_du (4 paths)
+explore_block: or1200_du (4 paths)
+explore_block: or1200_pic (3 paths)
+explore_block: or1200_pic (3 paths)
+explore_block: or1200_pic (2 paths)
+explore_block: or1200_tt (4 paths)
+explore_block: or1200_tt (5 paths)
+explore_block: or1200_tt (2 paths)
+explore_block: or1200_tpram_32x32 (2 paths)
+explore_block: or1200_tpram_32x32 (2 paths)
+explore_block: or1200_tpram_32x32 (3 paths)
+explore_block: or1200_tpram_32x32 (3 paths)
+Phase: merge_block_results
+  merge or1200_dc_fsm (1/80): 1 blocks → 25 paths
+  merge or1200_dc_ram (2/80): 0 blocks → 1 paths
+  merge or1200_dc_tag (3/80): 0 blocks → 1 paths
+  merge or1200_dpram_256x32 (4/80): 2 blocks → lazy merge (streamed)
+  merge or1200_dpram_32x32 (5/80): 2 blocks → lazy merge (streamed)
+  merge or1200_fpu_arith (6/80): 5 blocks → LazyProduct×3 groups
+  merge fpu_prenorm_addsub (7/80): 4 blocks → LazyProduct×3 groups
+  merge fpu_addsub (8/80): 1 blocks → 1 paths
+  merge fpu_postnorm_addsub (9/80): 4 blocks → LazyProduct×2 groups
+  merge fpu_pre_norm_mul (10/80): 1 blocks → 1 paths
+  merge fpu_mul (11/80): 4 blocks → LazyProduct×3 groups
+  merge fpu_post_norm_mul (12/80): 7 blocks → LazyProduct×3 groups
+  merge fpu_pre_norm_div (13/80): 4 blocks → LazyProduct×3 groups
+  merge fpu_div (14/80): 3 blocks → LazyProduct×2 groups
+  merge fpu_post_norm_div (15/80): 8 blocks → LazyProduct×6 groups
+  merge or1200_fpu_fcmp (16/80): 1 blocks → 28 paths
+  merge or1200_fpu_intfloat_conv (17/80): 20 blocks → LazyProduct×20 groups
+  merge u0 (18/80): 24 blocks → LazyProduct×24 groups
+  merge u4 (19/80): 6 blocks → LazyProduct×4 groups
+  merge or1200_iwb_biu (20/80): 0 blocks → 1 paths
+  merge or1200_rfram_generic (21/80): 5 blocks → lazy merge (streamed)
+  merge or1200_sb_fifo (22/80): 1 blocks → 18 paths
+  merge or1200_security_assertions (23/80): 9 blocks → lazy merge (streamed)
+  merge or1200_spram_1024x32 (24/80): 2 blocks → lazy merge (streamed)
+  merge or1200_spram_1024x32_bw (25/80): 5 blocks → lazy merge (streamed)
+  merge or1200_spram_1024x8 (26/80): 2 blocks → lazy merge (streamed)
+  merge or1200_spram_128x32 (27/80): 2 blocks → lazy merge (streamed)
+  merge or1200_spram_2048x32 (28/80): 2 blocks → lazy merge (streamed)
+  merge or1200_spram_2048x32_bw (29/80): 5 blocks → lazy merge (streamed)
+  merge or1200_spram_2048x8 (30/80): 2 blocks → lazy merge (streamed)
+  merge or1200_spram_256x21 (31/80): 2 blocks → lazy merge (streamed)
+  merge or1200_spram_32_bw (32/80): 2 blocks → lazy merge (streamed)
+  merge or1200_spram_32x24 (33/80): 2 blocks → lazy merge (streamed)
+  merge or1200_spram_512x20 (34/80): 2 blocks → lazy merge (streamed)
+  merge or1200_spram_64x14 (35/80): 2 blocks → lazy merge (streamed)
+  merge or1200_spram_64x22 (36/80): 2 blocks → lazy merge (streamed)
+  merge or1200_spram_64x24 (37/80): 2 blocks → lazy merge (streamed)
+  merge or1200_top (38/80): 0 blocks → 1 paths
+  merge iwb_biu (39/80): 6 blocks → lazy merge (streamed)
+  merge dwb_biu (40/80): 6 blocks → lazy merge (streamed)
+  merge or1200_immu_top (41/80): 7 blocks → lazy merge (streamed)
+  merge or1200_immu_tlb (42/80): 0 blocks → 1 paths
+  merge itlb_mr_ram (43/80): 2 blocks → lazy merge (streamed)
+  merge itlb_tr_ram (44/80): 2 blocks → lazy merge (streamed)
+  merge or1200_ic_top (45/80): 2 blocks → lazy merge (streamed)
+  merge or1200_ic_fsm (46/80): 1 blocks → 21 paths
+  merge or1200_ic_ram (47/80): 0 blocks → 1 paths
+  merge or1200_ic_tag (48/80): 0 blocks → 1 paths
+  merge or1200_cpu (49/80): 3 blocks → LazyProduct×2 groups
+  merge or1200_genpc (50/80): 5 blocks → lazy merge (streamed)
+  merge or1200_if (51/80): 5 blocks → lazy merge (streamed)
+  merge or1200_ctrl (52/80): 28 blocks → lazy merge (streamed)
+  merge or1200_rf (53/80): 3 blocks → LazyProduct×2 groups
+  merge rf_a (54/80): 2 blocks → lazy merge (streamed)
+  merge rf_b (55/80): 2 blocks → lazy merge (streamed)
+  merge or1200_operandmuxes (56/80): 4 blocks → lazy merge (streamed)
+  merge or1200_alu (57/80): 7 blocks → lazy merge (streamed)
+  merge or1200_fpu (58/80): 0 blocks → 1 paths
+  merge or1200_mult_mac (59/80): 11 blocks → lazy merge (streamed)
+  merge or1200_gmultp2_32x32 (60/80): 4 blocks → LazyProduct×3 groups
+  merge or1200_sprs (61/80): 12 blocks → LazyProduct×2 groups
+  merge or1200_lsu (62/80): 4 blocks → lazy merge (streamed)
+  merge or1200_mem2reg (63/80): 2 blocks → lazy merge (streamed)
+  merge or1200_reg2mem (64/80): 4 blocks → LazyProduct×2 groups
+  merge or1200_wbmux (65/80): 2 blocks → lazy merge (streamed)
+  merge or1200_freeze (66/80): 3 blocks → lazy merge (streamed)
+  merge or1200_except (67/80): 10 blocks → lazy merge (streamed)
+  merge or1200_cfgr (68/80): 1 blocks → 10 paths
+  merge or1200_dmmu_top (69/80): 2 blocks → lazy merge (streamed)
+  merge or1200_dmmu_tlb (70/80): 0 blocks → 1 paths
+  merge dtlb_ram (71/80): 2 blocks → lazy merge (streamed)
+  merge dtlb_tr_ram (72/80): 2 blocks → lazy merge (streamed)
+  merge or1200_dc_top (73/80): 0 blocks → 1 paths
+  merge or1200_qmem_top (74/80): 0 blocks → 1 paths
+  merge or1200_sb (75/80): 0 blocks → 1 paths
+  merge or1200_du (76/80): 11 blocks → LazyProduct×3 groups
+  merge or1200_pic (77/80): 3 blocks → lazy merge (streamed)
+  merge or1200_tt (78/80): 3 blocks → lazy merge (streamed)
+  merge or1200_pm (79/80): 0 blocks → 1 paths
+  merge or1200_tpram_32x32 (80/80): 4 blocks → lazy merge (streamed)
+Phase: cross-module path iteration (DFS)
+  Checking 8 assertion(s)
+  cross-module: 1 global path(s) completed; outcome_pulls=80 (each pull = next merged outcome for one module in this search; not intra-module merge steps), pruned 0, cache_hits 15
+
+=== ASSERTION VIOLATION FOUND ===
+  Assertion: #1 of 8 (index in collected assertion list)
+  Module: or1200_security_assertions
+  Kind: immediate
+  Source: <pyslang.pyslang.SourceRange object at 0x7f0af861fdb0>
+  Property (Z3, must hold; violation uses NOT this): wb_pc == spr_dat_ppc
+  Counterexample: {'or1200_dc_fsm.rst': 1, 'or1200_dc_fsm.tag': 1, 'or1200_dc_fsm.tag_v': 1, 'or1200_dpram_256x32.rst_a': 0, 'or1200_dpram_256x32.ce_a': 1, 'or1200_dpram_256x32.rst_b': 0, 'or1200_dpram_256x32.ce_b': 1, 'or1200_dpram_256x32.we_b': 0, 'or1200_dpram_32x32.rst_a': 0, 'or1200_dpram_32x32.ce_a': 1, 'or1200_dpram_32x32.rst_b': 0, 'or1200_dpram_32x32.ce_b': 1, 'or1200_dpram_32x32.we_b': 0, 'or1200_fpu_arith.fpu_op_i': 2, 'or1200_fpu_arith.s_rmode_i': 1, 'or1200_fpu_arith.s_start_i': 1, 'or1200_fpu_arith.s_count': 1, 'or1200_fpu_arith.s_div_zero_o': 0, 'or1200_fpu_arith.s_qnan_o': 0, 'or1200_fpu_arith.s_infa': 0, 'or1200_fpu_arith.s_infb': 0, 'or1200_fpu_arith.s_state': 1, 'fpu_prenorm_addsub.s_fract_sm_28': 0, 'fpu_prenorm_addsub.s_mux_diff': 1, 'fpu_addsub.fpu_op_i': 2, 'fpu_postnorm_addsub.fpu_op_i': 2, 'fpu_postnorm_addsub.s_fract_28_i': 0, 'fpu_postnorm_addsub.s_exp_i': 1, 'fpu_postnorm_addsub.s_rmode_i': 1, 'fpu_postnorm_addsub.s_shr1': 1, 'fpu_postnorm_addsub.s_shr2': 1, 'fpu_postnorm_addsub.s_exp10': 0, 'fpu_postnorm_addsub.s_roundup': 1, 'fpu_postnorm_addsub.s_infa': 0, 'fpu_postnorm_addsub.s_infb': 0, 'fpu_mul.s_start_i': 1, 'fpu_mul.s_state': 1, 'fpu_mul.s_count': 1, 'fpu_post_norm_mul.s_fract_48_i': 140737488355328, 'fpu_post_norm_mul.s_rmode_i': 1, 'fpu_post_norm_mul.s_shr2': 1, 'fpu_post_norm_mul.s_exp_10a': 0, 'fpu_post_norm_mul.s_exp_10b': 0, 'fpu_post_norm_mul.s_roundup': 1, 'fpu_post_norm_mul.s_infa': 0, 'fpu_post_norm_mul.s_infb': 0, 'fpu_post_norm_mul.v_shr1': 64, 'fpu_pre_norm_div.s_fracta_24': 0, 'fpu_pre_norm_div.s_fractb_24': 0, 'fpu_div.s_div_zero_o': 0, 'fpu_div.s_start_i': 1, 'fpu_div.s_state': 1, 'fpu_div.s_count': 1, 'fpu_post_norm_div.s_qutnt_i': 0, 'fpu_post_norm_div.s_rmode_i': 1, 'fpu_post_norm_div.s_exp_10b': 0, 'fpu_post_norm_div.s_shr1': 1, 'fpu_post_norm_div.s_shr2': 1, 'fpu_post_norm_div.s_roundup': 1, 'fpu_post_norm_div.s_infa': 0, 'fpu_post_norm_div.s_infb': 0, 'or1200_fpu_fcmp.signa': 1, 'or1200_fpu_fcmp.signb': 1, 'or1200_fpu_fcmp.opa_inf': 1, 'or1200_fpu_fcmp.opb_inf': 1, 'or1200_fpu_fcmp.qnan': 0, 'or1200_fpu_fcmp.snan': 1, 'or1200_fpu_fcmp.exp_eq': 1, 'or1200_fpu_fcmp.exp_gt': 1, 'or1200_fpu_fcmp.exp_lt': 1, 'or1200_fpu_fcmp.fract_eq': 1, 'or1200_fpu_fcmp.fract_gt': 1, 'or1200_fpu_fcmp.fract_lt': 1, 'or1200_fpu_fcmp.all_zero': 1, 'or1200_fpu_intfloat_conv.rmode': 1, 'or1200_fpu_intfloat_conv.snan': 1, 'or1200_fpu_intfloat_conv.qnan': 0, 'or1200_fpu_intfloat_conv.fpu_op_r2': 0, 'or1200_fpu_intfloat_conv.opa_inf': 1, 'u0.qnan': 0, 'u0.snan': 1, 'u0.opa_inf': 1, 'u0.opb_inf': 1, 'u4.rmode': 1, 'u4.fract_in': 0, 'u4.opa_inf': 1, 'or1200_rfram_generic.rst': 1, 'or1200_rfram_generic.ce_a': 1, 'or1200_rfram_generic.ce_b': 1, 'or1200_rfram_generic.intaddr_a': 0, 'or1200_rfram_generic.intaddr_b': 0, 'or1200_sb_fifo.rst_i': 0, 'or1200_security_assertions.rst': 1, 'or1200_security_assertions.rf_addrw': 1, 'or1200_security_assertions.rf_we': 1, 'or1200_security_assertions.spr_dat_ppc': 0, 'or1200_security_assertions.wb_pc': 1, 'or1200_security_assertions.ex_insn_top2': 0, 'or1200_security_assertions.ex_insn_opcode': 0, 'or1200_spram_1024x32.rst': 1, 'or1200_spram_1024x32.ce': 1, 'or1200_spram_1024x32.we': 15, 'or1200_spram_1024x32.addr': 1, 'or1200_spram_1024x32_bw.rst': 1, 'or1200_spram_1024x32_bw.ce': 1, 'or1200_spram_1024x32_bw.we': 15, 'or1200_spram_1024x32_bw.addr': 1, 'or1200_spram_1024x8.rst': 1, 'or1200_spram_1024x8.ce': 1, 'or1200_spram_1024x8.we': 15, 'or1200_spram_1024x8.addr': 1, 'or1200_spram_128x32.rst': 1, 'or1200_spram_128x32.ce': 1, 'or1200_spram_128x32.we': 15, 'or1200_spram_128x32.addr': 1, 'or1200_spram_2048x32.rst': 1, 'or1200_spram_2048x32.ce': 1, 'or1200_spram_2048x32.we': 15, 'or1200_spram_2048x32.addr': 1, 'or1200_spram_2048x32_bw.rst': 1, 'or1200_spram_2048x32_bw.ce': 1, 'or1200_spram_2048x32_bw.we': 15, 'or1200_spram_2048x32_bw.addr': 1, 'or1200_spram_2048x8.rst': 1, 'or1200_spram_2048x8.ce': 1, 'or1200_spram_2048x8.we': 15, 'or1200_spram_2048x8.addr': 1, 'or1200_spram_256x21.rst': 1, 'or1200_spram_256x21.ce': 1, 'or1200_spram_256x21.we': 15, 'or1200_spram_256x21.addr': 1, 'or1200_spram_32_bw.ce': 1, 'or1200_spram_32_bw.we': 15, 'or1200_spram_32_bw.addr': 1, 'or1200_spram_32x24.rst': 1, 'or1200_spram_32x24.ce': 1, 'or1200_spram_32x24.we': 15, 'or1200_spram_32x24.addr': 1, 'or1200_spram_512x20.rst': 1, 'or1200_spram_512x20.ce': 1, 'or1200_spram_512x20.we': 15, 'or1200_spram_512x20.addr': 1, 'or1200_spram_64x14.rst': 1, 'or1200_spram_64x14.ce': 1, 'or1200_spram_64x14.we': 15, 'or1200_spram_64x14.addr': 1, 'or1200_spram_64x22.rst': 1, 'or1200_spram_64x22.ce': 1, 'or1200_spram_64x22.we': 15, 'or1200_spram_64x22.addr': 1, 'or1200_spram_64x24.rst': 1, 'or1200_spram_64x24.ce': 1, 'or1200_spram_64x24.we': 15, 'or1200_spram_64x24.addr': 1, 'iwb_biu.rst': 1, 'iwb_biu.wb_rst_i': 0, 'iwb_biu.biu_cyc_i': 1, 'iwb_biu.biu_stb': 1, 'iwb_biu.wb_fsm_state_cur': 1, 'iwb_biu.wb_fsm_idle': 0, 'dwb_biu.rst': 1, 'dwb_biu.wb_rst_i': 0, 'dwb_biu.biu_cyc_i': 1, 'dwb_biu.biu_stb': 1, 'dwb_biu.wb_fsm_state_cur': 1, 'dwb_biu.wb_fsm_idle': 0, 'or1200_immu_top.rst': 1, 'or1200_immu_top.spr_cs': 1, 'or1200_immu_top.spr_addr': 1, 'or1200_immu_top.icpu_adr_select': 1, 'itlb_mr_ram.ce': 1, 'itlb_mr_ram.we': 15, 'itlb_mr_ram.addr': 1, 'itlb_tr_ram.ce': 1, 'itlb_tr_ram.we': 15, 'itlb_tr_ram.addr': 1, 'or1200_ic_top.rst': 1, 'or1200_ic_top.spr_cs': 1, 'or1200_ic_top.tag_v': 1, 'or1200_ic_top.tag': 1, 'or1200_ic_top.saved_addr': 0, 'or1200_ic_fsm.rst': 1, 'or1200_ic_fsm.saved_addr': 0, 'or1200_cpu.rst': 1, 'or1200_cpu.id_insn': 0, 'or1200_cpu.wb_pc': 1, 'or1200_cpu.du_read': 1, 'or1200_cpu.du_except_stop': 0, 'or1200_cpu.dcpu_adr_o': 1, 'or1200_cpu.spr_addr': 1, 'or1200_cpu.spr_cs': 1, 'or1200_cpu.rf_addrw': 1, 'or1200_cpu.alu_op': 3, 'or1200_cpu.alu_op2': 1, 'or1200_cpu.comp_op': 1, 'or1200_cpu.branch_op': 1, 'or1200_cpu.ex_freeze': 0, 'or1200_cpu.sel_a': 0, 'or1200_cpu.sel_b': 0, 'or1200_cpu.rfwb_op': 3, 'or1200_cpu.except_start': 1, 'or1200_cpu.spr_dat_ppc': 0, 'or1200_cpu.ex_void': 0, 'or1200_genpc.rst': 1, 'or1200_genpc.branch_op': 1, 'or1200_genpc.except_start': 1, 'or1200_genpc.spr_pc_we': 1, 'or1200_genpc.pcreg_select': 1, 'or1200_if.rst': 1, 'or1200_ctrl.rst': 1, 'or1200_ctrl.ex_freeze': 0, 'or1200_ctrl.alu_op': 3, 'or1200_ctrl.alu_op2': 1, 'or1200_ctrl.id_insn': 0, 'or1200_ctrl.rf_addrw': 1, 'or1200_ctrl.rfwb_op': 3, 'or1200_ctrl.sel_a': 0, 'or1200_ctrl.sel_b': 0, 'or1200_ctrl.sel_imm': 1, 'or1200_ctrl.comp_op': 1, 'or1200_ctrl.ex_void': 0, 'or1200_rf.rst': 1, 'or1200_rf.we': 15, 'or1200_rf.spr_cs': 1, 'or1200_rf.spr_addr': 1, 'or1200_rf.du_read': 1, 'or1200_rf.rf_addrw': 1, 'or1200_rf.rf_we': 1, 'or1200_rf.rf_ena': 1, 'or1200_rf.spr_cs_fe': 0, 'rf_a.ce_a': 1, 'rf_a.ce_b': 1, 'rf_a.we_b': 0, 'rf_b.ce_a': 1, 'rf_b.ce_b': 1, 'rf_b.we_b': 0, 'or1200_operandmuxes.rst': 1, 'or1200_operandmuxes.ex_freeze': 0, 'or1200_operandmuxes.sel_a': 0, 'or1200_operandmuxes.sel_b': 0, 'or1200_alu.alu_op': 3, 'or1200_alu.alu_op2': 1, 'or1200_alu.comp_op': 1, 'or1200_mult_mac.rst': 1, 'or1200_mult_mac.ex_freeze': 0, 'or1200_mult_mac.alu_op': 3, 'or1200_mult_mac.spr_cs': 1, 'or1200_mult_mac.spr_addr': 1, 'or1200_gmultp2_32x32.RST': 0, 'or1200_sprs.rst': 1, 'or1200_sprs.branch_op': 1, 'or1200_sprs.spr_dat_ppc': 0, 'or1200_sprs.spr_addr': 1, 'or1200_sprs.spr_cs': 1, 'or1200_sprs.du_read': 1, 'or1200_sprs.ex_void': 0, 'or1200_lsu.rst': 1, 'or1200_lsu.ex_freeze': 0, 'or1200_lsu.dcpu_adr_o': 1, 'or1200_lsu.ex_lsu_op': 1, 'or1200_mem2reg.addr': 1, 'or1200_mem2reg.lsu_op': 1, 'or1200_reg2mem.addr': 1, 'or1200_reg2mem.lsu_op': 1, 'or1200_wbmux.rst': 1, 'or1200_wbmux.rfwb_op': 3, 'or1200_freeze.rst': 1, 'or1200_freeze.ex_freeze': 0, 'or1200_except.rst': 1, 'or1200_except.ex_freeze': 0, 'or1200_except.except_start': 1, 'or1200_except.ex_void': 0, 'or1200_except.branch_op': 1, 'or1200_except.wb_pc': 1, 'or1200_except.spr_dat_ppc': 0, 'or1200_cfgr.spr_addr': 1, 'or1200_dmmu_top.rst': 1, 'or1200_dmmu_top.spr_cs': 1, 'or1200_dmmu_top.spr_addr': 1, 'dtlb_ram.ce': 1, 'dtlb_ram.we': 15, 'dtlb_ram.addr': 1, 'dtlb_tr_ram.ce': 1, 'dtlb_tr_ram.we': 15, 'dtlb_tr_ram.addr': 1, 'or1200_du.rst': 1, 'or1200_du.ex_freeze': 0, 'or1200_du.branch_op': 1, 'or1200_du.du_read': 1, 'or1200_du.du_except_stop': 0, 'or1200_du.spr_cs': 1, 'or1200_du.spr_addr': 1, 'or1200_du.ex_freeze_q': 0, 'or1200_pic.rst': 1, 'or1200_pic.spr_cs': 1, 'or1200_pic.spr_addr': 1, 'or1200_tt.rst': 1, 'or1200_tt.spr_cs': 1, 'or1200_tt.spr_addr': 1, 'or1200_tpram_32x32.rst_a': 0, 'or1200_tpram_32x32.ce_a': 1, 'or1200_tpram_32x32.we_a': 1, 'or1200_tpram_32x32.rst_b': 0, 'or1200_tpram_32x32.ce_b': 1, 'or1200_tpram_32x32.we_b': 0}
+  Solver time: feasibility=0.8509s, assertions=0.0013s (total 0.8523s)
+=================================
+
+Phase: cross-module iteration stopped (assertion violation). paths_checked=1 branch_points=0 DFS(pulls/pruned/cache_hits)=80/0/15
+  AST scan (SlangSymbolVisitor): branch_points=0 paths=0
+
+=== EXECUTION SUMMARY ===
+  Elapsed time: 84.6809s
+  Paths explored (feasible): 1
+  Branch points explored: 0
+  Assertions found: 8
+  Solver time: feasibility=0.8509s, assertions=0.0013s (total 0.8523s)
+  Feasibility: Z3_checks=254 (merge=174 lazy_product=16 cross_module=64), disjoint_skip_merge=0, disjoint_skip_cross=0, pruned_merge=0, pruned_lazy_product=0, pruned_cross_module=0
+  Result: ASSERTION VIOLATION FOUND
+=========================
+Top level design units:
+    or1200_dc_fsm
+    or1200_dc_ram
+    or1200_dc_tag
+    or1200_dpram_256x32
+    or1200_dpram_32x32
+    or1200_fpu_arith
+    or1200_fpu_fcmp
+    or1200_fpu_intfloat_conv
+    or1200_iwb_biu
+    or1200_rfram_generic
+    or1200_sb_fifo
+    or1200_security_assertions
+    or1200_spram_1024x32
+    or1200_spram_1024x32_bw
+    or1200_spram_1024x8
+    or1200_spram_128x32
+    or1200_spram_2048x32
+    or1200_spram_2048x32_bw
+    or1200_spram_2048x8
+    or1200_spram_256x21
+    or1200_spram_32_bw
+    or1200_spram_32x24
+    or1200_spram_512x20
+    or1200_spram_64x14
+    or1200_spram_64x22
+    or1200_spram_64x24
+    or1200_top
+    or1200_tpram_32x32
+
+Build succeeded: 0 errors, 0 warnings

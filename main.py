@@ -56,10 +56,21 @@ def timeout_exit():
             )
         else:
             print(f"  Paths explored (feasible): {mgr.path_count}", flush=True)
-        print(f"  Branch points explored: {mgr.branch_count}", flush=True)
+        print(
+            f"  AST branch visits (SymbolicDFS if/case/while): {mgr.branch_count} "
+            f"(often 0 in piecewise mode: CFG uses edge constraints, not this counter)",
+            flush=True,
+        )
         n_assertions = len(mgr.assertions) if hasattr(mgr, 'assertions') else 0
-        print(f"  Assertions checked: {n_assertions}", flush=True)
-        print(f"  Solver time: {getattr(mgr, 'solver_time', 0):.4f}s", flush=True)
+        # Same count as final summary ("Assertions found"); not "checks per path".
+        print(f"  Assertions found: {n_assertions}", flush=True)
+        _feas = getattr(mgr, "solver_time", 0) or 0
+        _asrt = getattr(mgr, "assertion_solver_time", 0) or 0
+        print(
+            f"  Solver time: feasibility={_feas:.4f}s, assertions={_asrt:.4f}s "
+            f"(total {_feas + _asrt:.4f}s)",
+            flush=True,
+        )
         if hasattr(mgr, "feasibility_stats_line"):
             print(f"  {mgr.feasibility_stats_line()}", flush=True)
         if mgr.assertion_violation:
@@ -250,10 +261,19 @@ def main():
                 )
             else:
                 print(f"  Paths explored (feasible): {mgr.path_count}", flush=True)
-            print(f"  Branch points explored: {mgr.branch_count}", flush=True)
+            print(
+                f"  AST branch visits (SymbolicDFS if/case/while): {mgr.branch_count} "
+                f"(often 0 in piecewise mode: CFG uses edge constraints, not this counter)",
+                flush=True,
+            )
             n_assertions = len(mgr.assertions) if hasattr(mgr, 'assertions') else 0
             print(f"  Assertions found: {n_assertions}", flush=True)
-            print(f"  Solver time: {mgr.solver_time:.4f}s", flush=True)
+            print(
+                f"  Solver time: feasibility={mgr.solver_time:.4f}s, "
+                f"assertions={getattr(mgr, 'assertion_solver_time', 0) or 0:.4f}s "
+                f"(total {mgr.solver_time + (getattr(mgr, 'assertion_solver_time', 0) or 0):.4f}s)",
+                flush=True,
+            )
             if hasattr(mgr, "feasibility_stats_line"):
                 print(f"  {mgr.feasibility_stats_line()}", flush=True)
             if mgr.assertion_violation:

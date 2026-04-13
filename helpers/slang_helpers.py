@@ -410,25 +410,38 @@ class SymbolicDFS:
             self.visit_expr(m, s, expr.right)
 
         elif kind == ps_ast.ExpressionKind.Assignment:
-            # Semantic assignment from CFG basic blocks (covers both blocking
-            # and non-blocking since pyslang's semantic model merges them).
+            # Blocking (=) updates the store immediately; nonblocking (<=) defers
+            # to end of this CFG path (see SymbolicState.flush_pending_nba).
             lhs_sym = getattr(getattr(expr, 'left', None), 'symbol', None)
             if lhs_sym is not None:
                 lhs_name = lhs_sym.name
                 rhs = expr.right
+
+                # TODO: For Jacob to check
+                is_nb = bool(getattr(expr, "isNonBlocking", False))
+                if getattr(s, "pending_nba", None) is None:
+                    s.pending_nba = {}
+                pend = s.pending_nba.setdefault(m.curr_module, {})
+
+                def _apply(val):
+                    if is_nb:
+                        pend[lhs_name] = val
+                    else:
+                        s.store[m.curr_module][lhs_name] = val
+
                 rhs_sym = getattr(rhs, 'symbol', None)
                 if rhs_sym is not None:
                     rhs_val = s.store[m.curr_module].get(rhs_sym.name, init_symbol())
-                    s.store[m.curr_module][lhs_name] = rhs_val
+                    _apply(rhs_val)
                 elif getattr(rhs, 'kind', None) == ps_ast.ExpressionKind.IntegerLiteral:
-                    s.store[m.curr_module][lhs_name] = str(rhs.value)
+                    _apply(str(rhs.value))
                 else:
                     try:
                         from helpers.rvalue_to_z3 import semantic_expr_to_z3
                         store = s.store.get(m.curr_module, {})
                         rhs_z3 = semantic_expr_to_z3(rhs, store, m.curr_module)
                         if rhs_z3 is not None:
-                            s.store[m.curr_module][lhs_name] = rhs_z3
+                            _apply(rhs_z3)
                     except Exception:
                         pass
 

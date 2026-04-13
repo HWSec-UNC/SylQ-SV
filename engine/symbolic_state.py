@@ -53,4 +53,25 @@ class SymbolicState:
         s = SymbolicState()
         s.store = {module_name: dict(base_store)}
         s.pc = Solver()
+
+        # TODO: For Jacob to check
+        s.pending_nba = {}
         return s
+
+    # TODO: For Jacob to check
+    def flush_pending_nba(self, module_name: str) -> None:
+        """Apply deferred nonblocking assignments (`<=`) for one module to the store.
+
+        Reads during the same simulated clock edge use ``store`` only; this merges
+        pending RHS values after all statements for that edge have been executed.
+        """
+        pend = getattr(self, "pending_nba", None)
+        if not pend:
+            return
+        bucket = pend.get(module_name)
+        if not bucket:
+            return
+        mod_store = self.store.setdefault(module_name, {})
+        for k, v in bucket.items():
+            mod_store[k] = v
+        bucket.clear()

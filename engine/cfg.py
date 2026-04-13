@@ -113,8 +113,12 @@ class CFG:
         G.add_node(-1, data="Dummy Start")
         G.add_node(-2, data="Dummy End")
 
-        for block1, block2, condition in self.cfg_edges:
-            G.add_edge(block1, block2, condition=condition)
+        for block1, block2, condition, guard_node_idx in self.cfg_edges:
+
+            # TODO(a): For Jacob to check
+            # Now carries the exact guard expression node index for the edge
+            # rather than just the condition string.
+            G.add_edge(block1, block2, condition=condition, guard_node_idx=guard_node_idx)
 
         G.add_edge(-1, 0)
 
@@ -164,8 +168,10 @@ class CFG:
             block1 = self._find_basic_block(node1)
             block2 = self._find_basic_block(node2)
 
+            # TODO(b): For Jacob to check
             if block1 != block2:
-                self.cfg_edges.append((block1, block2, condition))
+                # Keep node1 (AST index) to recover exact guard expression
+                self.cfg_edges.append((block1, block2, condition, node1))
 
     def _find_basic_block(self, node_idx):
         """Given a node index, find the index of the basic block that we're in."""

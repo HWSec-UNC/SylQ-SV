@@ -196,6 +196,9 @@ class ExecutionEngine:
 
             prev_bb_idx = bb_idx
 
+        # TODO: For Jacob to check
+        path_state.flush_pending_nba(module_name)
+
     @staticmethod
     def _to_bool(z3_expr):
         """Coerce a Z3 expression to BoolRef. BitVec values become (val != 0)."""
@@ -221,12 +224,25 @@ class ExecutionEngine:
 
         if source_bb_idx < 0:
             return
-        source_bb = cfg.basic_block_list[source_bb_idx]
+
         cond_expr_node = None
-        for node in source_bb:
-            if isinstance(node, ps_ast.Expression):
-                cond_expr_node = node
-                break
+
+        #TODO(c): For Jacob to check
+        # Exact guard node carried by CFG edge metadata.
+        guard_node_idx = edge_data.get('guard_node_idx')
+        if isinstance(guard_node_idx, int) and 0 <= guard_node_idx < len(cfg.all_nodes):
+            candidate = cfg.all_nodes[guard_node_idx]
+            if isinstance(candidate, ps_ast.Expression):
+                cond_expr_node = candidate
+
+        # Fallback: for older CFGs / missing metadata
+        if cond_expr_node is None:
+            source_bb = cfg.basic_block_list[source_bb_idx]
+            for node in source_bb:
+                if isinstance(node, ps_ast.Expression):
+                    cond_expr_node = node
+                    break
+
         if cond_expr_node is None:
             return
 
@@ -243,6 +259,14 @@ class ExecutionEngine:
         path_state.assertion_counter += 1
         tag = "cfg_p{}".format(path_state.assertion_counter)
 
+        # TODO(d): For Jacob to check
+        # Temp debug: map cfg_pN -> edge/source/condition for one module
+        if manager.curr_module == "or1200_dc_fsm":
+            try:
+                print(f"[CFG_ASSERT] {tag} src_bb={source_bb_idx} guard_idx={guard_node_idx} cond={cond} cond_z3={cond_z3}", flush=True)
+            except Exception:
+                pass
+        
         try:
             if cond == 'true':
                 path_state.pc.assert_and_track(self._to_bool(cond_z3), tag)
@@ -283,6 +307,36 @@ class ExecutionEngine:
         except Exception:
             pass
 
+    @staticmethod
+    def _format_source_range(sr) -> str:
+        """Human-readable location for pyslang SourceRange or string."""
+        if sr is None:
+            return "<unknown>"
+        if isinstance(sr, str):
+            return sr
+        try:
+            start = getattr(sr, "start", None)
+            if start is not None:
+                line = getattr(start, "line", None)
+                col = getattr(start, "column", None)
+                buf = getattr(start, "buffer", None)
+                path = ""
+                if buf is not None:
+                    path = getattr(buf, "name", None) or getattr(buf, "file", None) or ""
+                    if path is not None and not isinstance(path, str):
+                        path = str(path)
+                if line is not None:
+                    loc = f"{path}:{line}" if path else f"line {line}"
+                    if col is not None:
+                        loc += f":{col}"
+                    return loc
+        except Exception:
+            pass
+        try:
+            return str(sr)
+        except Exception:
+            return repr(sr)
+
     def _collect_assertions(self, ast, module_name, assertions_list):
         """Recursively walk a pyslang AST and collect SVA assertion nodes.
 
@@ -290,6 +344,7 @@ class ExecutionEngine:
           - 'node': the raw AST node
           - 'module': the module name the assertion belongs to
           - 'source': source location string for reporting
+          - 'source_range': raw SourceRange when available (better diagnostics)
           - 'kind': 'immediate' or 'concurrent'
         The z3 expression ('z3_expr') is filled in later during symbolic evaluation.
         """
@@ -308,13 +363,18 @@ class ExecutionEngine:
         if cname in ('ImmediateAssertStatementSyntax', 'ImmediateAssertionStatementSyntax',
                       'ImmediateAssertionMemberSyntax',
                       'ImmediateAssumeStatementSyntax', 'ImmediateCoverStatementSyntax'):
-            source = str(getattr(ast, 'sourceRange', getattr(ast, 'toString',
-                         lambda: '<unknown>'))() if callable(
-                         getattr(ast, 'toString', None)) else getattr(ast, 'sourceRange', '<unknown>'))
+            sr = getattr(ast, "sourceRange", None)
+            if callable(getattr(ast, "toString", None)) and sr is None:
+                try:
+                    sr = ast.toString()
+                except Exception:
+                    sr = None
+            source = self._format_source_range(sr)
             assertions_list.append({
                 'node': ast,
                 'module': module_name,
                 'source': source,
+                'source_range': sr,
                 'kind': 'immediate',
                 'z3_expr': None,  # filled during explore_block or cross-module check
             })
@@ -324,13 +384,13 @@ class ExecutionEngine:
         if cname in ('AssertPropertyStatementSyntax', 'ConcurrentAssertionMemberSyntax',
                       'AssumePropertyStatementSyntax', 'CoverPropertyStatementSyntax',
                       'ExpectPropertyStatementSyntax'):
-            source = str(getattr(ast, 'sourceRange', getattr(ast, 'toString',
-                         lambda: '<unknown>'))() if callable(
-                         getattr(ast, 'toString', None)) else getattr(ast, 'sourceRange', '<unknown>'))
+            sr = getattr(ast, "sourceRange", None)
+            source = self._format_source_range(sr)
             assertions_list.append({
                 'node': ast,
                 'module': module_name,
                 'source': source,
+                'source_range': sr,
                 'kind': 'concurrent',
                 'z3_expr': None,
             })
@@ -371,11 +431,12 @@ class ExecutionEngine:
             if getattr(node, 'kind', None) == ps_ast.StatementKind.ImmediateAssertion:
                 cond = getattr(node, 'cond', None)
                 source_range = getattr(node, 'sourceRange', None)
-                source = str(source_range) if source_range else '<unknown>'
+                source = ExecutionEngine._format_source_range(source_range)
                 found.append({
                     'node': node,
                     'module': module_name,
                     'source': source,
+                    'source_range': source_range,
                     'kind': 'immediate',
                     'cond_expr': cond,
                     'z3_expr': None,
@@ -515,7 +576,10 @@ class ExecutionEngine:
         print(f"Executing for {num_cycles} clock cycle(s)", flush=True)
         self.module_depth += 1
         state: SymbolicState = SymbolicState()
-        
+
+        # TODO: For Jacob to check
+        state.pending_nba = {}
+
         if manager is not None:
             # Only manager=None is supported: we build modules_dict, cfgs_by_module, etc. here.
             raise ValueError("execute_sv requires manager=None; the engine creates the manager internally.")
@@ -757,7 +821,7 @@ class ExecutionEngine:
                     manager.cross_module_stopped_reason = "violation"
                     print(
                         "Phase: cross-module iteration stopped (assertion violation). "
-                        "paths_checked={} branch_points={} DFS(pulls/pruned/cache_hits)={}/{}/{}".format(
+                        "paths_checked={} ast_branch_visits={} DFS(pulls/pruned/cache_hits)={}/{}/{}".format(
                             manager.path_count,
                             manager.branch_count,
                             stats["combos_checked"],
@@ -797,7 +861,8 @@ class ExecutionEngine:
             status = "complete (exhausted iterator)"
             manager.cross_module_stopped_reason = "complete"
         print(
-            "Phase: cross-module iteration {} — paths_checked={} branch_points={} "
+            "Phase: cross-module iteration {} — paths_checked={} "
+            "ast_branch_visits={} (SymbolicDFS if/case/while; 0 common: CFG branches are edge constraints) "
             "DFS(pulls/pruned/cache_hits)={}/{}/{}".format(
                 status,
                 manager.path_count,
@@ -821,7 +886,8 @@ class ExecutionEngine:
         if not manager.assertions:
             return False
 
-        for assertion_info in manager.assertions:
+        n_assertions = len(manager.assertions)
+        for a_idx, assertion_info in enumerate(manager.assertions):
             assertion_z3 = assertion_info.get("z3_expr")
             if assertion_z3 is None:
                 continue
@@ -839,7 +905,11 @@ class ExecutionEngine:
                 continue
             s.push()
             s.add(Not(assertion_z3))
+            t0 = time.monotonic()
             result = str(s.check())
+            dt = time.monotonic() - t0
+            if manager is not None:
+                manager.assertion_solver_time += dt
             if result == "sat":
                 # Assertion violation found -- extract counterexample
                 model = s.model()
@@ -851,13 +921,30 @@ class ExecutionEngine:
                     expr_str = str(expr)
                     if expr_str in symbols_to_values:
                         counterexample[qualified_signal] = symbols_to_values[expr_str]
-                source = assertion_info.get("source", "<unknown>")
                 module = assertion_info.get("module", "<unknown>")
+                sr = assertion_info.get("source_range")
+                source_pretty = self._format_source_range(
+                    sr if sr is not None else assertion_info.get("source")
+                )
+                z3_s = str(assertion_z3)
+                if len(z3_s) > 400:
+                    z3_s = z3_s[:400] + " ... [truncated]"
                 print(f"\n=== ASSERTION VIOLATION FOUND ===", flush=True)
+                print(
+                    f"  Assertion: #{a_idx + 1} of {n_assertions} (index in collected assertion list)",
+                    flush=True,
+                )
                 print(f"  Module: {module}", flush=True)
-                print(f"  Source: {source}", flush=True)
+                print(f"  Kind: {assertion_info.get('kind', '?')}", flush=True)
+                print(f"  Source: {source_pretty}", flush=True)
+                print(f"  Property (Z3, must hold; violation uses NOT this): {z3_s}", flush=True)
                 print(f"  Counterexample: {counterexample}", flush=True)
-                print(f"  Solver time: {manager.solver_time:.4f}s", flush=True)
+                print(
+                    f"  Solver time: feasibility={manager.solver_time:.4f}s, "
+                    f"assertions={manager.assertion_solver_time:.4f}s "
+                    f"(total {manager.solver_time + manager.assertion_solver_time:.4f}s)",
+                    flush=True,
+                )
                 print(f"=================================\n", flush=True)
                 manager.assertion_violation = True
                 return True
