@@ -64,6 +64,11 @@ class SymbolicState:
 
         Reads during the same simulated clock edge use ``store`` only; this merges
         pending RHS values after all statements for that edge have been executed.
+
+        This is per CFG path (end of ``_execute_cfg_path``), not a design-wide
+        timestep: other always blocks in the module are not executed in the same
+        ``SymbolicState`` walk, so there is no single global NBA queue across blocks
+        here (see ``execute_sv`` explore-phase comment in ``execution_engine.py``).
         """
         pend = getattr(self, "pending_nba", None)
         if not pend:

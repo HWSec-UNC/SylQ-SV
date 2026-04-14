@@ -106,9 +106,6 @@ def sat_check_full_pc(
         return False
     return False
 
-# Progress while *intra-module* merge DFS runs (set 0 to disable). Can still appear
-# during cross-module enumeration when a module's merged result is produced lazily.
-_MERGE_HEARTBEAT_SEC = float(os.environ.get("SYLQ_MERGE_HEARTBEAT_SEC", "20"))
 # Log individual SAT checks slower than this (seconds); 0 disables
 _SLOW_SAT_WARN_SEC = float(os.environ.get("SYLQ_SLOW_SAT_WARN_SEC", "5"))
 
@@ -396,7 +393,6 @@ class DFSMergeIterator:
         enable_early_pruning: bool = True,
         enable_caching: bool = True,
         solver_timeout: int = 10000,
-        heartbeat_sec: Optional[float] = None,
     ):
         """Initialize the DFS merge iterator.
         
@@ -409,8 +405,6 @@ class DFSMergeIterator:
             enable_early_pruning: If True, prune when partial merge is UNSAT.
             enable_caching: If True, cache SAT results.
             solver_timeout: Timeout for Z3 solver in milliseconds.
-            heartbeat_sec: Wall-clock interval for stall diagnostics (default: env
-                SYLQ_MERGE_HEARTBEAT_SEC or 20s); 0 or None with env 0 disables.
         """
         self.block_result_lists = block_result_lists
         self.module_name = module_name
@@ -430,10 +424,6 @@ class DFSMergeIterator:
         self.combos_checked = 0
         self.combos_pruned = 0
         self.cache_hits = 0
-        if heartbeat_sec is None:
-            self._heartbeat_sec = _MERGE_HEARTBEAT_SEC
-        else:
-            self._heartbeat_sec = float(heartbeat_sec)
         
     def _vars_in_pcs(self, pc_list: List[ExprRef]) -> set:
         """Extract variable names from a list of Z3 constraints."""
@@ -554,28 +544,8 @@ class DFSMergeIterator:
         # Initialize stack with first level
         self._push_level(0, [], {}, set())
         
-        yielded_count = 0
-        merge_t0 = time.monotonic()
-        last_hb = merge_t0
-        
         while self.stack:
             frame = self.stack[-1]
-            
-            # Stall diagnostics: progress can be invisible if yields are rare but SAT is busy
-            if self._heartbeat_sec > 0:
-                now = time.monotonic()
-                if now - last_hb >= self._heartbeat_sec:
-                    depth = len(self.stack)
-                    top_lv = frame.level
-                    print(
-                        f"    [intramodule-merge-heartbeat] {self.module_name}: "
-                        f"{now - merge_t0:.1f}s elapsed, stack_depth={depth}, "
-                        f"top_level={top_lv}, yielded={yielded_count}, "
-                        f"merge_steps={self.combos_checked}, pruned={self.combos_pruned}, "
-                        f"cache_hits={self.cache_hits}",
-                        flush=True,
-                    )
-                    last_hb = now
             
             # Try to get next result at current level
             try:
@@ -608,7 +578,6 @@ class DFSMergeIterator:
             
             # If at last level, yield the complete merged result
             if frame.level == self.num_levels - 1:
-                yielded_count += 1
                 yield {"pc": new_pc, "store": new_store}
             else:
                 # Push next level onto stack

@@ -12,8 +12,10 @@ from .dfs_iterator import (
     partition_blocks,
 )
 from typing import Optional, List
+import os
 import time
 import gc
+from math import prod
 from helpers.utils import to_binary
 import pyslang.syntax as ps_stx
 import pyslang.ast as ps_ast
@@ -261,7 +263,7 @@ class ExecutionEngine:
 
         # TODO(d): For Jacob to check
         # Temp debug: map cfg_pN -> edge/source/condition for one module
-        if manager.curr_module == "or1200_dc_fsm":
+        if manager.curr_module == "or1200_dpram_256x32":
             try:
                 print(f"[CFG_ASSERT] {tag} src_bb={source_bb_idx} guard_idx={guard_node_idx} cond={cond} cond_z3={cond_z3}", flush=True)
             except Exception:
@@ -739,30 +741,110 @@ class ExecutionEngine:
               f"{n_with_z3} with Z3 expressions", flush=True)
 
         print("Phase: explore_block", flush=True)
-        # Per paper §3.3: explore full path tree per always block; materialize list per block
+        # Per paper §3.3: explore full path tree per always block; materialize list per block.
+        #
+        # RTL timestep (ideal): one shared register snapshot for the posedge; every
+        # always_ff/always active region runs (reads see pre-NBA values); all ``<=`` are
+        # collected; one NBA commit updates every driven reg before the next timestep.
+        #
+        # Current model: each CFG path ends with ``flush_pending_nba`` (see
+        # ``SymbolicState``) so ``<=`` within one always block matches single-block NBA;
+        # different always blocks in the same module still start each ``explore_block``
+        # from the same ``base_store`` snapshot (parallel same-cycle reads) and merge
+        # later—there is no second global NBA pass across blocks here.
+        #
+        # CFG order: sequential (clocked) blocks before ``always_comb`` so comb reads
+        # see a stable ordering when results are merged downstream.
         block_results = {}
         for module_name in keys:
             state_template = state.fresh_for_block(module_name, base_store[module_name])
+            cfgs = list(cfgs_by_module[module_name])
+            cfgs.sort(key=lambda c: (1 if getattr(c, "is_combinational", False) else 0,))
             block_results[module_name] = [
                 self.explore_block(visitor, manager, state_template, module_name, cfg, modules_dict)
-                for cfg in cfgs_by_module[module_name]
+                for cfg in cfgs
             ]
 
         print("Phase: merge_block_results", flush=True)
+        merge_prof = os.environ.get("SYLQ_MERGE_PROFILE", "").strip().lower() in (
+            "1", "true", "yes", "on",
+        )
+        if merge_prof:
+            _mp_wall0 = time.monotonic()
+            _mp_solver0 = manager.solver_time
+            _mp_zm0 = manager.feasibility_z3_at_merge
+            _mp_zlp0 = manager.feasibility_z3_at_lazy_product
+            print(
+                "  [merge-profile] per-module lines print after each instance; "
+                "cumulative line prints after all merges (export SYLQ_MERGE_PROFILE=1).",
+                flush=True,
+            )
         merged_by_module = {}
         for idx, module_name in enumerate(keys):
+            if merge_prof:
+                _mod_wall0 = time.monotonic()
+                _mod_solver0 = manager.solver_time
+                _mod_zm0 = manager.feasibility_z3_at_merge
+                _mod_zlp0 = manager.feasibility_z3_at_lazy_product
             n_blocks = len(block_results[module_name])
             merged_by_module[module_name] = self.merge_block_results(
                 block_results[module_name], module_name, manager=manager)
             merged = merged_by_module[module_name]
+            explore_sizes = [len(br) for br in block_results[module_name]]
+            explorer_product = prod(explore_sizes) if explore_sizes else 1
+            max_log_product = int(os.environ.get("SYLQ_MERGE_LOG_MAX_PRODUCT", "100000"))
+            # merge_block_results returns a lazy iterator; optional path counting below
+            # walks the full intra-module merge (Z3). Large LazyProduct×k dominates gaps
+            # between the first line and the "→ N feasible merged paths" line.
             if isinstance(merged, LazyProduct):
-                tail = f"LazyProduct×{merged.n_components} groups"
+                merge_kind = f"LazyProduct×{merged.n_components}"
             elif isinstance(merged, ReplayableMergeResults):
-                tail = "lazy merge (streamed)"
+                merge_kind = "lazy merge"
             else:
-                tail = f"{len(merged)} paths"
+                merge_kind = ""
+
+            if merge_kind:
+                print(
+                    f"  merge {module_name} ({idx+1}/{len(keys)}): {n_blocks} blocks → {merge_kind}",
+                    flush=True,
+                )
+                if explorer_product <= max_log_product:
+                    n_paths = sum(1 for _ in merged)
+                    print(
+                        f"      → {n_paths} feasible merged paths",
+                        flush=True,
+                    )
+            else:
+                print(
+                    f"  merge {module_name} ({idx+1}/{len(keys)}): {n_blocks} blocks → {len(merged)} paths",
+                    flush=True,
+                )
+
+            if merge_prof:
+                mod_wall = time.monotonic() - _mod_wall0
+                mod_z3 = manager.solver_time - _mod_solver0
+                mod_zm = manager.feasibility_z3_at_merge - _mod_zm0
+                mod_zlp = manager.feasibility_z3_at_lazy_product - _mod_zlp0
+                mod_ovh = max(0.0, mod_wall - mod_z3)
+                mod_pct = 100.0 * mod_ovh / mod_wall if mod_wall > 1e-9 else 0.0
+                print(
+                    f"  [merge-profile] {module_name}: wall={mod_wall:.2f}s "
+                    f"feasibility_Z3_wall={mod_z3:.2f}s merge_calls={mod_zm} "
+                    f"lazy_product_calls={mod_zlp} non_Z3≈{mod_ovh:.2f}s ({mod_pct:.0f}%)",
+                    flush=True,
+                )
+
+        if merge_prof:
+            wall = time.monotonic() - _mp_wall0
+            z3 = manager.solver_time - _mp_solver0
+            ovh = max(0.0, wall - z3)
+            zm = manager.feasibility_z3_at_merge - _mp_zm0
+            zlp = manager.feasibility_z3_at_lazy_product - _mp_zlp0
+            pct = 100.0 * ovh / wall if wall > 1e-9 else 0.0
             print(
-                f"  merge {module_name} ({idx+1}/{len(keys)}): {n_blocks} blocks → {tail}",
+                f"  [merge-profile] phase_wall={wall:.2f}s feasibility_Z3_wall={z3:.2f}s "
+                f"(merge_calls={zm} lazy_product_calls={zlp}) "
+                f"non_Z3_wall≈{ovh:.2f}s ({pct:.0f}% of phase; Python/keys/cache/disjoint+iter)",
                 flush=True,
             )
 
