@@ -142,7 +142,9 @@ class BasicBlockVisitor:
             self.cfg.partition_points.add(case_start_idx)
 
             node.defaultCase.visit(lookup_table=self.lookup_table)
-            self.cfg.edgelist.append((parent_idx, case_start_idx, DefaultLabel(all_standard_exprs)))
+            default_edge = DefaultLabel(all_standard_exprs)
+            default_edge.case_kind = case_kind_str
+            self.cfg.edgelist.append((parent_idx, case_start_idx, default_edge))
 
             persisted_dangling_edge_stack.extend(self.edge_stack)
             self.edge_stack.clear()

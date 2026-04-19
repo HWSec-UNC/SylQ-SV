@@ -217,7 +217,7 @@ class ExecutionEngine:
         """Add a Z3 constraint to path_state.pc based on a CFG edge condition."""
         import z3
         from z3 import Not, Or, And
-        from helpers.rvalue_to_z3 import semantic_expr_to_z3
+        from helpers.rvalue_to_z3 import semantic_expr_to_z3, case_statement_arm_matches_z3
         from engine.basic_block_visitor import CaseLabel, DefaultLabel
 
         cond = edge_data.get('condition')
@@ -276,7 +276,15 @@ class ExecutionEngine:
                 path_state.pc.assert_and_track(Not(self._to_bool(cond_z3)), tag)
             elif isinstance(cond, CaseLabel):
                 item_z3s = []
+                case_kind = getattr(cond, "case_kind", "") or ""
                 for item_expr in cond:
+                    if isinstance(cond_z3, BitVecRef):
+                        arm = case_statement_arm_matches_z3(
+                            cond_z3, item_expr, store, module, case_kind
+                        )
+                        if arm is not None:
+                            item_z3s.append(arm)
+                            continue
                     item_z3 = semantic_expr_to_z3(item_expr, store, module)
                     if item_z3 is not None and isinstance(item_z3, (BoolRef, BitVecRef, ArithRef)):
                         if isinstance(cond_z3, BitVecRef) and isinstance(item_z3, BitVecRef):
@@ -292,7 +300,15 @@ class ExecutionEngine:
                     path_state.pc.assert_and_track(constraint, tag)
             elif isinstance(cond, DefaultLabel):
                 neg_z3s = []
+                case_kind = getattr(cond, "case_kind", "") or ""
                 for item_expr in cond.get('default_from', []):
+                    if isinstance(cond_z3, BitVecRef):
+                        arm = case_statement_arm_matches_z3(
+                            cond_z3, item_expr, store, module, case_kind
+                        )
+                        if arm is not None:
+                            neg_z3s.append(Not(arm))
+                            continue
                     item_z3 = semantic_expr_to_z3(item_expr, store, module)
                     if item_z3 is not None and isinstance(item_z3, (BoolRef, BitVecRef, ArithRef)):
                         if isinstance(cond_z3, BitVecRef) and isinstance(item_z3, BitVecRef):

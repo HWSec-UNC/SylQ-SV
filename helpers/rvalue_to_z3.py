@@ -1,6 +1,7 @@
 """Helpers for working with Z3: semantic expression conversion and solving."""
 
 import z3
+from typing import Optional, Tuple
 from z3 import Solver, BitVec, BitVecRef, If, BitVecVal, And, Or, Not, ULT, UGT, BoolRef
 import pyslang.ast as ps_ast
 
@@ -45,6 +46,258 @@ def _parse_svint(sv) -> int:
     clean = clean.replace('x', '0').replace('X', '0')
     clean = clean.replace('z', '0').replace('Z', '0')
     return int(clean, base) if clean else 0
+
+
+def _hex_char_value(ch: str) -> Optional[int]:
+    if ch in "0123456789":
+        return int(ch)
+    if ch in "aA":
+        return 10
+    if ch in "bB":
+        return 11
+    if ch in "cC":
+        return 12
+    if ch in "dD":
+        return 13
+    if ch in "eE":
+        return 14
+    if ch in "fF":
+        return 15
+    return None
+
+
+def _wildcard_literal_mask_and_pat(sv, casex: bool) -> Optional[Tuple[int, int, int]]:
+    """Parse ``casez``/``casex`` pattern literals for masked Z3 equality.
+
+    Supports sized **binary**, **hex**, and **oct** literals. **Decimal** (``d``)
+    with wildcards returns ``None`` (caller falls back to full-vector ``==``).
+
+    Returns ``(care_mask, pat_bits, width)`` — same semantics as the former
+    binary-only helper. Hex/oct expand each digit to 4 or 3 bits (MS digit =
+    MS bits of the vector).
+
+    - **casez** (``casex=False``): per-bit DCs ``?zZ`` in ``b``; per-nibble DCs
+      ``?zZ`` in ``h``/``o``; ``x``/``X`` are **cared** (2-state 0), matching
+      ``_parse_svint``-style abstraction.
+    - **casex** (``casex=True``): same radices; ``x``/``X`` are also DC (per bit
+      in ``b``, per nibble/tribble in ``h``/``o``). Pass ``casex=True`` from
+      ``case_statement_arm_matches_z3`` when ``case_kind == \"casex\"``.
+    """
+    s = str(sv).strip().replace("_", "")
+    if "'" not in s:
+        return None
+    head, body = s.split("'", 1)
+    if not body:
+        return None
+    base_char = body[0].lower()
+    digits = body[1:]
+    if not digits:
+        return None
+    if base_char == "d":
+        return None
+
+    if base_char == "b":
+        return _wildcard_mask_binary(digits, head, casex)
+    if base_char == "h":
+        return _wildcard_mask_hex(digits, head, casex)
+    if base_char == "o":
+        return _wildcard_mask_oct(digits, head, casex)
+    return None
+
+
+def _wildcard_mask_binary(digits: str, head: str, casex: bool) -> Optional[Tuple[int, int, int]]:
+    if not head:
+        width = len(digits)
+    else:
+        try:
+            width = int(head)
+        except ValueError:
+            return None
+    if len(digits) != width:
+        return None
+    care = 0
+    pat = 0
+    for i, ch in enumerate(digits):
+        bit_idx = width - 1 - i
+        if casex:
+            if ch in "?zZxX":
+                continue
+        else:
+            if ch in "?zZ":
+                continue
+        care |= 1 << bit_idx
+        if ch == "1":
+            pat |= 1 << bit_idx
+        elif ch == "0":
+            pass
+        elif not casex and ch in "xX":
+            pass
+        else:
+            return None
+    return care, pat, width
+
+
+def _wildcard_mask_hex(digits: str, head: str, casex: bool) -> Optional[Tuple[int, int, int]]:
+    if not head:
+        width = len(digits) * 4
+    else:
+        try:
+            width = int(head)
+        except ValueError:
+            return None
+    if len(digits) * 4 != width:
+        return None
+    care = 0
+    pat = 0
+    bit_index = width
+    for ch in digits:
+        lo = bit_index - 4
+        if ch in "?zZ" or (casex and ch in "xX"):
+            bit_index = lo
+            continue
+        if not casex and ch in "xX":
+            for k in range(4):
+                bit_idx = lo + 3 - k
+                care |= 1 << bit_idx
+            bit_index = lo
+            continue
+        nib = _hex_char_value(ch)
+        if nib is None:
+            return None
+        for k in range(4):
+            bit_idx = lo + 3 - k
+            care |= 1 << bit_idx
+            if (nib >> (3 - k)) & 1:
+                pat |= 1 << bit_idx
+        bit_index = lo
+    if bit_index != 0:
+        return None
+    return care, pat, width
+
+
+def _wildcard_mask_oct(digits: str, head: str, casex: bool) -> Optional[Tuple[int, int, int]]:
+    if not head:
+        width = len(digits) * 3
+    else:
+        try:
+            width = int(head)
+        except ValueError:
+            return None
+    if len(digits) * 3 != width:
+        return None
+    care = 0
+    pat = 0
+    bit_index = width
+    for ch in digits:
+        lo = bit_index - 3
+        if ch in "?zZ" or (casex and ch in "xX"):
+            bit_index = lo
+            continue
+        if not casex and ch in "xX":
+            for k in range(3):
+                bit_idx = lo + 2 - k
+                care |= 1 << bit_idx
+            bit_index = lo
+            continue
+        if ch not in "01234567":
+            return None
+        nib = int(ch)
+        for k in range(3):
+            bit_idx = lo + 2 - k
+            care |= 1 << bit_idx
+            if (nib >> (2 - k)) & 1:
+                pat |= 1 << bit_idx
+        bit_index = lo
+    if bit_index != 0:
+        return None
+    return care, pat, width
+
+
+# Backwards-compatible name used in tests
+def _binary_literal_mask_and_pat(sv, casex: bool) -> Optional[Tuple[int, int, int]]:
+    """Deprecated alias; use :func:`_wildcard_literal_mask_and_pat`."""
+    return _wildcard_literal_mask_and_pat(sv, casex)
+
+
+def _bitvec_align_same_width(a: BitVecRef, b: BitVecRef) -> tuple:
+    """Widen both bitvectors to ``max(size(a), size(b))`` with zero extension."""
+    if a.size() == b.size():
+        return a, b
+    tgt = max(a.size(), b.size())
+    if a.size() < tgt:
+        a = z3.ZeroExt(tgt - a.size(), a)
+    else:
+        a = z3.Extract(tgt - 1, 0, a)
+    if b.size() < tgt:
+        b = z3.ZeroExt(tgt - b.size(), b)
+    else:
+        b = z3.Extract(tgt - 1, 0, b)
+    return a, b
+
+
+def _bitvec_resize_to(selector: BitVecRef, pw: int) -> BitVecRef:
+    """Truncate or zero-extend ``selector`` to ``pw`` bits (Verilog-like low bits)."""
+    sw = selector.size()
+    if sw == pw:
+        return selector
+    if sw > pw:
+        return z3.Extract(pw - 1, 0, selector)
+    return z3.ZeroExt(pw - sw, selector)
+
+
+def case_statement_arm_matches_z3(
+    selector: BitVecRef,
+    pattern_expr,
+    store: dict,
+    module: str,
+    case_kind: str,
+):
+    """Z3 predicate: ``case`` / ``casez`` / ``casex`` arm matches (selector vs pattern).
+
+    For ``casez`` and ``casex`` with parseable literals (sized **binary**, **hex**,
+    **oct**), uses the same masked equality; ``casex`` only changes which
+    characters count as don’t-cares (see ``_wildcard_literal_mask_and_pat``).
+    Unsized or
+    odd shapes, **decimal** patterns, or width mismatch vs ``effectiveWidth``
+    fall back to full-vector ``==``. Plain ``case`` uses ``==`` after width align.
+
+    Returns a Z3 ``BoolRef``, or ``None`` if the match cannot be expressed.
+    """
+    item_z3 = semantic_expr_to_z3(pattern_expr, store, module)
+    if item_z3 is None:
+        return None
+    if not isinstance(item_z3, BitVecRef) or not isinstance(selector, BitVecRef):
+        return None
+
+    if case_kind not in ("casez", "casex"):
+        a, b = _bitvec_align_same_width(selector, item_z3)
+        return a == b
+
+    if getattr(pattern_expr, "kind", None) != ps_ast.ExpressionKind.IntegerLiteral:
+        a, b = _bitvec_align_same_width(selector, item_z3)
+        return a == b
+
+    parsed = _wildcard_literal_mask_and_pat(
+        pattern_expr.value, casex=(case_kind == "casex")
+    )
+    if parsed is None:
+        a, b = _bitvec_align_same_width(selector, item_z3)
+        return a == b
+
+    care, pat_bits, pw = parsed
+    ew = getattr(pattern_expr, "effectiveWidth", None)
+    if ew is not None:
+        try:
+            if int(ew) != pw:
+                a, b = _bitvec_align_same_width(selector, item_z3)
+                return a == b
+        except (TypeError, ValueError):
+            pass
+
+    sel_n = _bitvec_resize_to(selector, pw)
+    care_bv = BitVecVal(care, pw)
+    pat_bv = BitVecVal(pat_bits, pw)
+    return (sel_n & care_bv) == (pat_bv & care_bv)
 
 
 _BINOP_MAP = {

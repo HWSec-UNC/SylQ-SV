@@ -4,7 +4,7 @@ import pyslang.syntax as ps_stx
 from helpers.utils import init_symbol
 from engine.execution_manager import ExecutionManager
 from engine.symbolic_state import SymbolicState
-from helpers.rvalue_to_z3 import solve_pc
+from helpers.rvalue_to_z3 import solve_pc, case_statement_arm_matches_z3
 from z3 import Not, is_bool, BoolVal, ExprRef, BitVecRef, BitVecVal
 from engine.query_slicing import slice_query, get_vars_from_expr
 from engine.query_normalization import normalize_query
@@ -550,6 +550,14 @@ class SymbolicDFS:
 
         cond_z3 = self.expr_to_z3(m, s, case_expr)
 
+        case_cond = getattr(stmt, "condition", None)
+        if case_cond == ps_ast.CaseStatementCondition.WildcardJustZ:
+            case_kind_str = "casez"
+        elif case_cond == ps_ast.CaseStatementCondition.WildcardXOrZ:
+            case_kind_str = "casex"
+        else:
+            case_kind_str = ""
+
         for case in getattr(stmt, "items", getattr(stmt, "case_items", [])):
             exprs = getattr(case, "expressions", getattr(case, "exprs", []))
             for e in exprs:
@@ -566,8 +574,16 @@ class SymbolicDFS:
                         match_guard = cond_expr
                         mismatch_guard = Not(cond_expr)
                     elif case_expr is not None:
-                        match_guard = cond_expr == case_expr
-                        mismatch_guard = cond_expr != case_expr
+                        store = s.store.get(m.curr_module, {})
+                        arm_match = case_statement_arm_matches_z3(
+                            cond_expr, e, store, m.curr_module, case_kind_str
+                        )
+                        if arm_match is not None:
+                            match_guard = arm_match
+                            mismatch_guard = Not(arm_match)
+                        else:
+                            match_guard = cond_expr == case_expr
+                            mismatch_guard = cond_expr != case_expr
                     elif isinstance(cond_expr, BitVecRef):
                         zero = BitVecVal(0, cond_expr.size())
                         match_guard = cond_expr != zero
