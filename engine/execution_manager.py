@@ -110,6 +110,12 @@ class ExecutionManager:
     # Initialized lazily; separate instances for path exploration and merge
     qu_path = None   # QuickUnion for path-exploration queries
     qu_merge = None  # QuickUnion for merge queries (separate per §4.3)
+    # Continuous-assign metadata (paper §4.4). Populated by ExecutionEngine.execute_sv.
+    # module_name → list[ContinuousAssign], {idx→lhs_signal}, {rhs_signal→[idx,…]}.
+    # TODO: Param check
+    comb_assigns: Dict[str, list] = {}
+    comb_lhs: Dict[str, Dict[int, str]] = {}
+    comb_deps: Dict[str, Dict[str, list]] = {}
 
     def feasibility_stats_line(self) -> str:
         """One-line summary of feasibility checks (Z3, disjoint skips, pruned paths)."""
