@@ -9,6 +9,7 @@ further comb assigns that depend on it.
 """
 import pyslang.ast as ps_ast
 from helpers.rvalue_to_z3 import semantic_expr_to_z3
+import z3
 # TODO: Param look at this file
 
 def _collect_rhs_signals(expr, out):
@@ -117,8 +118,12 @@ def evaluate_dirty_comb(state, module_name, manager):
             new_val = None
         if new_val is None:
             continue
-        if store.get(lhs) is new_val:
-            continue
+
+        old = store.get(lhs)
+        if isinstance(old, z3.ExprRef) and isinstance(new_val, z3.ExprRef):
+            if old.eq(new_val):
+                continue 
+
         store[lhs] = new_val
         for dep_idx in deps_by_signal.get(lhs, ()):
             dirty |= 1 << dep_idx
