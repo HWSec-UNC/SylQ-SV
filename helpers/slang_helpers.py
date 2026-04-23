@@ -8,7 +8,7 @@ from helpers.rvalue_to_z3 import solve_pc
 from z3 import Not, is_bool, BoolVal, ExprRef, BitVecRef, BitVecVal
 from engine.query_slicing import slice_query, get_vars_from_expr
 from engine.query_normalization import normalize_query
-
+from logger import logger
 
 def _cache_key(manager, cond_z3, negate=False):
     """Compute the cache key for a branch condition using the
@@ -388,7 +388,7 @@ class SymbolicDFS:
     def visit_expr(self, m: ExecutionManager, s: SymbolicState, expr):
         """Visits expressions"""
         if getattr(m, "debug", False):
-            print(expr.__class__.__name__, flush=True)
+            logger.debug(expr.__class__.__name__)
         if expr is None:
             return
 
@@ -456,7 +456,7 @@ class SymbolicDFS:
                 # Only LHS has an identifier attribute
                 #  RHS is likely a literal
                 if getattr(m, "debug", False):
-                    print(expr.right.kind, flush=True)
+                    logger.debug(expr.right.kind)
                 if expr.right.kind == ps_stx.SyntaxKind.ConcatenationExpression:
                     # Handle concatenation on RHS
                     parts = [str(operand.value) for operand in expr.right.expressions if hasattr(operand, "value")]
@@ -537,13 +537,13 @@ class SymbolicDFS:
 
         else:
             if getattr(m, "debug", False):
-                print(f"Unsupported Expression: {expr} of kind {kind}", flush=True)
+                logger.debug(f"Unsupported Expression: {expr} of kind {kind}")
 
     def _visit_case_stmt(self, m: ExecutionManager, s: SymbolicState, stmt, modules=None, direction=None):
         """Case statement handling; called by visit_stmt without reading stmt.kind."""
         if getattr(m, "debug", False):
-            print("_visit_case_stmt", flush=True)
-            print("case", flush=True)
+            logger.debug("_visit_case_stmt")
+            logger.debug("case")
         m.branch_count += 1
         # Avoid reading stmt.expr if it can hang; use getattr with None default.
         case_expr = getattr(stmt, "expr", None)
@@ -633,28 +633,27 @@ class SymbolicDFS:
         # Progress indicator: every 10k statements print one line.
         m.visit_count = getattr(m, "visit_count", 0) + 1
         if getattr(m, "debug", False) and m.visit_count % 10000 == 0:
-            print("... {} statements visited".format(m.visit_count), flush=True)
+            logger.debug("... {} statements visited".format(m.visit_count))
 
         cls_name = stmt.__class__.__name__
         # Handle case/binary by class name first - never read m.ignore or stmt.kind for these.
         if "CaseStatement" in cls_name:
             if getattr(m, "debug", False):
-                print("visit:", cls_name, flush=True)
+                logger.debug("visit:", cls_name)
             self._visit_case_stmt(m, s, stmt, modules, direction)
             return
         if cls_name == "BinaryExpressionSyntax":
             if getattr(m, "debug", False):
-                print("visit:", cls_name, flush=True)
+                logger.debug("visit:", cls_name)
             self.visit_expr(m, s, stmt)
             return
 
         # For other nodes, print with kind then check ignore (only when debug).
         if getattr(m, "debug", False):
-            print(
+            logger.debug(
                 "visit:",
                 cls_name,
-                getattr(getattr(stmt, "kind", None), "name", getattr(stmt, "kind", None)),
-                flush=True,
+                getattr(getattr(stmt, "kind", None), "name", getattr(stmt, "kind", None))
             )
         if stmt is None or m.ignore:
             return
@@ -742,7 +741,7 @@ class SymbolicDFS:
 
         elif kind == ps_ast.StatementKind.WhileLoop:
             if getattr(m, "debug", False):
-                print("whileloop", flush=True)
+                logger.debug("whileloop")
             m.branch_count += 1
             if hasattr(stmt, "cond"):
                 self.visit_expr(m, s, stmt.cond)
@@ -786,7 +785,7 @@ class SymbolicDFS:
 
         elif kind == ps_ast.StatementKind.DoWhileLoop:
             if getattr(m, "debug", False):
-                print("dowhile", flush=True)
+                logger.debug("dowhile")
             m.branch_count += 1
             if hasattr(stmt, "body"):
                 self.visit_stmt(m, s, stmt.body, modules, direction)

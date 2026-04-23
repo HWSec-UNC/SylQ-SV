@@ -30,6 +30,7 @@ from dataclasses import dataclass, field
 from collections import OrderedDict, defaultdict
 from functools import reduce
 from operator import mul
+from logger import logger
 
 from .feasibility_independence import (
     canonical_var_set,
@@ -87,21 +88,17 @@ def sat_check_full_pc(
         return False
     if z3_unknown is not None and r == z3_unknown:
         if not _SAT_UNKNOWN_LOGGED:
-            print(
+            logger.warning(
                 "[sylq] Z3 returned unknown (timeout/incomplete); "
-                "treating as infeasible for feasibility checks (sound, may lose complete paths).",
-                flush=True,
-            )
+                "treating as infeasible for feasibility checks (sound, may lose complete paths).")
             _SAT_UNKNOWN_LOGGED = True
         return False
     # Fallback for older Z3 APIs
     rs = str(r)
     if rs == "unknown":
         if not _SAT_UNKNOWN_LOGGED:
-            print(
-                "[sylq] Z3 returned unknown; treating as infeasible for feasibility checks.",
-                flush=True,
-            )
+            logger.warning(
+                "[sylq] Z3 returned unknown; treating as infeasible for feasibility checks.")
             _SAT_UNKNOWN_LOGGED = True
         return False
     return False
@@ -446,11 +443,9 @@ class DFSMergeIterator:
         )
         dt = time.monotonic() - t0
         if _SLOW_SAT_WARN_SEC > 0 and dt >= _SLOW_SAT_WARN_SEC:
-            print(
+            logger.warning(
                 f"    [merge-slow-sat] {self.module_name}: {dt:.1f}s for "
-                f"{len(constraints)} constraint(s), result={'sat' if out else 'unsat/unknown'}",
-                flush=True,
-            )
+                f"{len(constraints)} constraint(s), result={'sat' if out else 'unsat/unknown'}")
         return out
 
     def _get_cache_key(self, constraints: List[ExprRef]) -> str:

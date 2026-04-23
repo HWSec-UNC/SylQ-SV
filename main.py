@@ -13,6 +13,7 @@ from helpers.slang_helpers import SlangSymbolVisitor, SymbolicDFS
 import redis
 import threading
 import time
+from logger import logger
 
 gc.collect()
 
@@ -32,8 +33,8 @@ _start_time_ref = None
 def timeout_exit():
     """This only happens when the timer runs out."""
     elapsed = time.process_time() - _start_time_ref if _start_time_ref else 0
-    print("\n=== TIMEOUT: Execution time limit exceeded ===", flush=True)
-    print(f"  Elapsed time: {elapsed:.4f}s", flush=True)
+    logger.warning("\n=== TIMEOUT: Execution time limit exceeded ===")
+    logger.warning(f"  Elapsed time: {elapsed:.4f}s")
     if _engine_ref and hasattr(_engine_ref, '_last_manager'):
         # Mark the engine as timed out so long-running loops can exit cooperatively.
         try:
@@ -42,42 +43,38 @@ def timeout_exit():
             pass
         mgr = _engine_ref._last_manager
         if getattr(mgr, "estimated_global_combinations", None) is not None:
-            print(
+            logger.info(
                 f"  Paths explored (feasible): {mgr.estimated_global_combinations:,} "
-                f"(estimated global product from per-module merge sizes)",
-                flush=True,
+                f"(estimated global product from per-module merge sizes)"
             )
         elif getattr(mgr, "feasible_paths_unknown", False):
-            print(
+            logger.info(
                 "  Paths explored (feasible): not summarized as one number (lazy merge — "
                 "global product not computed without iterating). See per-module "
-                "'feasible merged paths' / merge lines above.",
-                flush=True,
+                "'feasible merged paths' / merge lines above."
             )
         else:
-            print(f"  Paths explored (feasible): {mgr.path_count}", flush=True)
-        print(
+            logger.info(f"  Paths explored (feasible): {mgr.path_count}")
+        logger.info(
             f"  AST branch visits (SymbolicDFS if/case/while): {mgr.branch_count} "
-            f"(often 0 in piecewise mode: CFG uses edge constraints, not this counter)",
-            flush=True,
+            f"(often 0 in piecewise mode: CFG uses edge constraints, not this counter)"
         )
         n_assertions = len(mgr.assertions) if hasattr(mgr, 'assertions') else 0
         # Same count as final summary ("Assertions found"); not "checks per path".
-        print(f"  Assertions found: {n_assertions}", flush=True)
+        logger.info(f"  Assertions found: {n_assertions}")
         _feas = getattr(mgr, "solver_time", 0) or 0
         _asrt = getattr(mgr, "assertion_solver_time", 0) or 0
-        print(
+        logger.info(
             f"  Solver time: feasibility={_feas:.4f}s, assertions={_asrt:.4f}s "
-            f"(total {_feas + _asrt:.4f}s)",
-            flush=True,
+            f"(total {_feas + _asrt:.4f}s)"
         )
         if hasattr(mgr, "feasibility_stats_line"):
-            print(f"  {mgr.feasibility_stats_line()}", flush=True)
+            logger.debug(f"  {mgr.feasibility_stats_line()}")
         if mgr.assertion_violation:
-            print("  Result: VIOLATION FOUND (see above)", flush=True)
+            logger.warning("  Result: VIOLATION FOUND (see above)")
         else:
-            print("  Result: No violation found within time limit", flush=True)
-    print("=======================================", flush=True)
+            logger.info("  Result: No violation found within time limit")
+    logger.info("=======================================")
 
 def showVersion():
     print(INFO)
@@ -130,8 +127,17 @@ def main():
         help="Stop cross-module DFS after N global path combinations. "
              "Omit for no limit (can be very slow on large designs; use --explore_time to cap wall time)",
     )
+    optparser.add_option(
+        "--log-level",
+        dest="log_level",
+        default="INFO",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        help="Set Logging level: DEBUG / INFO / WARNING / ERROR. Default: INFO",
+    )
+    
     (options, args) = optparser.parse_args()
-
+    logger.setLevel(options.log_level)
+    logger.debug(f"Logging level set to {options.log_level}")
 
     num_cycles = args[0]
     filelist = args[1:]
@@ -198,8 +204,7 @@ def main():
             successful_compilation = driver.runFullCompilation(False)
         else:
             successful_compilation = driver.reportCompilation(compilation, False)
-        
-        if successful_compilation:
+        if successful_compilation: 
             root = compilation.getRoot()
             top_instances = root.topInstances
 
@@ -207,13 +212,12 @@ def main():
                 filtered = [t for t in top_instances if t.name == options.topmodule]
                 if not filtered:
                     all_names = [t.name for t in top_instances]
-                    print(f"ERROR: --top '{options.topmodule}' not found in topInstances: {all_names}",
-                          file=sys.stderr, flush=True)
+                    logger.error(f"ERROR: --top '{options.topmodule}' not found in topInstances: {all_names}",
+                          file=sys.stderr)
                     exit(1)
                 top_instances = filtered
-                print(f"--top: filtered to {options.topmodule} "
-                      f"(skipping {len(root.topInstances) - 1} other top-level modules)",
-                      flush=True)
+                logger.info(f"--top: filtered to {options.topmodule} "
+                      f"(skipping {len(root.topInstances) - 1} other top-level modules)")
 
             my_visitor_for_symbol = SymbolicDFS(num_cycles)
 
@@ -223,7 +227,7 @@ def main():
             global _engine_ref, _start_time_ref
             _engine_ref = engine
             _start_time_ref = start
-
+            logger.info(f"=== STARTING SYMBOLIC EXECUTION ===, top_instances = {(top_instances)}")
             engine.execute_sv(
                 my_visitor_for_symbol,
                 top_instances,
@@ -232,65 +236,58 @@ def main():
                 max_cross_module_paths=options.max_cross_module_paths,
             )
             symbol_visitor.visit(top_instances)
-            print(
+            logger.debug(
                 "  AST scan (SlangSymbolVisitor): branch_points={} paths={}".format(
                     symbol_visitor.branch_points, symbol_visitor.paths
-                ),
-                flush=True,
+                )
             )
 
         end = time.process_time()
         elapsed = end - start
 
         # --- Final summary report ---
-        print("\n=== EXECUTION SUMMARY ===", flush=True)
-        print(f"  Elapsed time: {elapsed:.4f}s", flush=True)
+        logger.info("\n=== EXECUTION SUMMARY ===")
+        logger.info(f"  Elapsed time: {elapsed:.4f}s")
         if hasattr(engine, '_last_manager'):
             mgr = engine._last_manager
             if getattr(mgr, "estimated_global_combinations", None) is not None:
-                print(
+                logger.info(
                     f"  Paths explored (feasible): {mgr.estimated_global_combinations:,} "
                     f"(estimated global product from per-module merge sizes)",
-                    flush=True,
                 )
             elif getattr(mgr, "feasible_paths_unknown", False):
-                print(
+                logger.info(
                     "  Paths explored (feasible): not summarized as one number (lazy merge — "
                     "see log above for per-module feasible merged paths).",
-                    flush=True,
                 )
             else:
-                print(f"  Paths explored (feasible): {mgr.path_count}", flush=True)
-            print(
+                logger.info(f"  Paths explored (feasible): {mgr.path_count}")
+            logger.debug(
                 f"  AST branch visits (SymbolicDFS if/case/while): {mgr.branch_count} "
-                f"(often 0 in piecewise mode: CFG uses edge constraints, not this counter)",
-                flush=True,
+                f"(often 0 in piecewise mode: CFG uses edge constraints, not this counter)"
             )
             n_assertions = len(mgr.assertions) if hasattr(mgr, 'assertions') else 0
-            print(f"  Assertions found: {n_assertions}", flush=True)
-            print(
+            logger.info(f"  Assertions found: {n_assertions}")
+            logger.info(
                 f"  Solver time: feasibility={mgr.solver_time:.4f}s, "
                 f"assertions={getattr(mgr, 'assertion_solver_time', 0) or 0:.4f}s "
-                f"(total {mgr.solver_time + (getattr(mgr, 'assertion_solver_time', 0) or 0):.4f}s)",
-                flush=True,
+                f"(total {mgr.solver_time + (getattr(mgr, 'assertion_solver_time', 0) or 0):.4f}s)"
             )
             if hasattr(mgr, "feasibility_stats_line"):
-                print(f"  {mgr.feasibility_stats_line()}", flush=True)
+                logger.debug(f"  {mgr.feasibility_stats_line()}")
             if mgr.assertion_violation:
-                print("  Result: ASSERTION VIOLATION FOUND", flush=True)
+                logger.info("  Result: ASSERTION VIOLATION FOUND")
             elif n_assertions > 0:
-                print("  Result: All paths explored, no violations", flush=True)
+                logger.info("  Result: All paths explored, no violations")
             elif getattr(mgr, "cross_module_stopped_reason", "") == "complete":
-                print("  Result: Cross-module enumeration finished (exhausted feasible combinations)",
-                      flush=True)
+                logger.info("  Result: Cross-module enumeration finished (exhausted feasible combinations)")
             elif getattr(mgr, "cross_module_stopped_reason", "") == "max_paths":
-                print("  Result: Cross-module enumeration stopped at --max-cross-module-paths limit",
-                      flush=True)
+                logger.info("  Result: Cross-module enumeration stopped at --max-cross-module-paths limit")
             elif getattr(mgr, "cross_module_stopped_reason", "") == "timeout":
-                print("  Result: Cross-module enumeration interrupted (timeout)", flush=True)
+                logger.warning("  Result: Cross-module enumeration interrupted (timeout)")
             else:
-                print("  Result: Exploratory run complete (no assertions in design)", flush=True)
-        print("=========================", flush=True)
+                logger.info("  Result: Exploratory run complete (no assertions in design)")
+        logger.info("=========================")
 
         if timer:
             timer.cancel()
