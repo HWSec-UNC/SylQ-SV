@@ -779,123 +779,118 @@ class ExecutionEngine:
         logger.info(f"  Found {n_total} assertion(s) ({n_immediate} immediate, {n_concurrent} concurrent), "
               f"{n_with_z3} with Z3 expressions")
 
-        logger.info("Phase: explore_block")
-        # Per paper §3.3: explore full path tree per always block; materialize list per block.
-        #
-        # RTL timestep (ideal): one shared register snapshot for the posedge; every
-        # always_ff/always active region runs (reads see pre-NBA values); all ``<=`` are
-        # collected; one NBA commit updates every driven reg before the next timestep.
-        # 
-        # Current model: each CFG path ends with ``flush_pending_nba`` (see
-        # ``SymbolicState``) so ``<=`` within one always block matches single-block NBA;
-        # different always blocks in the same module still start each ``explore_block``
-        # from the same ``base_store`` snapshot (parallel same-cycle reads) and merge
-        # later—there is no second global NBA pass across blocks here.
-        #
-        # CFG order: sequential (clocked) blocks before ``always_comb`` so comb reads
-        # see a stable ordering when results are merged downstream.
-        block_results = {}
-        for module_name in keys:
-            state_template = state.fresh_for_block(module_name, base_store[module_name])
-            cfgs = list(cfgs_by_module[module_name])
-            cfgs.sort(key=lambda c: (1 if getattr(c, "is_combinational", False) else 0,))
-            block_results[module_name] = [
-                self.explore_block(visitor, manager, state_template, module_name, cfg, modules_dict)
-                for cfg in cfgs
-            ]
+        logger.info("Phase: explore_block (multi-cycle: %s cycle(s))", num_cycles)
 
-        logger.info("Phase: merge_block_results")
-        merge_prof = os.environ.get("SYLQ_MERGE_PROFILE", "").strip().lower() in (
-            "1", "true", "yes", "on",
-        )
-        if merge_prof:
-            _mp_wall0 = time.monotonic()
-            _mp_solver0 = manager.solver_time
-            _mp_zm0 = manager.feasibility_z3_at_merge
-            _mp_zlp0 = manager.feasibility_z3_at_lazy_product
-            logger.debug(
-                "  [merge-profile] per-module lines print after each instance; "
-                "cumulative line prints after all merges (export SYLQ_MERGE_PROFILE=1)."
-            )
-        merged_by_module = {}
-        for idx, module_name in enumerate(keys):
-            if merge_prof:
-                _mod_wall0 = time.monotonic()
-                _mod_solver0 = manager.solver_time
-                _mod_zm0 = manager.feasibility_z3_at_merge
-                _mod_zlp0 = manager.feasibility_z3_at_lazy_product
-            n_blocks = len(block_results[module_name])
-            merged_by_module[module_name] = self.merge_block_results(
-                block_results[module_name], module_name, manager=manager)
-            merged = merged_by_module[module_name]
-            explore_sizes = [len(br) for br in block_results[module_name]]
-            explorer_product = prod(explore_sizes) if explore_sizes else 1
-            max_log_product = int(os.environ.get("SYLQ_MERGE_LOG_MAX_PRODUCT", "100000"))
-            # merge_block_results returns a lazy iterator; optional path counting below
-            # walks the full intra-module merge (Z3). Large LazyProduct×k dominates gaps
-            # between the first line and the "→ N feasible merged paths" line.
-            if isinstance(merged, LazyProduct):
-                merge_kind = f"LazyProduct×{merged.n_components}"
-            elif isinstance(merged, ReplayableMergeResults):
-                merge_kind = "lazy merge"
-            else:
-                merge_kind = ""
+        # per_cycle_results[cycle_idx][module_name] = merged result for that module/cycle
+        per_cycle_results = []
 
-            if merge_kind:
-                logger.debug(
-                    f"  merge {module_name} ({idx+1}/{len(keys)}): {n_blocks} blocks → {merge_kind}",
-                )
-                if explorer_product <= max_log_product:
-                    n_paths = sum(1 for _ in merged)
-                    logger.debug(
-                        f"      → {n_paths} feasible merged paths",
+        # The store that carries register state forward between cycles
+        cycle_store = {module_name: dict(base_store[module_name]) for module_name in keys}
 
+        for cycle_idx in range(int(num_cycles)):
+            logger.info("--- Cycle %d/%s ---", cycle_idx + 1, num_cycles)
+            # DEBUG if cycle is advancing correctly
+            for module_name in keys:
+                sample = list(cycle_store[module_name].items())[:3]
+                logger.debug("  cycle_store sample for %s: %s", module_name, sample)
+            # DEBUG if cycle is advancing correctly
+            block_results = {}
+            for module_name in keys:
+                # Build the state template for this cycle from the carried-forward store
+                state_template = state.fresh_for_block(module_name, cycle_store[module_name])
+                cfgs = list(cfgs_by_module[module_name])
+                cfgs.sort(key=lambda c: (1 if getattr(c, "is_combinational", False) else 0,))
+                block_results[module_name] = [
+                    self.explore_block(
+                        visitor, manager, state_template, module_name, cfg, modules_dict
                     )
-            else:
+                    for cfg in cfgs
+                ]
+
+            logger.info("Phase: merge_block_results (cycle %d)", cycle_idx + 1)
+            merged_this_cycle = {}
+            for idx, module_name in enumerate(keys):
+                n_blocks = len(block_results[module_name])
+                merged_this_cycle[module_name] = self.merge_block_results(
+                    block_results[module_name], module_name, manager=manager
+                )
+                merged = merged_this_cycle[module_name]
                 logger.debug(
-                    f"  merge {module_name} ({idx+1}/{len(keys)}): {n_blocks} blocks → {len(merged)} paths",
+                    "  merge %s (%d/%d): %d blocks",
+                    module_name, idx + 1, len(keys), n_blocks
                 )
 
-            if merge_prof:
-                mod_wall = time.monotonic() - _mod_wall0
-                mod_z3 = manager.solver_time - _mod_solver0
-                mod_zm = manager.feasibility_z3_at_merge - _mod_zm0
-                mod_zlp = manager.feasibility_z3_at_lazy_product - _mod_zlp0
-                mod_ovh = max(0.0, mod_wall - mod_z3)
-                mod_pct = 100.0 * mod_ovh / mod_wall if mod_wall > 1e-9 else 0.0
-                logger.debug(
-                    f"  [merge-profile] {module_name}: wall={mod_wall:.2f}s "
-                    f"feasibility_Z3_wall={mod_z3:.2f}s merge_calls={mod_zm} "
-                    f"lazy_product_calls={mod_zlp} non_Z3≈{mod_ovh:.2f}s ({mod_pct:.0f}%)",
-                )
+            per_cycle_results.append(merged_this_cycle)
 
-        if merge_prof:
-            wall = time.monotonic() - _mp_wall0
-            z3 = manager.solver_time - _mp_solver0
-            ovh = max(0.0, wall - z3)
-            zm = manager.feasibility_z3_at_merge - _mp_zm0
-            zlp = manager.feasibility_z3_at_lazy_product - _mp_zlp0
-            pct = 100.0 * ovh / wall if wall > 1e-9 else 0.0
-            logger.debug(
-                f"  [merge-profile] phase_wall={wall:.2f}s feasibility_Z3_wall={z3:.2f}s "
-                f"(merge_calls={zm} lazy_product_calls={zlp}) "
-                f"non_Z3_wall≈{ovh:.2f}s ({pct:.0f}% of phase; Python/keys/cache/disjoint+iter)"
-            )
+            # --- Advance state: carry registers forward into next cycle ---
+            # For each module, take the first feasible merged path's store as the
+            # representative end-of-cycle state for seeding the next cycle.
+            # A more complete implementation would branch on all feasible end states.
+            if cycle_idx < int(num_cycles) - 1:
+                logger.info("Advancing register state to cycle %d", cycle_idx + 2)
+                for module_name in keys:
+                    merged = merged_this_cycle[module_name]
+                    # Get the first feasible result to use as the seed store
+                    first_result = None
+                    for r in merged:
+                        first_result = r
+                        break
+                    if first_result is not None:
+                        # end_store = first_result["store"]
+                        # new_cycle_store = {}
+                        # for signal, val in cycle_store[module_name].items():
+                        #     if signal in manager.reg_decls:
+                        #         # Register: use the value from end of this cycle
+                        #         new_cycle_store[signal] = end_store.get(signal, val)
+                        #     else:
+                        #         # Input: give a fresh symbol for next cycle
+                        #         from helpers.utils import init_symbol
+                        #         new_cycle_store[signal] = init_symbol()
+                        # cycle_store[module_name] = new_cycle_store
+                        # Build a temporary SymbolicState loaded with end-of-cycle store
+                        # so we can call advance_cycle on it
+                        end_state = SymbolicState()
+                        end_state.store = {module_name: first_result["store"]}
+                        end_state.pending_nba = {}
+                        end_state.dirty = {}
+
+                        # advance_cycle carries registers forward and gives fresh
+                        # BitVec symbols to input signals
+                        next_state = end_state.advance_cycle(module_name, manager.reg_decls)
+                        cycle_store[module_name] = next_state.store[module_name]
+                    else:
+                        logger.warning(
+                            "No feasible paths in cycle %d for module %s; "
+                            "carrying forward unchanged store",
+                            cycle_idx + 1, module_name
+                        )
+
+
+        # NEW — flatten all cycles into one combined per-module result list
+        # Each module's results are the union across all cycles
+        combined_per_module = {}
+        for module_name in keys:
+            combined_per_module[module_name] = []
+            for cycle_results in per_cycle_results:
+                merged = cycle_results.get(module_name, [])
+                # Materialize lazy iterators so we can combine them
+                if hasattr(merged, '__iter__') and not isinstance(merged, list):
+                    merged = list(merged)
+                combined_per_module[module_name].extend(merged)
 
         valid_assertions = [a for a in manager.assertions
                             if a.get("z3_expr") is not None]
-
-        logger.info("Phase: cross-module path iteration (DFS)")
         if valid_assertions:
             logger.info(f"  Checking {len(valid_assertions)} assertion(s)")
         else:
             logger.info("  Mode: no assertions — enumerating all feasible global path combinations "
                   "(path_count and DFS stats updated)")
-            logger.info(f"  Per-module merged results: {len(merged_by_module)} module(s)")
+            logger.info(f"  Per-module merged results: {len(combined_per_module)} module(s)")
             if max_cross_module_paths is not None:
                 logger.info(f"  Stopping after {max_cross_module_paths:,} global path combination(s).")
+        logger.info("Phase: cross-module path iteration (DFS) — %s cycle(s)", num_cycles)
         dfs_xmod = DFSCrossModuleIterator(
-            per_module_results=merged_by_module,
+            per_module_results=combined_per_module,
             num_cycles=int(num_cycles),
             manager=manager,
             enable_early_pruning=True,

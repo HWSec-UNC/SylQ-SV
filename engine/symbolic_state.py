@@ -3,6 +3,8 @@ are some other methods here that may be helpful, too."""
 
 import z3
 from z3 import Solver, Int, BitVec, BitVecSort
+import random
+import string
 
 class SymbolicState:
     pc = Solver()
@@ -107,3 +109,38 @@ class SymbolicState:
             if manager is not None:
                 self.mark_dirty(module_name, k, manager)
         bucket.clear()
+    
+    def advance_cycle(self, module_name: str, reg_decls: set) -> 'SymbolicState':
+        """Create a new SymbolicState for the next clock cycle.
+        Register values (signals in reg_decls) carry forward from this cycle's
+        end store. Input signals get fresh symbolic variables.
+        Args:
+            module_name: The module whose store we are advancing.
+            reg_decls: Set of signal names that are registers (hold state).
+
+        Returns:
+            A fresh SymbolicState with registers pre-loaded from this cycle's store.
+        """
+        next_state = SymbolicState()
+        next_state.pending_nba = {}
+        next_state.dirty = {}
+        next_state.pc = Solver()
+        next_state.store = {}
+
+        current_store = self.store.get(module_name, {})
+        next_store = {}
+
+        for signal, val in current_store.items():
+            if signal in reg_decls:
+                # Register: carry forward the symbolic expression from end of this cycle
+                next_store[signal] = val
+            else:
+                # Input wire: give a fresh symbolic variable for the new cycle
+                fresh_name = ''.join(
+                    random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits)
+                    for _ in range(16)
+                )
+                next_store[signal] = BitVec(fresh_name, 32)
+
+        next_state.store[module_name] = next_store
+        return next_state

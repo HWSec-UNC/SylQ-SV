@@ -1,1 +1,978 @@
 DEBUG:root:Starting over
+DEBUG:SYLQ_LOGGER:Logging level set to DEBUG
+INFO:SYLQ_LOGGER:=== STARTING SYMBOLIC EXECUTION ===, top_instances = [Symbol(SymbolKind.Instance, "or1200_dc_fsm"), Symbol(SymbolKind.Instance, "or1200_dc_ram"), Symbol(SymbolKind.Instance, "or1200_dc_tag"), Symbol(SymbolKind.Instance, "or1200_dpram_256x32"), Symbol(SymbolKind.Instance, "or1200_dpram_32x32"), Symbol(SymbolKind.Instance, "or1200_fpu_arith"), Symbol(SymbolKind.Instance, "or1200_fpu_fcmp"), Symbol(SymbolKind.Instance, "or1200_fpu_intfloat_conv"), Symbol(SymbolKind.Instance, "or1200_iwb_biu"), Symbol(SymbolKind.Instance, "or1200_rfram_generic"), Symbol(SymbolKind.Instance, "or1200_sb_fifo"), Symbol(SymbolKind.Instance, "or1200_spram_1024x32"), Symbol(SymbolKind.Instance, "or1200_spram_1024x32_bw"), Symbol(SymbolKind.Instance, "or1200_spram_1024x8"), Symbol(SymbolKind.Instance, "or1200_spram_128x32"), Symbol(SymbolKind.Instance, "or1200_spram_2048x32"), Symbol(SymbolKind.Instance, "or1200_spram_2048x32_bw"), Symbol(SymbolKind.Instance, "or1200_spram_2048x8"), Symbol(SymbolKind.Instance, "or1200_spram_256x21"), Symbol(SymbolKind.Instance, "or1200_spram_32_bw"), Symbol(SymbolKind.Instance, "or1200_spram_32x24"), Symbol(SymbolKind.Instance, "or1200_spram_512x20"), Symbol(SymbolKind.Instance, "or1200_spram_64x14"), Symbol(SymbolKind.Instance, "or1200_spram_64x22"), Symbol(SymbolKind.Instance, "or1200_spram_64x24"), Symbol(SymbolKind.Instance, "or1200_top"), Symbol(SymbolKind.Instance, "or1200_tpram_32x32")]
+INFO:SYLQ_LOGGER:Executing for 2 clock cycle(s)
+INFO:SYLQ_LOGGER:Phase: init_state
+INFO:SYLQ_LOGGER:Phase: hierarchy traversal — 79 module(s)
+INFO:SYLQ_LOGGER:Phase: base_store — 79 module(s)
+DEBUG:SYLQ_LOGGER:  continuous-assign dep map: 637 CAs across 79 module(s)
+INFO:SYLQ_LOGGER:Phase: collecting SVA assertions
+INFO:SYLQ_LOGGER:  Found 0 assertion(s) (0 immediate, 0 concurrent), 0 with Z3 expressions
+INFO:SYLQ_LOGGER:Phase: explore_block (multi-cycle: 2 cycle(s))
+INFO:SYLQ_LOGGER:--- Cycle 1/2 ---
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_dc_fsm: [('clk', 'clk'), ('rst', 'rst'), ('dc_en', 'dc_en')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_dc_ram: []
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_dc_tag: []
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_dpram_256x32: [('clk_a', 'clk_a'), ('rst_a', 'rst_a'), ('ce_a', 'ce_a')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_dpram_32x32: [('clk_a', 'clk_a'), ('rst_a', 'rst_a'), ('ce_a', 'ce_a')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_fpu_arith: [('clk_i', 'clk_i'), ('opa_i', 'opa_i'), ('opb_i', 'opb_i')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for fpu_prenorm_addsub: [('clk_i', 'clk_i'), ('opa_i', 'opa_i'), ('opb_i', 'opb_i')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for fpu_addsub: [('clk_i', 'clk_i'), ('fpu_op_i', 'fpu_op_i'), ('fracta_i', 'fracta_i')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for fpu_postnorm_addsub: [('clk_i', 'clk_i'), ('opa_i', 'opa_i'), ('opb_i', 'opb_i')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for fpu_pre_norm_mul: [('clk_i', 'clk_i'), ('opa_i', 'opa_i'), ('opb_i', 'opb_i')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for fpu_mul: [('clk_i', 'clk_i'), ('fracta_i', 'fracta_i'), ('fractb_i', 'fractb_i')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for fpu_post_norm_mul: [('clk_i', 'clk_i'), ('opa_i', 'opa_i'), ('opb_i', 'opb_i')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for fpu_pre_norm_div: [('clk_i', 'clk_i'), ('opa_i', 'opa_i'), ('opb_i', 'opb_i')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for fpu_div: [('clk_i', 'clk_i'), ('dvdnd_i', 'dvdnd_i'), ('dvsor_i', 'dvsor_i')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for fpu_post_norm_div: [('clk_i', 'clk_i'), ('opa_i', 'opa_i'), ('opb_i', 'opb_i')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_fpu_fcmp: [('opb', 'opb'), ('opa', 'opa'), ('unordered', ZeroExt(22, bvredand(Extract(30, 23, opa))) &
+LShR(Extract(22, 0, opa), ZeroExt(18, 22)) &
+1 |
+ZeroExt(22, bvredand(Extract(30, 23, opb))) &
+LShR(Extract(22, 0, opb), ZeroExt(18, 22)) &
+1 |
+ZeroExt(22,
+        bvredand(Extract(30, 23, opa)) &
+        If(0 ==
+           LShR(Extract(22, 0, opa), ZeroExt(18, 22)) & 1,
+           1,
+           0) &
+        bvredor(Extract(21, 0, Extract(22, 0, opa))) |
+        bvredand(Extract(30, 23, opb)) &
+        If(0 ==
+           LShR(Extract(22, 0, opb), ZeroExt(18, 22)) & 1,
+           1,
+           0) &
+        bvredor(Extract(21, 0, Extract(22, 0, opb)))))]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_fpu_intfloat_conv: [('clk', 'clk'), ('rmode', 'rmode'), ('fpu_op', 'fpu_op')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for u0: [('clk', 'clk'), ('opb', 'opb'), ('opa', 'opa')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for u4: [('clk', 'clk'), ('fpu_op', 'fpu_op'), ('opas', 'opas')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_iwb_biu: []
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_rfram_generic: [('clk', 'clk'), ('rst', 'rst'), ('ce_a', 'ce_a')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_sb_fifo: [('clk_i', 'clk_i'), ('rst_i', 'rst_i'), ('dat_i', 'dat_i')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_spram_1024x32: [('clk', 'clk'), ('rst', 'rst'), ('ce', 'ce')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_spram_1024x32_bw: [('clk', 'clk'), ('rst', 'rst'), ('ce', 'ce')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_spram_1024x8: [('clk', 'clk'), ('rst', 'rst'), ('ce', 'ce')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_spram_128x32: [('clk', 'clk'), ('rst', 'rst'), ('ce', 'ce')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_spram_2048x32: [('clk', 'clk'), ('rst', 'rst'), ('ce', 'ce')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_spram_2048x32_bw: [('clk', 'clk'), ('rst', 'rst'), ('ce', 'ce')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_spram_2048x8: [('clk', 'clk'), ('rst', 'rst'), ('ce', 'ce')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_spram_256x21: [('clk', 'clk'), ('rst', 'rst'), ('ce', 'ce')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_spram_32_bw: [('clk', 'clk'), ('ce', 'ce'), ('we', 'we')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_spram_32x24: [('clk', 'clk'), ('rst', 'rst'), ('ce', 'ce')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_spram_512x20: [('clk', 'clk'), ('rst', 'rst'), ('ce', 'ce')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_spram_64x14: [('clk', 'clk'), ('rst', 'rst'), ('ce', 'ce')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_spram_64x22: [('clk', 'clk'), ('rst', 'rst'), ('ce', 'ce')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_spram_64x24: [('clk', 'clk'), ('rst', 'rst'), ('ce', 'ce')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_top: []
+DEBUG:SYLQ_LOGGER:  cycle_store sample for iwb_biu: [('clk', 'clk'), ('rst', 'rst'), ('clmode', 'clmode')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for dwb_biu: [('clk', 'clk'), ('rst', 'rst'), ('clmode', 'clmode')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_immu_top: [('clk', 'clk'), ('rst', 'rst'), ('ic_en', 'ic_en')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_immu_tlb: []
+DEBUG:SYLQ_LOGGER:  cycle_store sample for itlb_mr_ram: [('clk', 'clk'), ('ce', 'ce'), ('we', 'we')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for itlb_tr_ram: [('clk', 'clk'), ('ce', 'ce'), ('we', 'we')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_ic_top: [('clk', 'clk'), ('rst', 'rst'), ('icbiu_dat_o', 0)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_ic_fsm: [('clk', 'clk'), ('rst', 'rst'), ('ic_en', 'ic_en')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_ic_ram: []
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_ic_tag: []
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_cpu: [('clk', 'clk'), ('rst', 'rst'), ('ic_en', 0)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_genpc: [('clk', 'clk'), ('rst', 'rst'), ('icpu_adr_o', 'icpu_adr_o')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_if: [('clk', 'clk'), ('rst', 'rst'), ('icpu_dat_i', 'icpu_dat_i')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_ctrl: [('clk', 'clk'), ('rst', 'rst'), ('id_freeze', 'id_freeze')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_rf: [('clk', 'clk'), ('rst', 'rst'), ('cy_we_i', 'cy_we_i')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for rf_a: [('clk_a', 'clk_a'), ('ce_a', 'ce_a'), ('addr_a', 'addr_a')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for rf_b: [('clk_a', 'clk_a'), ('ce_a', 'ce_a'), ('addr_a', 'addr_a')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_operandmuxes: [('clk', 'clk'), ('rst', 'rst'), ('id_freeze', 'id_freeze')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_alu: [('a', 'a'), ('b', 'b'), ('mult_mac_result', 'mult_mac_result')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_fpu: []
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_mult_mac: [('clk', 'clk'), ('rst', 'rst'), ('ex_freeze', 'ex_freeze')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_gmultp2_32x32: [('X', 'X'), ('Y', 'Y'), ('CLK', 'CLK')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_sprs: [('clk', 'clk'), ('rst', 'rst'), ('flagforw', 'flagforw')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_lsu: [('clk', 'clk'), ('rst', 'rst'), ('id_addrbase', 'id_addrbase')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_mem2reg: [('addr', 'addr'), ('lsu_op', 'lsu_op'), ('memdata', 'memdata')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_reg2mem: [('addr', 'addr'), ('lsu_op', 'lsu_op'), ('regdata', 'regdata')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_wbmux: [('clk', 'clk'), ('rst', 'rst'), ('wb_freeze', 'wb_freeze')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_freeze: [('clk', 'clk'), ('rst', 'rst'), ('multicycle', 'multicycle')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_except: [('clk', 'clk'), ('rst', 'rst'), ('sig_ibuserr', 'sig_ibuserr')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_cfgr: [('spr_addr', 'spr_addr'), ('spr_dat_o', 'spr_dat_o')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_dmmu_top: [('clk', 'clk'), ('rst', 'rst'), ('dc_en', 'dc_en')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_dmmu_tlb: []
+DEBUG:SYLQ_LOGGER:  cycle_store sample for dtlb_ram: [('clk', 'clk'), ('ce', 'ce'), ('we', 'we')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for dtlb_tr_ram: [('clk', 'clk'), ('ce', 'ce'), ('we', 'we')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_dc_top: []
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_qmem_top: []
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_sb: []
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_du: [('clk', 'clk'), ('rst', 'rst'), ('dcpu_cycstb_i', 'dcpu_cycstb_i')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_pic: [('clk', 'clk'), ('rst', 'rst'), ('spr_cs', 'spr_cs')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_tt: [('clk', 'clk'), ('rst', 'rst'), ('du_stall', 'du_stall')]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_pm: []
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_tpram_32x32: [('clk_a', 'clk_a'), ('rst_a', 'rst_a'), ('ce_a', 'ce_a')]
+DEBUG:SYLQ_LOGGER:explore_block: or1200_dc_fsm (38 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_dpram_256x32 (3 paths)
+DEBUG:SYLQ_LOGGER:[CFG_ASSERT] cfg_p1 src_bb=0 guard_idx=0 cond=true cond_z3=1 == rst_a
+DEBUG:SYLQ_LOGGER:[CFG_ASSERT] cfg_p1 src_bb=0 guard_idx=0 cond=false cond_z3=1 == rst_a
+DEBUG:SYLQ_LOGGER:[CFG_ASSERT] cfg_p2 src_bb=2 guard_idx=2 cond=true cond_z3=ce_a
+DEBUG:SYLQ_LOGGER:[CFG_ASSERT] cfg_p1 src_bb=0 guard_idx=0 cond=false cond_z3=1 == rst_a
+DEBUG:SYLQ_LOGGER:[CFG_ASSERT] cfg_p2 src_bb=2 guard_idx=None cond=false cond_z3=ce_a
+DEBUG:SYLQ_LOGGER:explore_block: or1200_dpram_256x32 (2 paths)
+DEBUG:SYLQ_LOGGER:[CFG_ASSERT] cfg_p1 src_bb=0 guard_idx=0 cond=true cond_z3=And(ce_b != 0, we_b != 0)
+DEBUG:SYLQ_LOGGER:[CFG_ASSERT] cfg_p1 src_bb=0 guard_idx=None cond=false cond_z3=And(ce_b != 0, we_b != 0)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_dpram_32x32 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_dpram_32x32 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_arith (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_arith (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_arith (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_arith (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_arith (7 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_prenorm_addsub (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_prenorm_addsub (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_prenorm_addsub (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_prenorm_addsub (29 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_addsub (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_postnorm_addsub (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_postnorm_addsub (28 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_postnorm_addsub (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_postnorm_addsub (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_pre_norm_mul (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_mul (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_mul (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_mul (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_mul (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_mul (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_mul (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_mul (48 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_mul (49 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_mul (8 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_mul (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_mul (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_pre_norm_div (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_pre_norm_div (25 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_pre_norm_div (25 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_pre_norm_div (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_div (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_div (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_div (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_div (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_div (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_div (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_div (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_div (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_div (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_div (28 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_div (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_fcmp (28 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u4 (48 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u4 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u4 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u4 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u4 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u4 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_rfram_generic (34 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_rfram_generic (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_rfram_generic (32 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_rfram_generic (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_rfram_generic (32 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_sb_fifo (18 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_1024x32 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_1024x32 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_1024x32_bw (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_1024x32_bw (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_1024x32_bw (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_1024x32_bw (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_1024x32_bw (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_1024x8 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_1024x8 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_128x32 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_128x32 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_2048x32 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_2048x32 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_2048x32_bw (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_2048x32_bw (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_2048x32_bw (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_2048x32_bw (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_2048x32_bw (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_2048x8 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_2048x8 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_256x21 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_256x21 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_32_bw (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_32_bw (17 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_32x24 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_32x24 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_512x20 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_512x20 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_64x14 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_64x14 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_64x22 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_64x22 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_64x24 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_64x24 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: iwb_biu (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: iwb_biu (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: iwb_biu (8 paths)
+DEBUG:SYLQ_LOGGER:explore_block: iwb_biu (49 paths)
+DEBUG:SYLQ_LOGGER:explore_block: iwb_biu (28 paths)
+DEBUG:SYLQ_LOGGER:explore_block: iwb_biu (55 paths)
+DEBUG:SYLQ_LOGGER:explore_block: dwb_biu (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: dwb_biu (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: dwb_biu (8 paths)
+DEBUG:SYLQ_LOGGER:explore_block: dwb_biu (49 paths)
+DEBUG:SYLQ_LOGGER:explore_block: dwb_biu (28 paths)
+DEBUG:SYLQ_LOGGER:explore_block: dwb_biu (55 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_immu_top (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_immu_top (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_immu_top (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_immu_top (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_immu_top (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_immu_top (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_immu_top (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: itlb_mr_ram (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: itlb_mr_ram (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: itlb_tr_ram (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: itlb_tr_ram (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ic_top (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ic_top (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ic_fsm (48 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_cpu (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_cpu (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_cpu (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_genpc (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_genpc (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_genpc (11 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_genpc (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_genpc (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_if (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_if (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_if (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_if (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_if (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (10 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (15 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (16 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (6 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (15 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (6 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (22 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (11 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (10 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_rf (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_rf (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_rf (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: rf_a (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: rf_a (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: rf_b (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: rf_b (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_operandmuxes (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_operandmuxes (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_operandmuxes (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_operandmuxes (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_alu (13 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_alu (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_alu (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_alu (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_alu (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_alu (7 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_alu (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_mult_mac (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_mult_mac (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_mult_mac (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_mult_mac (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_mult_mac (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_mult_mac (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_mult_mac (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_mult_mac (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_mult_mac (7 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_mult_mac (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_mult_mac (7 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_gmultp2_32x32 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_gmultp2_32x32 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_gmultp2_32x32 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_gmultp2_32x32 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_sprs (32 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_sprs (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_sprs (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_sprs (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_sprs (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_sprs (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_sprs (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_sprs (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_sprs (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_sprs (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_sprs (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_sprs (10 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_lsu (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_lsu (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_lsu (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_lsu (15 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_mem2reg (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_mem2reg (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_reg2mem (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_reg2mem (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_reg2mem (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_reg2mem (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_wbmux (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_wbmux (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_freeze (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_freeze (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_freeze (6 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_except (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_except (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_except (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_except (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_except (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_except (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_except (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_except (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_except (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_except (90 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_cfgr (10 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_dmmu_top (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_dmmu_top (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: dtlb_ram (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: dtlb_ram (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: dtlb_tr_ram (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: dtlb_tr_ram (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_du (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_du (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_du (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_du (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_du (15 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_du (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_du (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_du (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_du (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_du (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_du (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_pic (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_pic (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_pic (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_tt (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_tt (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_tt (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_tpram_32x32 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_tpram_32x32 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_tpram_32x32 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_tpram_32x32 (3 paths)
+INFO:SYLQ_LOGGER:Phase: merge_block_results (cycle 1)
+DEBUG:SYLQ_LOGGER:  merge or1200_dc_fsm (1/79): 1 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_dc_ram (2/79): 0 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_dc_tag (3/79): 0 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_dpram_256x32 (4/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_dpram_32x32 (5/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_fpu_arith (6/79): 5 blocks
+DEBUG:SYLQ_LOGGER:  merge fpu_prenorm_addsub (7/79): 4 blocks
+DEBUG:SYLQ_LOGGER:  merge fpu_addsub (8/79): 1 blocks
+DEBUG:SYLQ_LOGGER:  merge fpu_postnorm_addsub (9/79): 4 blocks
+DEBUG:SYLQ_LOGGER:  merge fpu_pre_norm_mul (10/79): 1 blocks
+DEBUG:SYLQ_LOGGER:  merge fpu_mul (11/79): 4 blocks
+DEBUG:SYLQ_LOGGER:  merge fpu_post_norm_mul (12/79): 7 blocks
+DEBUG:SYLQ_LOGGER:  merge fpu_pre_norm_div (13/79): 4 blocks
+DEBUG:SYLQ_LOGGER:  merge fpu_div (14/79): 3 blocks
+DEBUG:SYLQ_LOGGER:  merge fpu_post_norm_div (15/79): 8 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_fpu_fcmp (16/79): 1 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_fpu_intfloat_conv (17/79): 20 blocks
+DEBUG:SYLQ_LOGGER:  merge u0 (18/79): 24 blocks
+DEBUG:SYLQ_LOGGER:  merge u4 (19/79): 6 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_iwb_biu (20/79): 0 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_rfram_generic (21/79): 5 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_sb_fifo (22/79): 1 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_spram_1024x32 (23/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_spram_1024x32_bw (24/79): 5 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_spram_1024x8 (25/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_spram_128x32 (26/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_spram_2048x32 (27/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_spram_2048x32_bw (28/79): 5 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_spram_2048x8 (29/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_spram_256x21 (30/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_spram_32_bw (31/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_spram_32x24 (32/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_spram_512x20 (33/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_spram_64x14 (34/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_spram_64x22 (35/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_spram_64x24 (36/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_top (37/79): 0 blocks
+DEBUG:SYLQ_LOGGER:  merge iwb_biu (38/79): 6 blocks
+DEBUG:SYLQ_LOGGER:  merge dwb_biu (39/79): 6 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_immu_top (40/79): 7 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_immu_tlb (41/79): 0 blocks
+DEBUG:SYLQ_LOGGER:  merge itlb_mr_ram (42/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge itlb_tr_ram (43/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_ic_top (44/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_ic_fsm (45/79): 1 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_ic_ram (46/79): 0 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_ic_tag (47/79): 0 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_cpu (48/79): 3 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_genpc (49/79): 5 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_if (50/79): 5 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_ctrl (51/79): 28 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_rf (52/79): 3 blocks
+DEBUG:SYLQ_LOGGER:  merge rf_a (53/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge rf_b (54/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_operandmuxes (55/79): 4 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_alu (56/79): 7 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_fpu (57/79): 0 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_mult_mac (58/79): 11 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_gmultp2_32x32 (59/79): 4 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_sprs (60/79): 12 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_lsu (61/79): 4 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_mem2reg (62/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_reg2mem (63/79): 4 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_wbmux (64/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_freeze (65/79): 3 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_except (66/79): 10 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_cfgr (67/79): 1 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_dmmu_top (68/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_dmmu_tlb (69/79): 0 blocks
+DEBUG:SYLQ_LOGGER:  merge dtlb_ram (70/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge dtlb_tr_ram (71/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_dc_top (72/79): 0 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_qmem_top (73/79): 0 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_sb (74/79): 0 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_du (75/79): 11 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_pic (76/79): 3 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_tt (77/79): 3 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_pm (78/79): 0 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_tpram_32x32 (79/79): 4 blocks
+INFO:SYLQ_LOGGER:Advancing register state to cycle 2
+INFO:SYLQ_LOGGER:--- Cycle 2/2 ---
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_dc_fsm: [('clk', 0JtQlirxS9htW0Zf), ('rst', uU0HQlqILd9ryrx9), ('dc_en', RpODGgnZXFAv2Se3)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_dc_ram: []
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_dc_tag: []
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_dpram_256x32: [('clk_a', PEHsxtV5v0Hs2UZx), ('rst_a', PYKX5BzqyGM8Y0BS), ('ce_a', ygByW8QI4c8YKsnM)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_dpram_32x32: [('clk_a', M1gmfqt8U86CXg2e), ('rst_a', gCEIMIXN4zuJ0CLz), ('ce_a', WxFmmkkoKsLMwIad)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_fpu_arith: [('clk_i', sq1MioZ8fUkFQUQf), ('opa_i', J0jEjgJ9PeiIpYpC), ('opb_i', MrQKL1BJzfaGL2CH)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for fpu_prenorm_addsub: [('clk_i', xdZAkM4k4CuUxElv), ('opa_i', QM2OdEwDENQTcika), ('opb_i', lcUZe5IfizUy9xx7)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for fpu_addsub: [('clk_i', dCEquBAoxDSTWfsG), ('fpu_op_i', gblt7jFpL05fWWnG), ('fracta_i', UH7TUr8j2O7D96zL)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for fpu_postnorm_addsub: [('clk_i', eKdMKM5NSw3WHE4k), ('opa_i', BWAeGWld1CpsGTKE), ('opb_i', GP56owOwE0S3lFgE)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for fpu_pre_norm_mul: [('clk_i', 1m681CGezucLXKLF), ('opa_i', jsgAxisv1j1JjsrO), ('opb_i', kCOQuJLoCB9RoVDp)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for fpu_mul: [('clk_i', 643OZecgt3REoMAf), ('fracta_i', bpq8yOpRlBY0RUrj), ('fractb_i', uHbTMpwOxkbfNid9)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for fpu_post_norm_mul: [('clk_i', 6uslYb30inFtG1P9), ('opa_i', I8CpzurSvEZwzYUD), ('opb_i', 3p1H1BFS6ph3AyyP)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for fpu_pre_norm_div: [('clk_i', I2w4WXVRd11si7Sr), ('opa_i', Sx35BookL5HmGKUp), ('opb_i', uPf5SUPTAO0BqLN8)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for fpu_div: [('clk_i', SwM6JpTjEhex4Nfs), ('dvdnd_i', 5tZt3kbrVYg9xSXh), ('dvsor_i', 1ARLEa8ZyZI3mIuA)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for fpu_post_norm_div: [('clk_i', 4E6aqYn0QlYxMsob), ('opa_i', QJQWsmRCbfc11jSg), ('opb_i', uVXFt3HBUZoinLF7)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_fpu_fcmp: [('opb', LcI677MUfb82hDEr), ('opa', ZBgkLrqZTlBc7SIE), ('unordered', CnXiDJjz0pkjGwpb)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_fpu_intfloat_conv: [('clk', gpmeVgrv4WrAas26), ('rmode', InaaqYxoJGQQabk6), ('fpu_op', TyopvByuGAJP5tVX)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for u0: [('clk', aR8Ss8wTalBUVqDx), ('opb', ubQB74Z8wsMi43od), ('opa', aFTrM4wLzrX2l7CD)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for u4: [('clk', kK1rxcCb2wdOVkv0), ('fpu_op', N8BAomneeKrEzP9Y), ('opas', FSKfAUagznLYJDf9)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_iwb_biu: []
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_rfram_generic: [('clk', 0kdScrbqkYdMBJIz), ('rst', FIAWz5FcLPnocarZ), ('ce_a', mSKf2WvuIgWm7DeG)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_sb_fifo: [('clk_i', 2airkllxc09c9Sw1), ('rst_i', FhrtrwlaNPkFzVIi), ('dat_i', VKTowQ8NlmiI0gq6)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_spram_1024x32: [('clk', Npl0vkI6sBuR4pvW), ('rst', Dq6DHFpwSj9Lsecc), ('ce', qgWzpxlJ8CRZaN6E)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_spram_1024x32_bw: [('clk', 9t5OfzLZAxbxAh2b), ('rst', DHbhl0jSx4K9Z95x), ('ce', ENg8eIDvp98EH4aO)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_spram_1024x8: [('clk', NFrrT0VatQwrrjFa), ('rst', Hteh3VTE55BRIuT6), ('ce', zvjhIqXgLoTxHPv7)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_spram_128x32: [('clk', sK2g2EgYuEbZf1PK), ('rst', kVu6zEVDaLb3nt9x), ('ce', vXizQo2CFZAsI10V)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_spram_2048x32: [('clk', zPIfiNfTTTHg7hrN), ('rst', 1CVrh6VvCGdddNnD), ('ce', MNyM6hYeN3bmGC98)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_spram_2048x32_bw: [('clk', g22C81K1kqrzvDAu), ('rst', CAh7KklZYBGMMQ8p), ('ce', HEgE4vmjZeY4NBBs)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_spram_2048x8: [('clk', JQdNcJ2PMGFhx4It), ('rst', sqPn9FcEAw9tCfB4), ('ce', Jb9X1AljJIJ0T05V)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_spram_256x21: [('clk', eej9z5ObImhbNU2k), ('rst', Y9O7RJD38HxjIhqz), ('ce', SFCNDYcWBxvvG0bb)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_spram_32_bw: [('clk', MgGLY2u9kmanwcnr), ('ce', mWuzy169ucCqFnj2), ('we', pofDnNXTdaZgSG7q)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_spram_32x24: [('clk', 2UYYbLulREMP1jCy), ('rst', DQJ0YZrUwpzR2zAm), ('ce', 3XydtV1d1sCrGjTs)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_spram_512x20: [('clk', ZYVPjoP3WDNx7y3X), ('rst', yxd4tzSCMz4A0KEK), ('ce', KyWg4CdGjwNC76GW)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_spram_64x14: [('clk', OM2QL8RRf9xgCCrM), ('rst', TMjYBv97qwO9HvBt), ('ce', b81e2y6qKhJmi5FI)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_spram_64x22: [('clk', yNkEneolImOaMIMg), ('rst', 8dTvFvBmtksWbek8), ('ce', mBmR9pDZK4f4lt8o)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_spram_64x24: [('clk', IQSLO6OZ1Kb3WK8p), ('rst', 53Ej57vvxpkQcrg2), ('ce', v8K7AG8ARvnQGCI9)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_top: []
+DEBUG:SYLQ_LOGGER:  cycle_store sample for iwb_biu: [('clk', l3U35emamQLNfRsG), ('rst', 4fKRg6Zckq8OkHh2), ('clmode', Zu6bothIwk6Gqdvh)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for dwb_biu: [('clk', s4QOukQitlPoL4Pk), ('rst', LRRcMRoJRd45s8BT), ('clmode', 3WgaJcpaWO2q429g)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_immu_top: [('clk', OYyL46OdRTzPVxhr), ('rst', GElNIyDc80TnjZr5), ('ic_en', 1HZmt7cs9zRoNO3P)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_immu_tlb: []
+DEBUG:SYLQ_LOGGER:  cycle_store sample for itlb_mr_ram: [('clk', 1dUgu7iNP9d4OtZL), ('ce', aeYhUTixmGTjNMrT), ('we', DwKoU1MDw9XRGFkB)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for itlb_tr_ram: [('clk', wk1MBH3NMZQj9fFl), ('ce', xMfSH2V889V0un6m), ('we', hs95TOWO48EQRPHR)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_ic_top: [('clk', CQWXA2nBci9iCbSQ), ('rst', tk2su5dthpCE6sLU), ('icbiu_dat_o', s0ZF7fO4adrpfvmB)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_ic_fsm: [('clk', zBoWumUh08agYWrc), ('rst', FSfPvjgHO6EBovol), ('ic_en', JGFKSmNsO7YiVwHv)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_ic_ram: []
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_ic_tag: []
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_cpu: [('clk', C188QAjReYvXUVx5), ('rst', V6zbMbzhY2gW6J2f), ('ic_en', O05WEeBRK85phAAz)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_genpc: [('clk', oKezwNVacT9NDn0S), ('rst', eC0ylOoXpobHWmHj), ('icpu_adr_o', g0Yc0ckNTzn5SkPo)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_if: [('clk', 2D4nJn1WTno14nO3), ('rst', JIzreX1HsdEzcAMo), ('icpu_dat_i', x0o0Z7LmyyHv0mZF)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_ctrl: [('clk', ICPeL5b2EkGj7sGP), ('rst', 424k2hZmtAOmPaGP), ('id_freeze', icK5tAFOtU0ti9bG)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_rf: [('clk', HfgGgvPEL4BaP3xc), ('rst', CwfJg4E25IoL1TQ3), ('cy_we_i', Tf3dw3Wyw8GHZEOv)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for rf_a: [('clk_a', KU2lCZPIx0czRtN3), ('ce_a', E5AbuJJ6444CJTDE), ('addr_a', YfxHBVY1Duol4AwQ)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for rf_b: [('clk_a', 3RDPUY6rCWk7XfcN), ('ce_a', eMydPtPT2MCU55lC), ('addr_a', iv6RHo4LqL8hmEXK)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_operandmuxes: [('clk', R4UqZHTXoqzghCMT), ('rst', AdwLYoP7fOiQDWcp), ('id_freeze', GBFjI2ItVgse8zd6)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_alu: [('a', OEnWv53dqxWoKJ19), ('b', 7QrgfRMWBV3BIzcJ), ('mult_mac_result', 3pr2TBM53FBmREW9)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_fpu: []
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_mult_mac: [('clk', 0cuVUni8MwySn5Vu), ('rst', RldW1cZaHk7BMGxN), ('ex_freeze', aLdOCAKXVkc35M1y)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_gmultp2_32x32: [('X', oMxJUVN6IwDeuGGV), ('Y', nLmZvfSYFoDoIHy4), ('CLK', Zhf7Owe8hkhN83sO)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_sprs: [('clk', R3GBV0JFODAWZnz3), ('rst', HPHhdfifHK92T6Lz), ('flagforw', Lf4139OKtDHT5Kiq)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_lsu: [('clk', CaMta9srsBS4swIL), ('rst', yhxznn38BmeOIKlQ), ('id_addrbase', bM9oMTLbiAqn5Eru)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_mem2reg: [('addr', 7V0IAojsrfmWW5yZ), ('lsu_op', ZLbMNIknJqb1USGf), ('memdata', Fo8wKIjyJk3JJJsF)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_reg2mem: [('addr', acZGtQv7zPVlFgBI), ('lsu_op', xJYkAlVrxLUAOT80), ('regdata', 9rK5AhFGpIupRq2D)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_wbmux: [('clk', zvEfIFQzTkDFs9C8), ('rst', 73xzREkP3VessJBS), ('wb_freeze', nqaxUq07oxP3IIrU)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_freeze: [('clk', zIR2ZzTbPZfxzXTJ), ('rst', Ncm9OCT75OfoihX7), ('multicycle', R0FUStG4j44Yg6cd)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_except: [('clk', I7KRceAGlfQGgyLT), ('rst', BdnWdaQsh1dBoYFG), ('sig_ibuserr', PoANSJMBD7yj5Kpl)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_cfgr: [('spr_addr', KKDJMiHtwuW9hYSP), ('spr_dat_o', tJgFqIG2HYawtidN)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_dmmu_top: [('clk', YMrsLJHCJNR3ze2u), ('rst', oQJUKLWIWLwETQCa), ('dc_en', 6vou3opxYyG5TcTP)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_dmmu_tlb: []
+DEBUG:SYLQ_LOGGER:  cycle_store sample for dtlb_ram: [('clk', igUGCcKNxHKCIAUW), ('ce', 1N3ULbI6dQE8Gi8X), ('we', U0KqH8H5DgyuZE4P)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for dtlb_tr_ram: [('clk', xcZa10z9d0QouzsW), ('ce', oLN86naxgoSGuTpr), ('we', ohTeN5cPgTNi6LtF)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_dc_top: []
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_qmem_top: []
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_sb: []
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_du: [('clk', 5gYV0smZCm1jvXwZ), ('rst', sGEyV27NIjHeVHO8), ('dcpu_cycstb_i', kjPemy3WOwG9vppn)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_pic: [('clk', x2HG52cX8YY9LJeO), ('rst', gnMBpSWwD8JCEuVn), ('spr_cs', QhQbCSErZ96fS2KU)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_tt: [('clk', b4WhNemLQ17KTJ8c), ('rst', yLuR1xnaya8aiP05), ('du_stall', scPz0cPCQNn2Ed40)]
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_pm: []
+DEBUG:SYLQ_LOGGER:  cycle_store sample for or1200_tpram_32x32: [('clk_a', X3xVHEUq4qyrKqA0), ('rst_a', RDn2JnVsH5ygsnvD), ('ce_a', gWabwblPL3HLmMAL)]
+DEBUG:SYLQ_LOGGER:explore_block: or1200_dc_fsm (38 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_dpram_256x32 (3 paths)
+DEBUG:SYLQ_LOGGER:[CFG_ASSERT] cfg_p1 src_bb=0 guard_idx=0 cond=true cond_z3=PYKX5BzqyGM8Y0BS == ZeroExt(31, 1)
+DEBUG:SYLQ_LOGGER:[CFG_ASSERT] cfg_p1 src_bb=0 guard_idx=0 cond=false cond_z3=PYKX5BzqyGM8Y0BS == ZeroExt(31, 1)
+DEBUG:SYLQ_LOGGER:[CFG_ASSERT] cfg_p2 src_bb=2 guard_idx=2 cond=true cond_z3=ygByW8QI4c8YKsnM
+DEBUG:SYLQ_LOGGER:[CFG_ASSERT] cfg_p1 src_bb=0 guard_idx=0 cond=false cond_z3=PYKX5BzqyGM8Y0BS == ZeroExt(31, 1)
+DEBUG:SYLQ_LOGGER:[CFG_ASSERT] cfg_p2 src_bb=2 guard_idx=None cond=false cond_z3=ygByW8QI4c8YKsnM
+DEBUG:SYLQ_LOGGER:explore_block: or1200_dpram_256x32 (2 paths)
+DEBUG:SYLQ_LOGGER:[CFG_ASSERT] cfg_p1 src_bb=0 guard_idx=0 cond=true cond_z3=And(tWDyvkk4O0g8bD5I != 0, 5vm6mKgm24myoxdy != 0)
+DEBUG:SYLQ_LOGGER:[CFG_ASSERT] cfg_p1 src_bb=0 guard_idx=None cond=false cond_z3=And(tWDyvkk4O0g8bD5I != 0, 5vm6mKgm24myoxdy != 0)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_dpram_32x32 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_dpram_32x32 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_arith (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_arith (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_arith (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_arith (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_arith (7 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_prenorm_addsub (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_prenorm_addsub (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_prenorm_addsub (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_prenorm_addsub (29 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_addsub (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_postnorm_addsub (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_postnorm_addsub (28 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_postnorm_addsub (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_postnorm_addsub (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_pre_norm_mul (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_mul (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_mul (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_mul (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_mul (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_mul (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_mul (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_mul (48 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_mul (49 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_mul (8 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_mul (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_mul (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_pre_norm_div (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_pre_norm_div (25 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_pre_norm_div (25 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_pre_norm_div (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_div (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_div (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_div (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_div (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_div (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_div (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_div (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_div (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_div (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_div (28 paths)
+DEBUG:SYLQ_LOGGER:explore_block: fpu_post_norm_div (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_fcmp (28 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_fpu_intfloat_conv (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u0 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u4 (48 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u4 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u4 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u4 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u4 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: u4 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_rfram_generic (34 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_rfram_generic (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_rfram_generic (32 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_rfram_generic (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_rfram_generic (32 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_sb_fifo (18 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_1024x32 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_1024x32 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_1024x32_bw (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_1024x32_bw (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_1024x32_bw (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_1024x32_bw (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_1024x32_bw (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_1024x8 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_1024x8 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_128x32 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_128x32 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_2048x32 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_2048x32 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_2048x32_bw (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_2048x32_bw (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_2048x32_bw (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_2048x32_bw (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_2048x32_bw (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_2048x8 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_2048x8 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_256x21 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_256x21 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_32_bw (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_32_bw (17 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_32x24 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_32x24 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_512x20 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_512x20 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_64x14 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_64x14 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_64x22 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_64x22 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_64x24 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_spram_64x24 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: iwb_biu (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: iwb_biu (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: iwb_biu (8 paths)
+DEBUG:SYLQ_LOGGER:explore_block: iwb_biu (49 paths)
+DEBUG:SYLQ_LOGGER:explore_block: iwb_biu (28 paths)
+DEBUG:SYLQ_LOGGER:explore_block: iwb_biu (55 paths)
+DEBUG:SYLQ_LOGGER:explore_block: dwb_biu (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: dwb_biu (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: dwb_biu (8 paths)
+DEBUG:SYLQ_LOGGER:explore_block: dwb_biu (49 paths)
+DEBUG:SYLQ_LOGGER:explore_block: dwb_biu (28 paths)
+DEBUG:SYLQ_LOGGER:explore_block: dwb_biu (55 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_immu_top (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_immu_top (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_immu_top (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_immu_top (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_immu_top (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_immu_top (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_immu_top (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: itlb_mr_ram (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: itlb_mr_ram (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: itlb_tr_ram (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: itlb_tr_ram (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ic_top (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ic_top (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ic_fsm (48 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_cpu (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_cpu (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_cpu (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_genpc (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_genpc (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_genpc (11 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_genpc (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_genpc (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_if (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_if (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_if (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_if (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_if (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (10 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (15 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (16 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (6 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (15 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (6 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (22 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (11 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (10 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_ctrl (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_rf (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_rf (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_rf (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: rf_a (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: rf_a (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: rf_b (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: rf_b (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_operandmuxes (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_operandmuxes (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_operandmuxes (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_operandmuxes (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_alu (13 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_alu (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_alu (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_alu (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_alu (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_alu (7 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_alu (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_mult_mac (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_mult_mac (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_mult_mac (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_mult_mac (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_mult_mac (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_mult_mac (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_mult_mac (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_mult_mac (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_mult_mac (7 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_mult_mac (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_mult_mac (7 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_gmultp2_32x32 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_gmultp2_32x32 (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_gmultp2_32x32 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_gmultp2_32x32 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_sprs (32 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_sprs (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_sprs (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_sprs (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_sprs (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_sprs (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_sprs (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_sprs (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_sprs (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_sprs (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_sprs (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_sprs (10 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_lsu (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_lsu (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_lsu (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_lsu (15 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_mem2reg (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_mem2reg (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_reg2mem (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_reg2mem (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_reg2mem (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_reg2mem (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_wbmux (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_wbmux (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_freeze (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_freeze (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_freeze (6 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_except (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_except (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_except (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_except (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_except (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_except (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_except (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_except (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_except (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_except (90 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_cfgr (10 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_dmmu_top (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_dmmu_top (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: dtlb_ram (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: dtlb_ram (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: dtlb_tr_ram (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: dtlb_tr_ram (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_du (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_du (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_du (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_du (1 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_du (15 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_du (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_du (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_du (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_du (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_du (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_du (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_pic (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_pic (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_pic (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_tt (4 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_tt (5 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_tt (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_tpram_32x32 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_tpram_32x32 (2 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_tpram_32x32 (3 paths)
+DEBUG:SYLQ_LOGGER:explore_block: or1200_tpram_32x32 (3 paths)
+INFO:SYLQ_LOGGER:Phase: merge_block_results (cycle 2)
+DEBUG:SYLQ_LOGGER:  merge or1200_dc_fsm (1/79): 1 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_dc_ram (2/79): 0 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_dc_tag (3/79): 0 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_dpram_256x32 (4/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_dpram_32x32 (5/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_fpu_arith (6/79): 5 blocks
+DEBUG:SYLQ_LOGGER:  merge fpu_prenorm_addsub (7/79): 4 blocks
+DEBUG:SYLQ_LOGGER:  merge fpu_addsub (8/79): 1 blocks
+DEBUG:SYLQ_LOGGER:  merge fpu_postnorm_addsub (9/79): 4 blocks
+DEBUG:SYLQ_LOGGER:  merge fpu_pre_norm_mul (10/79): 1 blocks
+DEBUG:SYLQ_LOGGER:  merge fpu_mul (11/79): 4 blocks
+DEBUG:SYLQ_LOGGER:  merge fpu_post_norm_mul (12/79): 7 blocks
+DEBUG:SYLQ_LOGGER:  merge fpu_pre_norm_div (13/79): 4 blocks
+DEBUG:SYLQ_LOGGER:  merge fpu_div (14/79): 3 blocks
+DEBUG:SYLQ_LOGGER:  merge fpu_post_norm_div (15/79): 8 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_fpu_fcmp (16/79): 1 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_fpu_intfloat_conv (17/79): 20 blocks
+DEBUG:SYLQ_LOGGER:  merge u0 (18/79): 24 blocks
+DEBUG:SYLQ_LOGGER:  merge u4 (19/79): 6 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_iwb_biu (20/79): 0 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_rfram_generic (21/79): 5 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_sb_fifo (22/79): 1 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_spram_1024x32 (23/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_spram_1024x32_bw (24/79): 5 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_spram_1024x8 (25/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_spram_128x32 (26/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_spram_2048x32 (27/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_spram_2048x32_bw (28/79): 5 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_spram_2048x8 (29/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_spram_256x21 (30/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_spram_32_bw (31/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_spram_32x24 (32/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_spram_512x20 (33/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_spram_64x14 (34/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_spram_64x22 (35/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_spram_64x24 (36/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_top (37/79): 0 blocks
+DEBUG:SYLQ_LOGGER:  merge iwb_biu (38/79): 6 blocks
+DEBUG:SYLQ_LOGGER:  merge dwb_biu (39/79): 6 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_immu_top (40/79): 7 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_immu_tlb (41/79): 0 blocks
+DEBUG:SYLQ_LOGGER:  merge itlb_mr_ram (42/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge itlb_tr_ram (43/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_ic_top (44/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_ic_fsm (45/79): 1 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_ic_ram (46/79): 0 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_ic_tag (47/79): 0 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_cpu (48/79): 3 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_genpc (49/79): 5 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_if (50/79): 5 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_ctrl (51/79): 28 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_rf (52/79): 3 blocks
+DEBUG:SYLQ_LOGGER:  merge rf_a (53/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge rf_b (54/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_operandmuxes (55/79): 4 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_alu (56/79): 7 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_fpu (57/79): 0 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_mult_mac (58/79): 11 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_gmultp2_32x32 (59/79): 4 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_sprs (60/79): 12 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_lsu (61/79): 4 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_mem2reg (62/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_reg2mem (63/79): 4 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_wbmux (64/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_freeze (65/79): 3 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_except (66/79): 10 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_cfgr (67/79): 1 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_dmmu_top (68/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_dmmu_tlb (69/79): 0 blocks
+DEBUG:SYLQ_LOGGER:  merge dtlb_ram (70/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge dtlb_tr_ram (71/79): 2 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_dc_top (72/79): 0 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_qmem_top (73/79): 0 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_sb (74/79): 0 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_du (75/79): 11 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_pic (76/79): 3 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_tt (77/79): 3 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_pm (78/79): 0 blocks
+DEBUG:SYLQ_LOGGER:  merge or1200_tpram_32x32 (79/79): 4 blocks
+WARNING:SYLQ_LOGGER:
+=== TIMEOUT: Execution time limit exceeded ===
+WARNING:SYLQ_LOGGER:  Elapsed time: 59.5053s
+INFO:SYLQ_LOGGER:  Paths explored (feasible): 0
+INFO:SYLQ_LOGGER:  AST branch visits (SymbolicDFS if/case/while): 0 (often 0 in piecewise mode: CFG uses edge constraints, not this counter)
+INFO:SYLQ_LOGGER:  Assertions found: 0
+INFO:SYLQ_LOGGER:  Solver time: feasibility=0.0487s, assertions=0.0000s (total 0.0487s)
+DEBUG:SYLQ_LOGGER:  Feasibility: Z3_checks=16 (merge=0 lazy_product=16 cross_module=0), disjoint_skip_merge=0, disjoint_skip_cross=0, pruned_merge=0, pruned_lazy_product=0, pruned_cross_module=0
+INFO:SYLQ_LOGGER:  Result: No violation found within time limit
+INFO:SYLQ_LOGGER:=======================================

@@ -132,7 +132,7 @@ def main():
         dest="log_level",
         default="INFO",
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
-        help="Set Logging level: DEBUG / INFO / WARNING / ERROR. Default: INFO",
+        help="Set Logging level: DEBUG / INFO / WARNING / ERROR / CRITICAL. Default: INFO",
     )
     
     (options, args) = optparser.parse_args()

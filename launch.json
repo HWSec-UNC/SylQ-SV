@@ -1,0 +1,37 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "SylQ-SV: run main (recommended)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "main",
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "1",
+                "--sv",
+                "designs/benchmarks/or1200/or1200.F",
+                "--use_cache",
+                "--explore_time=300"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "SylQ-SV: main.py (alternative)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/main.py",
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "1",
+                "--sv",
+                "designs/benchmarks/or1200/or1200.F",
+                "--use_cache",
+                "--explore_time=300"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true
+        }
+    ]
+}
