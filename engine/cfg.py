@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import pyslang.ast as ps_ast
 from .basic_block_visitor import BasicBlockVisitor
 from helpers.visitor_helpers import handles, build_lookup_table
-
+from logger import logger
 class CFG:
     """Represents the control flow graph of a module/always block"""
     def __init__(self):
@@ -236,7 +236,7 @@ class CFG:
 
     def _print_simple_paths_with_conditions(self, G, paths):
         for i, path in enumerate(paths):
-            print(f"\n--- Path {i} ---")
+            logger.info(f"\n--- Path {i} ---")
             path_str = ""
 
             for j in range(len(path) - 1):
@@ -259,7 +259,7 @@ class CFG:
                 path_str += f"Block({u}) {label}"
 
             path_str += f"Block({path[-1]})"
-            print(path_str)
+            logger.info(path_str)
 
     def save_cfg_visualization(self, G, filename="cfg_output.png"):
         """
@@ -313,7 +313,7 @@ class CFG:
 
         file_ext = os.path.splitext(filename)[1][1:]
         plt.savefig(filename, format=file_ext, bbox_inches='tight', dpi=300)
-        print(f"CFG saved successfully to {os.path.abspath(filename)}")
+        logger.info(f"CFG saved successfully to {os.path.abspath(filename)}")
         plt.close()
 
 class AlwaysBlockVisitor:

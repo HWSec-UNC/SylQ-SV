@@ -1,0 +1,1978 @@
+Executing for 1 clock cycles
+Here
+Branch points explored: 0 (phase: initial)
+Phase: init_state and module traversal
+Phase: traversing module or1200_dc_fsm
+Phase: traversing module or1200_dc_ram
+Phase: traversing module or1200_dc_tag
+Phase: traversing module or1200_dpram_256x32
+Phase: traversing module or1200_dpram_32x32
+Phase: traversing module or1200_fpu_arith
+Phase: traversing module fpu_prenorm_addsub
+Phase: traversing module fpu_addsub
+Phase: traversing module fpu_postnorm_addsub
+Phase: traversing module fpu_pre_norm_mul
+Phase: traversing module fpu_mul
+Phase: traversing module fpu_post_norm_mul
+Phase: traversing module fpu_pre_norm_div
+Phase: traversing module fpu_div
+Phase: traversing module fpu_post_norm_div
+Phase: traversing module or1200_fpu_fcmp
+Phase: traversing module or1200_fpu_intfloat_conv
+Phase: traversing module u0
+Phase: traversing module u4
+Phase: traversing module or1200_iwb_biu
+Phase: traversing module or1200_rfram_generic
+Phase: traversing module or1200_sb_fifo
+Phase: traversing module or1200_spram_1024x32
+Phase: traversing module or1200_spram_1024x32_bw
+Phase: traversing module or1200_spram_1024x8
+Phase: traversing module or1200_spram_128x32
+Phase: traversing module or1200_spram_2048x32
+Phase: traversing module or1200_spram_2048x32_bw
+Phase: traversing module or1200_spram_2048x8
+Phase: traversing module or1200_spram_256x21
+Phase: traversing module or1200_spram_32_bw
+Phase: traversing module or1200_spram_32x24
+Phase: traversing module or1200_spram_512x20
+Phase: traversing module or1200_spram_64x14
+Phase: traversing module or1200_spram_64x22
+Phase: traversing module or1200_spram_64x24
+Phase: traversing module or1200_top
+Phase: traversing module iwb_biu
+Phase: traversing module dwb_biu
+Phase: traversing module or1200_immu_top
+Phase: traversing module or1200_immu_tlb
+Phase: traversing module itlb_mr_ram
+Phase: traversing module itlb_tr_ram
+Phase: traversing module or1200_ic_top
+Phase: traversing module or1200_ic_fsm
+Phase: traversing module or1200_ic_ram
+Phase: traversing module or1200_ic_tag
+Phase: traversing module or1200_cpu
+Phase: traversing module or1200_genpc
+Phase: traversing module or1200_if
+Phase: traversing module or1200_ctrl
+Phase: traversing module or1200_rf
+Phase: traversing module rf_a
+Phase: traversing module rf_b
+Phase: traversing module or1200_operandmuxes
+Phase: traversing module or1200_alu
+Phase: traversing module or1200_fpu
+Phase: traversing module or1200_mult_mac
+Phase: traversing module or1200_gmultp2_32x32
+Phase: traversing module or1200_sprs
+Phase: traversing module or1200_lsu
+Phase: traversing module or1200_mem2reg
+Phase: traversing module or1200_reg2mem
+Phase: traversing module or1200_wbmux
+Phase: traversing module or1200_freeze
+Phase: traversing module or1200_except
+Phase: traversing module or1200_cfgr
+Phase: traversing module or1200_dmmu_top
+Phase: traversing module or1200_dmmu_tlb
+Phase: traversing module dtlb_ram
+Phase: traversing module dtlb_tr_ram
+Phase: traversing module or1200_dc_top
+Phase: traversing module or1200_qmem_top
+Phase: traversing module or1200_sb
+Phase: traversing module or1200_du
+Phase: traversing module or1200_pic
+Phase: traversing module or1200_tt
+Phase: traversing module or1200_pm
+Phase: traversing module or1200_tpram_32x32
+Phase: base_store for module or1200_dc_fsm
+  61 signal(s) initialized in store
+Phase: base_store for module or1200_dc_ram
+Phase: base_store for module or1200_dc_tag
+Phase: base_store for module or1200_dpram_256x32
+  14 signal(s) initialized in store
+Phase: base_store for module or1200_dpram_32x32
+  14 signal(s) initialized in store
+Phase: base_store for module or1200_fpu_arith
+  68 signal(s) initialized in store
+Phase: base_store for module fpu_prenorm_addsub
+  29 signal(s) initialized in store
+Phase: base_store for module fpu_addsub
+  17 signal(s) initialized in store
+Phase: base_store for module fpu_postnorm_addsub
+  44 signal(s) initialized in store
+Phase: base_store for module fpu_pre_norm_mul
+  15 signal(s) initialized in store
+Phase: base_store for module fpu_mul
+  21 signal(s) initialized in store
+Phase: base_store for module fpu_post_norm_mul
+  48 signal(s) initialized in store
+Phase: base_store for module fpu_pre_norm_div
+  23 signal(s) initialized in store
+Phase: base_store for module fpu_div
+  26 signal(s) initialized in store
+Phase: base_store for module fpu_post_norm_div
+  53 signal(s) initialized in store
+Phase: base_store for module or1200_fpu_fcmp
+  35 signal(s) initialized in store
+Phase: base_store for module or1200_fpu_intfloat_conv
+  60 signal(s) initialized in store
+Phase: base_store for module u0
+  31 signal(s) initialized in store
+Phase: base_store for module u4
+  104 signal(s) initialized in store
+Phase: base_store for module or1200_iwb_biu
+Phase: base_store for module or1200_rfram_generic
+  15 signal(s) initialized in store
+Phase: base_store for module or1200_sb_fifo
+  12 signal(s) initialized in store
+Phase: base_store for module or1200_spram_1024x32
+  10 signal(s) initialized in store
+Phase: base_store for module or1200_spram_1024x32_bw
+  13 signal(s) initialized in store
+Phase: base_store for module or1200_spram_1024x8
+  10 signal(s) initialized in store
+Phase: base_store for module or1200_spram_128x32
+  10 signal(s) initialized in store
+Phase: base_store for module or1200_spram_2048x32
+  10 signal(s) initialized in store
+Phase: base_store for module or1200_spram_2048x32_bw
+  13 signal(s) initialized in store
+Phase: base_store for module or1200_spram_2048x8
+  10 signal(s) initialized in store
+Phase: base_store for module or1200_spram_256x21
+  10 signal(s) initialized in store
+Phase: base_store for module or1200_spram_32_bw
+  11 signal(s) initialized in store
+Phase: base_store for module or1200_spram_32x24
+  10 signal(s) initialized in store
+Phase: base_store for module or1200_spram_512x20
+  10 signal(s) initialized in store
+Phase: base_store for module or1200_spram_64x14
+  10 signal(s) initialized in store
+Phase: base_store for module or1200_spram_64x22
+  10 signal(s) initialized in store
+Phase: base_store for module or1200_spram_64x24
+  10 signal(s) initialized in store
+Phase: base_store for module or1200_top
+Phase: base_store for module iwb_biu
+  47 signal(s) initialized in store
+Phase: base_store for module dwb_biu
+  47 signal(s) initialized in store
+Phase: base_store for module or1200_immu_top
+  43 signal(s) initialized in store
+Phase: base_store for module or1200_immu_tlb
+Phase: base_store for module itlb_mr_ram
+  9 signal(s) initialized in store
+Phase: base_store for module itlb_tr_ram
+  9 signal(s) initialized in store
+Phase: base_store for module or1200_ic_top
+  46 signal(s) initialized in store
+Phase: base_store for module or1200_ic_fsm
+  24 signal(s) initialized in store
+Phase: base_store for module or1200_ic_ram
+Phase: base_store for module or1200_ic_tag
+Phase: base_store for module or1200_cpu
+  225 signal(s) initialized in store
+Phase: base_store for module or1200_genpc
+  37 signal(s) initialized in store
+Phase: base_store for module or1200_if
+  27 signal(s) initialized in store
+Phase: base_store for module or1200_ctrl
+  75 signal(s) initialized in store
+Phase: base_store for module or1200_rf
+  44 signal(s) initialized in store
+Phase: base_store for module rf_a
+  14 signal(s) initialized in store
+Phase: base_store for module rf_b
+  14 signal(s) initialized in store
+Phase: base_store for module or1200_operandmuxes
+  17 signal(s) initialized in store
+Phase: base_store for module or1200_alu
+  32 signal(s) initialized in store
+Phase: base_store for module or1200_fpu
+Phase: base_store for module or1200_mult_mac
+  44 signal(s) initialized in store
+Phase: base_store for module or1200_gmultp2_32x32
+  9 signal(s) initialized in store
+Phase: base_store for module or1200_sprs
+  111 signal(s) initialized in store
+Phase: base_store for module or1200_lsu
+  33 signal(s) initialized in store
+Phase: base_store for module or1200_mem2reg
+  5 signal(s) initialized in store
+Phase: base_store for module or1200_reg2mem
+  8 signal(s) initialized in store
+Phase: base_store for module or1200_wbmux
+  12 signal(s) initialized in store
+Phase: base_store for module or1200_freeze
+  27 signal(s) initialized in store
+Phase: base_store for module or1200_except
+  96 signal(s) initialized in store
+Phase: base_store for module or1200_cfgr
+  2 signal(s) initialized in store
+Phase: base_store for module or1200_dmmu_top
+  34 signal(s) initialized in store
+Phase: base_store for module or1200_dmmu_tlb
+Phase: base_store for module dtlb_ram
+  9 signal(s) initialized in store
+Phase: base_store for module dtlb_tr_ram
+  9 signal(s) initialized in store
+Phase: base_store for module or1200_dc_top
+Phase: base_store for module or1200_qmem_top
+Phase: base_store for module or1200_sb
+Phase: base_store for module or1200_du
+  94 signal(s) initialized in store
+Phase: base_store for module or1200_pic
+  15 signal(s) initialized in store
+Phase: base_store for module or1200_tt
+  16 signal(s) initialized in store
+Phase: base_store for module or1200_pm
+Phase: base_store for module or1200_tpram_32x32
+  19 signal(s) initialized in store
+Phase: collecting SVA assertions
+  Found 0 assertion(s) (0 immediate, 0 concurrent), 0 with Z3 expressions
+Phase: explore_block (per-module)
+explore_block: or1200_dc_fsm (38 paths)
+  path 1/38
+  path 38/38
+explore_block: or1200_dpram_256x32 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_dpram_256x32 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_dpram_32x32 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_dpram_32x32 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_fpu_arith (1 paths)
+  path 1/1
+explore_block: or1200_fpu_arith (1 paths)
+  path 1/1
+explore_block: or1200_fpu_arith (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_fpu_arith (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_fpu_arith (7 paths)
+  path 1/7
+  path 7/7
+explore_block: fpu_prenorm_addsub (1 paths)
+  path 1/1
+explore_block: fpu_prenorm_addsub (1 paths)
+  path 1/1
+explore_block: fpu_prenorm_addsub (4 paths)
+  path 1/4
+  path 4/4
+explore_block: fpu_prenorm_addsub (29 paths)
+  path 1/29
+  path 29/29
+explore_block: fpu_addsub (1 paths)
+  path 1/1
+explore_block: fpu_postnorm_addsub (1 paths)
+  path 1/1
+explore_block: fpu_postnorm_addsub (28 paths)
+  path 1/28
+  path 28/28
+explore_block: fpu_postnorm_addsub (4 paths)
+  path 1/4
+  path 4/4
+explore_block: fpu_postnorm_addsub (2 paths)
+  path 1/2
+  path 2/2
+explore_block: fpu_pre_norm_mul (1 paths)
+  path 1/1
+explore_block: fpu_mul (1 paths)
+  path 1/1
+explore_block: fpu_mul (1 paths)
+  path 1/1
+explore_block: fpu_mul (4 paths)
+  path 1/4
+  path 4/4
+explore_block: fpu_mul (3 paths)
+  path 1/3
+  path 3/3
+explore_block: fpu_post_norm_mul (1 paths)
+  path 1/1
+explore_block: fpu_post_norm_mul (1 paths)
+  path 1/1
+explore_block: fpu_post_norm_mul (48 paths)
+  path 1/48
+  path 48/48
+explore_block: fpu_post_norm_mul (49 paths)
+  path 1/49
+  path 49/49
+explore_block: fpu_post_norm_mul (8 paths)
+  path 1/8
+  path 8/8
+explore_block: fpu_post_norm_mul (2 paths)
+  path 1/2
+  path 2/2
+explore_block: fpu_post_norm_mul (2 paths)
+  path 1/2
+  path 2/2
+explore_block: fpu_pre_norm_div (1 paths)
+  path 1/1
+explore_block: fpu_pre_norm_div (25 paths)
+  path 1/25
+  path 25/25
+explore_block: fpu_pre_norm_div (25 paths)
+  path 1/25
+  path 25/25
+explore_block: fpu_pre_norm_div (1 paths)
+  path 1/1
+explore_block: fpu_div (1 paths)
+  path 1/1
+explore_block: fpu_div (4 paths)
+  path 1/4
+  path 4/4
+explore_block: fpu_div (4 paths)
+  path 1/4
+  path 4/4
+explore_block: fpu_post_norm_div (1 paths)
+  path 1/1
+explore_block: fpu_post_norm_div (1 paths)
+  path 1/1
+explore_block: fpu_post_norm_div (2 paths)
+  path 1/2
+  path 2/2
+explore_block: fpu_post_norm_div (1 paths)
+  path 1/1
+explore_block: fpu_post_norm_div (1 paths)
+  path 1/1
+explore_block: fpu_post_norm_div (2 paths)
+  path 1/2
+  path 2/2
+explore_block: fpu_post_norm_div (28 paths)
+  path 1/28
+  path 28/28
+explore_block: fpu_post_norm_div (1 paths)
+  path 1/1
+explore_block: or1200_fpu_fcmp (28 paths)
+  path 1/28
+  path 28/28
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: or1200_fpu_intfloat_conv (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u0 (1 paths)
+  path 1/1
+explore_block: u4 (48 paths)
+  path 1/48
+  path 48/48
+explore_block: u4 (1 paths)
+  path 1/1
+explore_block: u4 (1 paths)
+  path 1/1
+explore_block: u4 (1 paths)
+  path 1/1
+explore_block: u4 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: u4 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_rfram_generic (34 paths)
+  path 1/34
+  path 34/34
+explore_block: or1200_rfram_generic (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_rfram_generic (32 paths)
+  path 1/32
+  path 32/32
+explore_block: or1200_rfram_generic (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_rfram_generic (32 paths)
+  path 1/32
+  path 32/32
+explore_block: or1200_sb_fifo (18 paths)
+  path 1/18
+  path 18/18
+explore_block: or1200_spram_1024x32 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_spram_1024x32 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_1024x32_bw (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_spram_1024x32_bw (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_1024x32_bw (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_1024x32_bw (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_1024x32_bw (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_1024x8 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_spram_1024x8 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_128x32 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_spram_128x32 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_2048x32 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_spram_2048x32 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_2048x32_bw (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_spram_2048x32_bw (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_2048x32_bw (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_2048x32_bw (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_2048x32_bw (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_2048x8 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_spram_2048x8 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_256x21 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_spram_256x21 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_32_bw (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_32_bw (17 paths)
+  path 1/17
+  path 17/17
+explore_block: or1200_spram_32x24 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_spram_32x24 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_512x20 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_spram_512x20 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_64x14 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_spram_64x14 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_64x22 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_spram_64x22 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_spram_64x24 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_spram_64x24 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: iwb_biu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: iwb_biu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: iwb_biu (8 paths)
+  path 1/8
+  path 8/8
+explore_block: iwb_biu (49 paths)
+  path 1/49
+  path 49/49
+explore_block: iwb_biu (28 paths)
+  path 1/28
+  path 28/28
+explore_block: iwb_biu (55 paths)
+  path 1/55
+  path 55/55
+explore_block: dwb_biu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: dwb_biu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: dwb_biu (8 paths)
+  path 1/8
+  path 8/8
+explore_block: dwb_biu (49 paths)
+  path 1/49
+  path 49/49
+explore_block: dwb_biu (28 paths)
+  path 1/28
+  path 28/28
+explore_block: dwb_biu (55 paths)
+  path 1/55
+  path 55/55
+explore_block: or1200_immu_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_immu_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_immu_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_immu_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_immu_top (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_immu_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_immu_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: itlb_mr_ram (2 paths)
+  path 1/2
+  path 2/2
+explore_block: itlb_mr_ram (2 paths)
+  path 1/2
+  path 2/2
+explore_block: itlb_tr_ram (2 paths)
+  path 1/2
+  path 2/2
+explore_block: itlb_tr_ram (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_ic_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_ic_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_ic_fsm (48 paths)
+  path 1/48
+  path 48/48
+explore_block: or1200_cpu (1 paths)
+  path 1/1
+explore_block: or1200_cpu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_cpu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_genpc (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_genpc (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_genpc (11 paths)
+  path 1/11
+  path 11/11
+explore_block: or1200_genpc (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_genpc (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_if (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_if (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_if (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_if (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_if (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_ctrl (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_ctrl (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_ctrl (10 paths)
+  path 1/10
+  path 10/10
+explore_block: or1200_ctrl (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_ctrl (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_ctrl (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_ctrl (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_ctrl (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_ctrl (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_ctrl (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_ctrl (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_ctrl (15 paths)
+  path 1/15
+  path 15/15
+explore_block: or1200_ctrl (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_ctrl (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_ctrl (16 paths)
+  path 1/16
+  path 16/16
+explore_block: or1200_ctrl (6 paths)
+  path 1/6
+  path 6/6
+explore_block: or1200_ctrl (15 paths)
+  path 1/15
+  path 15/15
+explore_block: or1200_ctrl (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_ctrl (6 paths)
+  path 1/6
+  path 6/6
+explore_block: or1200_ctrl (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_ctrl (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_ctrl (22 paths)
+  path 1/22
+  path 22/22
+explore_block: or1200_ctrl (11 paths)
+  path 1/11
+  path 11/11
+explore_block: or1200_ctrl (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_ctrl (10 paths)
+  path 1/10
+  path 10/10
+explore_block: or1200_ctrl (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_ctrl (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_ctrl (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_rf (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_rf (1 paths)
+  path 1/1
+explore_block: or1200_rf (3 paths)
+  path 1/3
+  path 3/3
+explore_block: rf_a (2 paths)
+  path 1/2
+  path 2/2
+explore_block: rf_a (2 paths)
+  path 1/2
+  path 2/2
+explore_block: rf_b (2 paths)
+  path 1/2
+  path 2/2
+explore_block: rf_b (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_operandmuxes (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_operandmuxes (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_operandmuxes (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_operandmuxes (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_alu (13 paths)
+  path 1/13
+  path 13/13
+explore_block: or1200_alu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_alu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_alu (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_alu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_alu (7 paths)
+  path 1/7
+  path 7/7
+explore_block: or1200_alu (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_mult_mac (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_mult_mac (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_mult_mac (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_mult_mac (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_mult_mac (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_mult_mac (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_mult_mac (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_mult_mac (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_mult_mac (7 paths)
+  path 1/7
+  path 7/7
+explore_block: or1200_mult_mac (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_mult_mac (7 paths)
+  path 1/7
+  path 7/7
+explore_block: or1200_gmultp2_32x32 (1 paths)
+  path 1/1
+explore_block: or1200_gmultp2_32x32 (1 paths)
+  path 1/1
+explore_block: or1200_gmultp2_32x32 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_gmultp2_32x32 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_sprs (32 paths)
+  path 1/32
+  path 32/32
+explore_block: or1200_sprs (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_sprs (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_sprs (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_sprs (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_sprs (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_sprs (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_sprs (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_sprs (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_sprs (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_sprs (1 paths)
+  path 1/1
+explore_block: or1200_sprs (10 paths)
+  path 1/10
+  path 10/10
+explore_block: or1200_lsu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_lsu (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_lsu (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_lsu (15 paths)
+  path 1/15
+  path 15/15
+explore_block: or1200_mem2reg (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_mem2reg (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_reg2mem (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_reg2mem (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_reg2mem (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_reg2mem (1 paths)
+  path 1/1
+explore_block: or1200_wbmux (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_wbmux (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_freeze (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_freeze (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_freeze (6 paths)
+  path 1/6
+  path 6/6
+explore_block: or1200_except (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_except (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_except (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_except (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_except (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_except (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_except (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_except (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_except (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_except (90 paths)
+  path 1/90
+  path 90/90
+explore_block: or1200_cfgr (10 paths)
+  path 1/10
+  path 10/10
+explore_block: or1200_dmmu_top (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_dmmu_top (2 paths)
+  path 1/2
+  path 2/2
+explore_block: dtlb_ram (2 paths)
+  path 1/2
+  path 2/2
+explore_block: dtlb_ram (2 paths)
+  path 1/2
+  path 2/2
+explore_block: dtlb_tr_ram (2 paths)
+  path 1/2
+  path 2/2
+explore_block: dtlb_tr_ram (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_du (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_du (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_du (1 paths)
+  path 1/1
+explore_block: or1200_du (1 paths)
+  path 1/1
+explore_block: or1200_du (15 paths)
+  path 1/15
+  path 15/15
+explore_block: or1200_du (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_du (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_du (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_du (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_du (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_du (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_pic (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_pic (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_pic (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_tt (4 paths)
+  path 1/4
+  path 4/4
+explore_block: or1200_tt (5 paths)
+  path 1/5
+  path 5/5
+explore_block: or1200_tt (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_tpram_32x32 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_tpram_32x32 (2 paths)
+  path 1/2
+  path 2/2
+explore_block: or1200_tpram_32x32 (3 paths)
+  path 1/3
+  path 3/3
+explore_block: or1200_tpram_32x32 (3 paths)
+  path 1/3
+  path 3/3
+Phase: merge_block_results (per-module, Paper §4.3)
+  merge or1200_dc_fsm (1/79): 1 blocks
+    -> 25 feasible merged paths
+  merge or1200_dc_ram (2/79): 0 blocks
+    -> 1 feasible merged paths
+  merge or1200_dc_tag (3/79): 0 blocks
+    -> 1 feasible merged paths
+  merge or1200_dpram_256x32 (4/79): 2 blocks
+    merge or1200_dpram_256x32 group 0: block indices [0, 1], per-block outcome counts [3, 2], naive Cartesian size 6
+    -> 6 feasible merged paths
+  merge or1200_dpram_32x32 (5/79): 2 blocks
+    merge or1200_dpram_32x32 group 0: block indices [0, 1], per-block outcome counts [3, 2], naive Cartesian size 6
+    -> 6 feasible merged paths
+  merge or1200_fpu_arith (6/79): 5 blocks
+    merge or1200_fpu_arith: partitioned 5 blocks into 3 independent groups (full product would be 112)
+    merge or1200_fpu_arith group 2: block indices [2, 3, 4], per-block outcome counts [4, 4, 7], naive Cartesian size 112
+    merge or1200_fpu_arith: LazyProduct of 3 groups, sizes=[1, 1, 112], stored=114, logical_size=112
+    -> 112 feasible merged paths (lazy: 3 groups, 114 stored)
+  merge fpu_prenorm_addsub (7/79): 4 blocks
+    merge fpu_prenorm_addsub: partitioned 4 blocks into 3 independent groups (full product would be 116)
+    merge fpu_prenorm_addsub group 2: block indices [2, 3], per-block outcome counts [4, 29], naive Cartesian size 116
+    merge fpu_prenorm_addsub: LazyProduct of 3 groups, sizes=[1, 1, 116], stored=118, logical_size=116
+    -> 116 feasible merged paths (lazy: 3 groups, 118 stored)
+  merge fpu_addsub (8/79): 1 blocks
+    -> 1 feasible merged paths
+  merge fpu_postnorm_addsub (9/79): 4 blocks
+    merge fpu_postnorm_addsub: partitioned 4 blocks into 2 independent groups (full product would be 224)
+    merge fpu_postnorm_addsub group 1: block indices [1, 2, 3], per-block outcome counts [28, 4, 2], naive Cartesian size 224
+    merge fpu_postnorm_addsub: LazyProduct of 2 groups, sizes=[1, 224], stored=225, logical_size=224
+    -> 224 feasible merged paths (lazy: 2 groups, 225 stored)
+  merge fpu_pre_norm_mul (10/79): 1 blocks
+    -> 1 feasible merged paths
+  merge fpu_mul (11/79): 4 blocks
+    merge fpu_mul: partitioned 4 blocks into 3 independent groups (full product would be 12)
+    merge fpu_mul group 2: block indices [2, 3], per-block outcome counts [4, 3], naive Cartesian size 12
+    merge fpu_mul: LazyProduct of 3 groups, sizes=[1, 1, 12], stored=14, logical_size=12
+    -> 12 feasible merged paths (lazy: 3 groups, 14 stored)
+  merge fpu_post_norm_mul (12/79): 7 blocks
+    merge fpu_post_norm_mul: partitioned 7 blocks into 3 independent groups (full product would be 75,264)
+    merge fpu_post_norm_mul group 2: block indices [2, 3, 4, 5, 6], per-block outcome counts [48, 49, 8, 2, 2], naive Cartesian size 75,264
+    [merge-heartbeat] fpu_post_norm_mul_g2: 20.0s elapsed, stack_depth=5, top_level=4, yielded=255, combos_checked=456, pruned=0, cache_hits=455
+    [merge-heartbeat] fpu_post_norm_mul_g2: 40.0s elapsed, stack_depth=5, top_level=4, yielded=503, combos_checked=898, pruned=0, cache_hits=897
+    [merge-heartbeat] fpu_post_norm_mul_g2: 60.1s elapsed, stack_depth=5, top_level=4, yielded=756, combos_checked=1348, pruned=0, cache_hits=1347
+    [merge-heartbeat] fpu_post_norm_mul_g2: 80.1s elapsed, stack_depth=5, top_level=4, yielded=1002, combos_checked=1788, pruned=0, cache_hits=1787
+    [merge-heartbeat] fpu_post_norm_mul_g2: 100.1s elapsed, stack_depth=5, top_level=4, yielded=1256, combos_checked=2241, pruned=0, cache_hits=2240
+    [merge-heartbeat] fpu_post_norm_mul_g2: 120.1s elapsed, stack_depth=5, top_level=4, yielded=1512, combos_checked=2695, pruned=0, cache_hits=2694
+    [merge-heartbeat] fpu_post_norm_mul_g2: 140.2s elapsed, stack_depth=5, top_level=4, yielded=1767, combos_checked=3151, pruned=0, cache_hits=3149
+    [merge-heartbeat] fpu_post_norm_mul_g2: 160.2s elapsed, stack_depth=5, top_level=4, yielded=2021, combos_checked=3604, pruned=0, cache_hits=3602
+    [merge-heartbeat] fpu_post_norm_mul_g2: 180.2s elapsed, stack_depth=5, top_level=4, yielded=2276, combos_checked=4059, pruned=0, cache_hits=4057
+    [merge-heartbeat] fpu_post_norm_mul_g2: 200.2s elapsed, stack_depth=5, top_level=4, yielded=2528, combos_checked=4508, pruned=0, cache_hits=4506
+    [merge-heartbeat] fpu_post_norm_mul_g2: 220.2s elapsed, stack_depth=5, top_level=4, yielded=2781, combos_checked=4957, pruned=0, cache_hits=4955
+    [merge-heartbeat] fpu_post_norm_mul_g2: 240.2s elapsed, stack_depth=5, top_level=4, yielded=3034, combos_checked=5408, pruned=0, cache_hits=5406
+    [merge-heartbeat] fpu_post_norm_mul_g2: 260.2s elapsed, stack_depth=5, top_level=4, yielded=3292, combos_checked=5869, pruned=0, cache_hits=5866
+    [merge-heartbeat] fpu_post_norm_mul_g2: 280.3s elapsed, stack_depth=4, top_level=3, yielded=3552, combos_checked=6332, pruned=0, cache_hits=6329
+    [merge-heartbeat] fpu_post_norm_mul_g2: 300.3s elapsed, stack_depth=5, top_level=4, yielded=3812, combos_checked=6794, pruned=0, cache_hits=6791
+    [merge-heartbeat] fpu_post_norm_mul_g2: 320.3s elapsed, stack_depth=5, top_level=4, yielded=4068, combos_checked=7252, pruned=0, cache_hits=7249
+    [merge-heartbeat] fpu_post_norm_mul_g2: 340.3s elapsed, stack_depth=5, top_level=4, yielded=4328, combos_checked=7713, pruned=0, cache_hits=7710
+    [merge-heartbeat] fpu_post_norm_mul_g2: 360.4s elapsed, stack_depth=5, top_level=4, yielded=4583, combos_checked=8168, pruned=0, cache_hits=8165
+    [merge-heartbeat] fpu_post_norm_mul_g2: 380.4s elapsed, stack_depth=5, top_level=4, yielded=4842, combos_checked=8631, pruned=0, cache_hits=8627
+    [merge-heartbeat] fpu_post_norm_mul_g2: 400.4s elapsed, stack_depth=5, top_level=4, yielded=5102, combos_checked=9094, pruned=0, cache_hits=9090
+    [merge-heartbeat] fpu_post_norm_mul_g2: 420.5s elapsed, stack_depth=5, top_level=4, yielded=5363, combos_checked=9558, pruned=0, cache_hits=9554
+    [merge-heartbeat] fpu_post_norm_mul_g2: 440.5s elapsed, stack_depth=5, top_level=4, yielded=5622, combos_checked=10019, pruned=0, cache_hits=10015
+    [merge-heartbeat] fpu_post_norm_mul_g2: 460.6s elapsed, stack_depth=5, top_level=4, yielded=5880, combos_checked=10478, pruned=0, cache_hits=10474
+    [merge-heartbeat] fpu_post_norm_mul_g2: 480.6s elapsed, stack_depth=5, top_level=4, yielded=6138, combos_checked=10939, pruned=0, cache_hits=10935
+    [merge-heartbeat] fpu_post_norm_mul_g2: 500.6s elapsed, stack_depth=5, top_level=4, yielded=6397, combos_checked=11401, pruned=0, cache_hits=11396
+    [merge-heartbeat] fpu_post_norm_mul_g2: 520.7s elapsed, stack_depth=5, top_level=4, yielded=6655, combos_checked=11860, pruned=0, cache_hits=11855
+    [merge-heartbeat] fpu_post_norm_mul_g2: 540.7s elapsed, stack_depth=5, top_level=4, yielded=6910, combos_checked=12314, pruned=0, cache_hits=12309
+    [merge-heartbeat] fpu_post_norm_mul_g2: 560.7s elapsed, stack_depth=5, top_level=4, yielded=7170, combos_checked=12779, pruned=0, cache_hits=12774
+    [merge-heartbeat] fpu_post_norm_mul_g2: 580.7s elapsed, stack_depth=5, top_level=4, yielded=7431, combos_checked=13243, pruned=0, cache_hits=13238
+    [merge-heartbeat] fpu_post_norm_mul_g2: 600.8s elapsed, stack_depth=5, top_level=4, yielded=7694, combos_checked=13711, pruned=0, cache_hits=13706
+    [merge-heartbeat] fpu_post_norm_mul_g2: 620.8s elapsed, stack_depth=5, top_level=4, yielded=7955, combos_checked=14177, pruned=0, cache_hits=14171
+    [merge-heartbeat] fpu_post_norm_mul_g2: 640.8s elapsed, stack_depth=4, top_level=3, yielded=8216, combos_checked=14642, pruned=0, cache_hits=14636
+    [merge-heartbeat] fpu_post_norm_mul_g2: 660.9s elapsed, stack_depth=5, top_level=4, yielded=8478, combos_checked=15108, pruned=0, cache_hits=15102
+    [merge-heartbeat] fpu_post_norm_mul_g2: 680.9s elapsed, stack_depth=5, top_level=4, yielded=8736, combos_checked=15567, pruned=0, cache_hits=15561
+    [merge-heartbeat] fpu_post_norm_mul_g2: 700.9s elapsed, stack_depth=4, top_level=3, yielded=8992, combos_checked=16025, pruned=0, cache_hits=16019
+    [merge-heartbeat] fpu_post_norm_mul_g2: 720.9s elapsed, stack_depth=5, top_level=4, yielded=9255, combos_checked=16493, pruned=0, cache_hits=16487
+    [merge-heartbeat] fpu_post_norm_mul_g2: 740.9s elapsed, stack_depth=5, top_level=4, yielded=9514, combos_checked=16955, pruned=0, cache_hits=16948
+    [merge-heartbeat] fpu_post_norm_mul_g2: 760.9s elapsed, stack_depth=5, top_level=4, yielded=9775, combos_checked=17420, pruned=0, cache_hits=17413
+    [merge-heartbeat] fpu_post_norm_mul_g2: 780.9s elapsed, stack_depth=5, top_level=4, yielded=10036, combos_checked=17884, pruned=0, cache_hits=17877
+    [merge-heartbeat] fpu_post_norm_mul_g2: 801.0s elapsed, stack_depth=5, top_level=4, yielded=10296, combos_checked=18349, pruned=0, cache_hits=18342
+    [merge-heartbeat] fpu_post_norm_mul_g2: 821.0s elapsed, stack_depth=5, top_level=4, yielded=10558, combos_checked=18815, pruned=0, cache_hits=18808
+    [merge-heartbeat] fpu_post_norm_mul_g2: 841.0s elapsed, stack_depth=5, top_level=4, yielded=10821, combos_checked=19284, pruned=0, cache_hits=19277
+    [merge-heartbeat] fpu_post_norm_mul_g2: 861.0s elapsed, stack_depth=5, top_level=4, yielded=11084, combos_checked=19752, pruned=0, cache_hits=19744
+    [merge-heartbeat] fpu_post_norm_mul_g2: 881.0s elapsed, stack_depth=5, top_level=4, yielded=11346, combos_checked=20219, pruned=0, cache_hits=20211
+    [merge-heartbeat] fpu_post_norm_mul_g2: 901.1s elapsed, stack_depth=5, top_level=4, yielded=11607, combos_checked=20684, pruned=0, cache_hits=20676
+    [merge-heartbeat] fpu_post_norm_mul_g2: 921.1s elapsed, stack_depth=4, top_level=3, yielded=11868, combos_checked=21149, pruned=0, cache_hits=21141
+    [merge-heartbeat] fpu_post_norm_mul_g2: 941.1s elapsed, stack_depth=5, top_level=4, yielded=12130, combos_checked=21616, pruned=0, cache_hits=21608
+    [merge-heartbeat] fpu_post_norm_mul_g2: 961.1s elapsed, stack_depth=4, top_level=3, yielded=12392, combos_checked=22083, pruned=0, cache_hits=22075
+    [merge-heartbeat] fpu_post_norm_mul_g2: 981.2s elapsed, stack_depth=5, top_level=4, yielded=12650, combos_checked=22544, pruned=0, cache_hits=22535
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1001.2s elapsed, stack_depth=4, top_level=3, yielded=12912, combos_checked=23010, pruned=0, cache_hits=23001
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1021.2s elapsed, stack_depth=5, top_level=4, yielded=13174, combos_checked=23476, pruned=0, cache_hits=23467
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1041.2s elapsed, stack_depth=5, top_level=4, yielded=13435, combos_checked=23941, pruned=0, cache_hits=23932
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1061.2s elapsed, stack_depth=5, top_level=4, yielded=13696, combos_checked=24408, pruned=0, cache_hits=24399
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1081.2s elapsed, stack_depth=5, top_level=4, yielded=13960, combos_checked=24876, pruned=0, cache_hits=24867
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1101.2s elapsed, stack_depth=4, top_level=3, yielded=14220, combos_checked=25341, pruned=0, cache_hits=25331
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1121.3s elapsed, stack_depth=5, top_level=4, yielded=14482, combos_checked=25808, pruned=0, cache_hits=25798
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1141.3s elapsed, stack_depth=5, top_level=4, yielded=14744, combos_checked=26273, pruned=0, cache_hits=26263
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1161.3s elapsed, stack_depth=5, top_level=4, yielded=15005, combos_checked=26739, pruned=0, cache_hits=26729
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1181.4s elapsed, stack_depth=5, top_level=4, yielded=15268, combos_checked=27207, pruned=0, cache_hits=27197
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1201.4s elapsed, stack_depth=5, top_level=4, yielded=15530, combos_checked=27674, pruned=0, cache_hits=27664
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1221.4s elapsed, stack_depth=5, top_level=4, yielded=15792, combos_checked=28141, pruned=0, cache_hits=28130
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1241.4s elapsed, stack_depth=5, top_level=4, yielded=16052, combos_checked=28606, pruned=0, cache_hits=28595
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1261.4s elapsed, stack_depth=5, top_level=4, yielded=16310, combos_checked=29064, pruned=0, cache_hits=29053
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1281.5s elapsed, stack_depth=5, top_level=4, yielded=16571, combos_checked=29529, pruned=0, cache_hits=29518
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1301.5s elapsed, stack_depth=5, top_level=4, yielded=16832, combos_checked=29996, pruned=0, cache_hits=29985
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1321.5s elapsed, stack_depth=5, top_level=4, yielded=17091, combos_checked=30456, pruned=0, cache_hits=30445
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1341.5s elapsed, stack_depth=5, top_level=4, yielded=17354, combos_checked=30925, pruned=0, cache_hits=30913
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1361.6s elapsed, stack_depth=4, top_level=3, yielded=17616, combos_checked=31392, pruned=0, cache_hits=31380
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1381.6s elapsed, stack_depth=5, top_level=4, yielded=17878, combos_checked=31858, pruned=0, cache_hits=31846
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1401.6s elapsed, stack_depth=5, top_level=4, yielded=18140, combos_checked=32324, pruned=0, cache_hits=32312
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1421.6s elapsed, stack_depth=5, top_level=4, yielded=18400, combos_checked=32790, pruned=0, cache_hits=32778
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1441.6s elapsed, stack_depth=4, top_level=3, yielded=18664, combos_checked=33259, pruned=0, cache_hits=33247
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1461.6s elapsed, stack_depth=5, top_level=4, yielded=18920, combos_checked=33717, pruned=0, cache_hits=33704
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1481.7s elapsed, stack_depth=5, top_level=4, yielded=19182, combos_checked=34183, pruned=0, cache_hits=34170
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1501.7s elapsed, stack_depth=5, top_level=4, yielded=19444, combos_checked=34648, pruned=0, cache_hits=34635
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1521.7s elapsed, stack_depth=5, top_level=4, yielded=19704, combos_checked=35113, pruned=0, cache_hits=35100
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1541.8s elapsed, stack_depth=5, top_level=4, yielded=19966, combos_checked=35578, pruned=0, cache_hits=35565
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1561.8s elapsed, stack_depth=5, top_level=4, yielded=20222, combos_checked=36035, pruned=0, cache_hits=36022
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1581.8s elapsed, stack_depth=5, top_level=4, yielded=20484, combos_checked=36502, pruned=0, cache_hits=36488
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1601.9s elapsed, stack_depth=5, top_level=4, yielded=20745, combos_checked=36968, pruned=0, cache_hits=36954
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1621.9s elapsed, stack_depth=5, top_level=4, yielded=21006, combos_checked=37432, pruned=0, cache_hits=37418
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1641.9s elapsed, stack_depth=5, top_level=4, yielded=21267, combos_checked=37897, pruned=0, cache_hits=37883
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1661.9s elapsed, stack_depth=4, top_level=3, yielded=21528, combos_checked=38362, pruned=0, cache_hits=38348
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1681.9s elapsed, stack_depth=5, top_level=4, yielded=21788, combos_checked=38824, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1701.9s elapsed, stack_depth=5, top_level=4, yielded=22022, combos_checked=39244, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1722.0s elapsed, stack_depth=5, top_level=4, yielded=22258, combos_checked=39663, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1742.0s elapsed, stack_depth=5, top_level=4, yielded=22492, combos_checked=40079, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1762.0s elapsed, stack_depth=5, top_level=4, yielded=22730, combos_checked=40505, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1782.1s elapsed, stack_depth=5, top_level=4, yielded=22967, combos_checked=40926, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1802.1s elapsed, stack_depth=4, top_level=3, yielded=23204, combos_checked=41349, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1822.1s elapsed, stack_depth=5, top_level=4, yielded=23442, combos_checked=41773, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1842.1s elapsed, stack_depth=5, top_level=4, yielded=23679, combos_checked=42195, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1862.1s elapsed, stack_depth=5, top_level=4, yielded=23915, combos_checked=42616, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1882.2s elapsed, stack_depth=5, top_level=4, yielded=24152, combos_checked=43037, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1902.2s elapsed, stack_depth=5, top_level=4, yielded=24390, combos_checked=43462, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1922.2s elapsed, stack_depth=5, top_level=4, yielded=24628, combos_checked=43885, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1942.3s elapsed, stack_depth=4, top_level=3, yielded=24860, combos_checked=44299, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1962.3s elapsed, stack_depth=5, top_level=4, yielded=25098, combos_checked=44724, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 1982.3s elapsed, stack_depth=5, top_level=4, yielded=25334, combos_checked=45145, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2002.3s elapsed, stack_depth=5, top_level=4, yielded=25568, combos_checked=45560, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2022.3s elapsed, stack_depth=5, top_level=4, yielded=25806, combos_checked=45986, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2042.4s elapsed, stack_depth=5, top_level=4, yielded=26043, combos_checked=46407, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2062.4s elapsed, stack_depth=5, top_level=4, yielded=26281, combos_checked=46832, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2082.4s elapsed, stack_depth=5, top_level=4, yielded=26518, combos_checked=47253, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2102.4s elapsed, stack_depth=5, top_level=4, yielded=26755, combos_checked=47677, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2122.4s elapsed, stack_depth=5, top_level=4, yielded=26994, combos_checked=48102, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2142.5s elapsed, stack_depth=5, top_level=4, yielded=27230, combos_checked=48523, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2162.5s elapsed, stack_depth=5, top_level=4, yielded=27466, combos_checked=48944, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2182.5s elapsed, stack_depth=5, top_level=4, yielded=27704, combos_checked=49368, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2202.6s elapsed, stack_depth=5, top_level=4, yielded=27945, combos_checked=49797, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2222.6s elapsed, stack_depth=4, top_level=3, yielded=28184, combos_checked=50222, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2242.6s elapsed, stack_depth=4, top_level=3, yielded=28424, combos_checked=50651, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2262.6s elapsed, stack_depth=5, top_level=4, yielded=28662, combos_checked=51075, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2282.7s elapsed, stack_depth=5, top_level=4, yielded=28902, combos_checked=51502, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2302.7s elapsed, stack_depth=5, top_level=4, yielded=29140, combos_checked=51927, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2322.7s elapsed, stack_depth=5, top_level=4, yielded=29379, combos_checked=52352, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2342.8s elapsed, stack_depth=5, top_level=4, yielded=29613, combos_checked=52769, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2362.8s elapsed, stack_depth=5, top_level=4, yielded=29850, combos_checked=53192, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2382.8s elapsed, stack_depth=5, top_level=4, yielded=30090, combos_checked=53619, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2402.9s elapsed, stack_depth=5, top_level=4, yielded=30328, combos_checked=54042, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2422.9s elapsed, stack_depth=5, top_level=4, yielded=30567, combos_checked=54469, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2442.9s elapsed, stack_depth=5, top_level=4, yielded=30804, combos_checked=54892, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2462.9s elapsed, stack_depth=5, top_level=4, yielded=31035, combos_checked=55302, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2483.0s elapsed, stack_depth=5, top_level=4, yielded=31274, combos_checked=55729, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2503.0s elapsed, stack_depth=5, top_level=4, yielded=31512, combos_checked=56152, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2523.0s elapsed, stack_depth=5, top_level=4, yielded=31750, combos_checked=56578, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2543.0s elapsed, stack_depth=5, top_level=4, yielded=31988, combos_checked=57002, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2563.0s elapsed, stack_depth=5, top_level=4, yielded=32226, combos_checked=57425, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2583.0s elapsed, stack_depth=5, top_level=4, yielded=32465, combos_checked=57851, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2603.0s elapsed, stack_depth=5, top_level=4, yielded=32702, combos_checked=58273, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2623.1s elapsed, stack_depth=5, top_level=4, yielded=32942, combos_checked=58702, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2643.1s elapsed, stack_depth=4, top_level=3, yielded=33180, combos_checked=59125, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2663.1s elapsed, stack_depth=5, top_level=4, yielded=33416, combos_checked=59545, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2683.2s elapsed, stack_depth=5, top_level=4, yielded=33653, combos_checked=59968, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2703.2s elapsed, stack_depth=5, top_level=4, yielded=33892, combos_checked=60393, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2723.2s elapsed, stack_depth=5, top_level=4, yielded=34131, combos_checked=60819, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2743.3s elapsed, stack_depth=4, top_level=3, yielded=34368, combos_checked=61242, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2763.3s elapsed, stack_depth=5, top_level=4, yielded=34606, combos_checked=61667, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2783.3s elapsed, stack_depth=4, top_level=3, yielded=34840, combos_checked=62083, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2803.3s elapsed, stack_depth=5, top_level=4, yielded=35079, combos_checked=62509, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2823.3s elapsed, stack_depth=5, top_level=4, yielded=35316, combos_checked=62932, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2843.4s elapsed, stack_depth=5, top_level=4, yielded=35554, combos_checked=63356, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2863.4s elapsed, stack_depth=5, top_level=4, yielded=35793, combos_checked=63781, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2883.4s elapsed, stack_depth=5, top_level=4, yielded=36031, combos_checked=64204, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2903.5s elapsed, stack_depth=5, top_level=4, yielded=36270, combos_checked=64631, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2923.5s elapsed, stack_depth=5, top_level=4, yielded=36507, combos_checked=65053, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2943.5s elapsed, stack_depth=5, top_level=4, yielded=36746, combos_checked=65480, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2963.5s elapsed, stack_depth=4, top_level=3, yielded=36984, combos_checked=65903, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 2983.6s elapsed, stack_depth=5, top_level=4, yielded=37223, combos_checked=66329, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3003.6s elapsed, stack_depth=5, top_level=4, yielded=37461, combos_checked=66753, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3023.6s elapsed, stack_depth=5, top_level=4, yielded=37700, combos_checked=67179, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3043.6s elapsed, stack_depth=5, top_level=4, yielded=37939, combos_checked=67605, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3063.7s elapsed, stack_depth=5, top_level=4, yielded=38170, combos_checked=68017, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3083.7s elapsed, stack_depth=5, top_level=4, yielded=38409, combos_checked=68443, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3103.7s elapsed, stack_depth=5, top_level=4, yielded=38645, combos_checked=68863, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3123.7s elapsed, stack_depth=5, top_level=4, yielded=38882, combos_checked=69285, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3143.8s elapsed, stack_depth=5, top_level=4, yielded=39121, combos_checked=69711, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3163.8s elapsed, stack_depth=5, top_level=4, yielded=39358, combos_checked=70133, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3183.8s elapsed, stack_depth=5, top_level=4, yielded=39596, combos_checked=70559, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3203.9s elapsed, stack_depth=5, top_level=4, yielded=39830, combos_checked=70974, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3223.9s elapsed, stack_depth=5, top_level=4, yielded=40068, combos_checked=71398, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3243.9s elapsed, stack_depth=5, top_level=4, yielded=40306, combos_checked=71823, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3264.0s elapsed, stack_depth=5, top_level=4, yielded=40544, combos_checked=72245, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3284.0s elapsed, stack_depth=5, top_level=4, yielded=40782, combos_checked=72672, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3304.0s elapsed, stack_depth=5, top_level=4, yielded=41018, combos_checked=73091, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3324.0s elapsed, stack_depth=5, top_level=4, yielded=41256, combos_checked=73517, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3344.0s elapsed, stack_depth=5, top_level=4, yielded=41494, combos_checked=73939, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3364.1s elapsed, stack_depth=5, top_level=4, yielded=41732, combos_checked=74363, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3384.1s elapsed, stack_depth=5, top_level=4, yielded=41967, combos_checked=74782, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3404.1s elapsed, stack_depth=4, top_level=3, yielded=42204, combos_checked=75204, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3424.1s elapsed, stack_depth=5, top_level=4, yielded=42444, combos_checked=75632, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3444.2s elapsed, stack_depth=5, top_level=4, yielded=42682, combos_checked=76056, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3464.2s elapsed, stack_depth=5, top_level=4, yielded=42918, combos_checked=76477, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3484.2s elapsed, stack_depth=5, top_level=4, yielded=43154, combos_checked=76898, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3504.2s elapsed, stack_depth=5, top_level=4, yielded=43390, combos_checked=77318, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3524.2s elapsed, stack_depth=5, top_level=4, yielded=43625, combos_checked=77737, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3544.3s elapsed, stack_depth=5, top_level=4, yielded=43860, combos_checked=78156, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3564.3s elapsed, stack_depth=5, top_level=4, yielded=44094, combos_checked=78573, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3584.3s elapsed, stack_depth=4, top_level=3, yielded=44332, combos_checked=78997, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3604.4s elapsed, stack_depth=5, top_level=4, yielded=44566, combos_checked=79413, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3624.4s elapsed, stack_depth=5, top_level=4, yielded=44800, combos_checked=79829, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3644.4s elapsed, stack_depth=5, top_level=4, yielded=45036, combos_checked=80252, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3664.5s elapsed, stack_depth=5, top_level=4, yielded=45268, combos_checked=80663, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3684.5s elapsed, stack_depth=5, top_level=4, yielded=45504, combos_checked=81084, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3704.5s elapsed, stack_depth=5, top_level=4, yielded=45744, combos_checked=81512, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3724.5s elapsed, stack_depth=5, top_level=4, yielded=45981, combos_checked=81935, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3744.5s elapsed, stack_depth=5, top_level=4, yielded=46221, combos_checked=82363, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3764.6s elapsed, stack_depth=5, top_level=4, yielded=46456, combos_checked=82780, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3784.6s elapsed, stack_depth=5, top_level=4, yielded=46694, combos_checked=83205, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3804.6s elapsed, stack_depth=5, top_level=4, yielded=46928, combos_checked=83621, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3824.6s elapsed, stack_depth=5, top_level=4, yielded=47164, combos_checked=84042, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3844.7s elapsed, stack_depth=5, top_level=4, yielded=47403, combos_checked=84469, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3864.7s elapsed, stack_depth=4, top_level=3, yielded=47640, combos_checked=84891, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3884.7s elapsed, stack_depth=5, top_level=4, yielded=47878, combos_checked=85316, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3904.7s elapsed, stack_depth=5, top_level=4, yielded=48116, combos_checked=85740, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3924.7s elapsed, stack_depth=5, top_level=4, yielded=48354, combos_checked=86164, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3944.7s elapsed, stack_depth=5, top_level=4, yielded=48593, combos_checked=86589, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3964.8s elapsed, stack_depth=5, top_level=4, yielded=48826, combos_checked=87005, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 3984.8s elapsed, stack_depth=4, top_level=3, yielded=49064, combos_checked=87429, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4004.8s elapsed, stack_depth=5, top_level=4, yielded=49301, combos_checked=87851, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4024.8s elapsed, stack_depth=5, top_level=4, yielded=49534, combos_checked=88265, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4044.8s elapsed, stack_depth=4, top_level=3, yielded=49772, combos_checked=88690, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4064.9s elapsed, stack_depth=5, top_level=4, yielded=50008, combos_checked=89111, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4084.9s elapsed, stack_depth=5, top_level=4, yielded=50244, combos_checked=89531, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4104.9s elapsed, stack_depth=5, top_level=4, yielded=50478, combos_checked=89948, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4125.0s elapsed, stack_depth=5, top_level=4, yielded=50712, combos_checked=90366, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4145.0s elapsed, stack_depth=5, top_level=4, yielded=50946, combos_checked=90783, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4165.0s elapsed, stack_depth=5, top_level=4, yielded=51185, combos_checked=91208, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4185.0s elapsed, stack_depth=5, top_level=4, yielded=51422, combos_checked=91629, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4205.0s elapsed, stack_depth=5, top_level=4, yielded=51661, combos_checked=92056, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4225.1s elapsed, stack_depth=5, top_level=4, yielded=51899, combos_checked=92480, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4245.1s elapsed, stack_depth=5, top_level=4, yielded=52139, combos_checked=92908, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4265.1s elapsed, stack_depth=5, top_level=4, yielded=52373, combos_checked=93325, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4285.1s elapsed, stack_depth=5, top_level=4, yielded=52612, combos_checked=93750, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4305.1s elapsed, stack_depth=5, top_level=4, yielded=52850, combos_checked=94174, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4325.1s elapsed, stack_depth=5, top_level=4, yielded=53087, combos_checked=94596, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4345.2s elapsed, stack_depth=5, top_level=4, yielded=53326, combos_checked=95024, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4365.2s elapsed, stack_depth=5, top_level=4, yielded=53564, combos_checked=95446, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4385.2s elapsed, stack_depth=5, top_level=4, yielded=53798, combos_checked=95865, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4405.2s elapsed, stack_depth=4, top_level=3, yielded=54036, combos_checked=96288, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4425.3s elapsed, stack_depth=5, top_level=4, yielded=54274, combos_checked=96712, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4445.3s elapsed, stack_depth=5, top_level=4, yielded=54514, combos_checked=97139, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4465.3s elapsed, stack_depth=5, top_level=4, yielded=54752, combos_checked=97562, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4485.4s elapsed, stack_depth=5, top_level=4, yielded=54988, combos_checked=97984, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4505.4s elapsed, stack_depth=5, top_level=4, yielded=55224, combos_checked=98406, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4525.4s elapsed, stack_depth=5, top_level=4, yielded=55462, combos_checked=98830, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4545.5s elapsed, stack_depth=4, top_level=3, yielded=55700, combos_checked=99253, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4565.5s elapsed, stack_depth=5, top_level=4, yielded=55936, combos_checked=99675, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4585.5s elapsed, stack_depth=4, top_level=3, yielded=56172, combos_checked=100094, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4605.5s elapsed, stack_depth=5, top_level=4, yielded=56408, combos_checked=100515, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4625.6s elapsed, stack_depth=5, top_level=4, yielded=56648, combos_checked=100942, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4645.6s elapsed, stack_depth=5, top_level=4, yielded=56885, combos_checked=101365, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4665.6s elapsed, stack_depth=5, top_level=4, yielded=57122, combos_checked=101787, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4685.7s elapsed, stack_depth=5, top_level=4, yielded=57361, combos_checked=102213, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4705.7s elapsed, stack_depth=5, top_level=4, yielded=57597, combos_checked=102633, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4725.7s elapsed, stack_depth=5, top_level=4, yielded=57836, combos_checked=103060, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4745.8s elapsed, stack_depth=4, top_level=3, yielded=58072, combos_checked=103480, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4765.8s elapsed, stack_depth=4, top_level=3, yielded=58308, combos_checked=103901, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4785.8s elapsed, stack_depth=5, top_level=4, yielded=58545, combos_checked=104323, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4805.9s elapsed, stack_depth=5, top_level=4, yielded=58780, combos_checked=104742, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4825.9s elapsed, stack_depth=5, top_level=4, yielded=59018, combos_checked=105166, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4845.9s elapsed, stack_depth=5, top_level=4, yielded=59254, combos_checked=105585, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4866.0s elapsed, stack_depth=5, top_level=4, yielded=59489, combos_checked=106005, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4886.0s elapsed, stack_depth=5, top_level=4, yielded=59724, combos_checked=106423, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4906.0s elapsed, stack_depth=5, top_level=4, yielded=59961, combos_checked=106846, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4926.0s elapsed, stack_depth=5, top_level=4, yielded=60201, combos_checked=107274, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4946.1s elapsed, stack_depth=4, top_level=3, yielded=60440, combos_checked=107699, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4966.1s elapsed, stack_depth=5, top_level=4, yielded=60680, combos_checked=108126, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 4986.1s elapsed, stack_depth=5, top_level=4, yielded=60917, combos_checked=108549, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5006.1s elapsed, stack_depth=5, top_level=4, yielded=61155, combos_checked=108974, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5026.2s elapsed, stack_depth=5, top_level=4, yielded=61394, combos_checked=109399, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5046.2s elapsed, stack_depth=5, top_level=4, yielded=61630, combos_checked=109819, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5066.2s elapsed, stack_depth=4, top_level=3, yielded=61868, combos_checked=110244, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5086.2s elapsed, stack_depth=5, top_level=4, yielded=62106, combos_checked=110667, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5106.3s elapsed, stack_depth=5, top_level=4, yielded=62345, combos_checked=111094, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5126.3s elapsed, stack_depth=5, top_level=4, yielded=62584, combos_checked=111518, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5146.3s elapsed, stack_depth=4, top_level=3, yielded=62820, combos_checked=111941, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5166.4s elapsed, stack_depth=5, top_level=4, yielded=63056, combos_checked=112362, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5186.4s elapsed, stack_depth=5, top_level=4, yielded=63291, combos_checked=112779, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5206.4s elapsed, stack_depth=5, top_level=4, yielded=63530, combos_checked=113206, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5226.4s elapsed, stack_depth=4, top_level=3, yielded=63768, combos_checked=113629, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5246.4s elapsed, stack_depth=5, top_level=4, yielded=64008, combos_checked=114056, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5266.4s elapsed, stack_depth=5, top_level=4, yielded=64246, combos_checked=114481, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5286.5s elapsed, stack_depth=5, top_level=4, yielded=64486, combos_checked=114909, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5306.5s elapsed, stack_depth=4, top_level=3, yielded=64724, combos_checked=115333, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5326.6s elapsed, stack_depth=5, top_level=4, yielded=64962, combos_checked=115757, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5346.6s elapsed, stack_depth=5, top_level=4, yielded=65202, combos_checked=116184, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5366.6s elapsed, stack_depth=5, top_level=4, yielded=65439, combos_checked=116606, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5386.7s elapsed, stack_depth=5, top_level=4, yielded=65679, combos_checked=117034, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5406.7s elapsed, stack_depth=4, top_level=3, yielded=65916, combos_checked=117457, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5426.7s elapsed, stack_depth=5, top_level=4, yielded=66156, combos_checked=117884, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5446.7s elapsed, stack_depth=5, top_level=4, yielded=66393, combos_checked=118307, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5466.8s elapsed, stack_depth=5, top_level=4, yielded=66629, combos_checked=118728, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5486.8s elapsed, stack_depth=5, top_level=4, yielded=66868, combos_checked=119154, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5506.8s elapsed, stack_depth=4, top_level=3, yielded=67100, combos_checked=119566, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5526.8s elapsed, stack_depth=5, top_level=4, yielded=67336, combos_checked=119986, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5546.9s elapsed, stack_depth=5, top_level=4, yielded=67572, combos_checked=120409, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5566.9s elapsed, stack_depth=4, top_level=3, yielded=67808, combos_checked=120829, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5586.9s elapsed, stack_depth=5, top_level=4, yielded=68048, combos_checked=121255, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5607.0s elapsed, stack_depth=5, top_level=4, yielded=68284, combos_checked=121677, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5627.0s elapsed, stack_depth=4, top_level=3, yielded=68524, combos_checked=122104, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5647.0s elapsed, stack_depth=5, top_level=4, yielded=68760, combos_checked=122525, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5667.0s elapsed, stack_depth=5, top_level=4, yielded=68999, combos_checked=122951, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5687.0s elapsed, stack_depth=5, top_level=4, yielded=69236, combos_checked=123374, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5707.0s elapsed, stack_depth=5, top_level=4, yielded=69474, combos_checked=123798, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5727.1s elapsed, stack_depth=5, top_level=4, yielded=69714, combos_checked=124224, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5747.1s elapsed, stack_depth=5, top_level=4, yielded=69951, combos_checked=124646, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5767.1s elapsed, stack_depth=5, top_level=4, yielded=70188, combos_checked=125068, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5787.1s elapsed, stack_depth=5, top_level=4, yielded=70426, combos_checked=125493, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5807.1s elapsed, stack_depth=5, top_level=4, yielded=70667, combos_checked=125923, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5827.1s elapsed, stack_depth=5, top_level=4, yielded=70905, combos_checked=126347, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5847.2s elapsed, stack_depth=5, top_level=4, yielded=71146, combos_checked=126776, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5867.2s elapsed, stack_depth=5, top_level=4, yielded=71382, combos_checked=127197, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5887.2s elapsed, stack_depth=5, top_level=4, yielded=71616, combos_checked=127615, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5907.3s elapsed, stack_depth=5, top_level=4, yielded=71856, combos_checked=128040, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5927.3s elapsed, stack_depth=4, top_level=3, yielded=72092, combos_checked=128461, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5947.3s elapsed, stack_depth=5, top_level=4, yielded=72323, combos_checked=128874, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5967.4s elapsed, stack_depth=5, top_level=4, yielded=72562, combos_checked=129299, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 5987.4s elapsed, stack_depth=5, top_level=4, yielded=72800, combos_checked=129722, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 6007.4s elapsed, stack_depth=4, top_level=3, yielded=73040, combos_checked=130151, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 6027.5s elapsed, stack_depth=5, top_level=4, yielded=73278, combos_checked=130574, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 6047.5s elapsed, stack_depth=5, top_level=4, yielded=73518, combos_checked=131003, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 6067.6s elapsed, stack_depth=5, top_level=4, yielded=73752, combos_checked=131421, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 6087.6s elapsed, stack_depth=5, top_level=4, yielded=74005, combos_checked=131871, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 6107.6s elapsed, stack_depth=5, top_level=4, yielded=74254, combos_checked=132314, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 6127.6s elapsed, stack_depth=5, top_level=4, yielded=74506, combos_checked=132763, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 6147.6s elapsed, stack_depth=5, top_level=4, yielded=74756, combos_checked=133210, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 6167.6s elapsed, stack_depth=5, top_level=4, yielded=75007, combos_checked=133655, pruned=0, cache_hits=38788
+    [merge-heartbeat] fpu_post_norm_mul_g2: 6187.6s elapsed, stack_depth=5, top_level=4, yielded=75259, combos_checked=134104, pruned=0, cache_hits=38788
+    merge fpu_post_norm_mul: LazyProduct of 3 groups, sizes=[1, 1, 75264], stored=75266, logical_size=75,264
+    -> 75,264 feasible merged paths (lazy: 3 groups, 75266 stored)
+  merge fpu_pre_norm_div (13/79): 4 blocks
+    merge fpu_pre_norm_div: partitioned 4 blocks into 3 independent groups (full product would be 625)
+    merge fpu_pre_norm_div group 1: block indices [1, 2], per-block outcome counts [25, 25], naive Cartesian size 625
+    merge fpu_pre_norm_div: LazyProduct of 3 groups, sizes=[1, 625, 1], stored=627, logical_size=625
+    -> 625 feasible merged paths (lazy: 3 groups, 627 stored)
+  merge fpu_div (14/79): 3 blocks
+    merge fpu_div: partitioned 3 blocks into 2 independent groups (full product would be 16)
+    merge fpu_div group 1: block indices [1, 2], per-block outcome counts [4, 4], naive Cartesian size 16
+    merge fpu_div: LazyProduct of 2 groups, sizes=[1, 16], stored=17, logical_size=16
+    -> 16 feasible merged paths (lazy: 2 groups, 17 stored)
+  merge fpu_post_norm_div (15/79): 8 blocks
+    merge fpu_post_norm_div: partitioned 8 blocks into 6 independent groups (full product would be 112)
+    merge fpu_post_norm_div group 2: block indices [2, 5, 6], per-block outcome counts [2, 2, 28], naive Cartesian size 112
+    merge fpu_post_norm_div: LazyProduct of 6 groups, sizes=[1, 1, 112, 1, 1, 1], stored=117, logical_size=112
+    -> 112 feasible merged paths (lazy: 6 groups, 117 stored)
+  merge or1200_fpu_fcmp (16/79): 1 blocks
+    -> 28 feasible merged paths
+  merge or1200_fpu_intfloat_conv (17/79): 20 blocks
+    merge or1200_fpu_intfloat_conv: partitioned 20 blocks into 20 independent groups (full product would be 2)
+    merge or1200_fpu_intfloat_conv: LazyProduct of 20 groups, sizes=[1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], stored=21, logical_size=2
+    -> 2 feasible merged paths (lazy: 20 groups, 21 stored)
+  merge u0 (18/79): 24 blocks
+    merge u0: partitioned 24 blocks into 24 independent groups (full product would be 1)
+    merge u0: LazyProduct of 24 groups, sizes=[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], stored=24, logical_size=1
+    -> 1 feasible merged paths (lazy: 24 groups, 24 stored)
+  merge u4 (19/79): 6 blocks
+    merge u4: partitioned 6 blocks into 4 independent groups (full product would be 432)
+    merge u4 group 0: block indices [0, 4, 5], per-block outcome counts [48, 3, 3], naive Cartesian size 432
+    merge u4: LazyProduct of 4 groups, sizes=[432, 1, 1, 1], stored=435, logical_size=432
+    -> 432 feasible merged paths (lazy: 4 groups, 435 stored)
+  merge or1200_iwb_biu (20/79): 0 blocks
+    -> 1 feasible merged paths
+  merge or1200_rfram_generic (21/79): 5 blocks
+    merge or1200_rfram_generic group 0: block indices [0, 1, 2, 3, 4], per-block outcome counts [34, 3, 32, 3, 32], naive Cartesian size 313,344
+    [merge-heartbeat] or1200_rfram_generic_g0: 20.0s elapsed, stack_depth=5, top_level=4, yielded=792, combos_checked=828, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 40.0s elapsed, stack_depth=5, top_level=4, yielded=1574, combos_checked=1643, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 60.1s elapsed, stack_depth=5, top_level=4, yielded=2369, combos_checked=2471, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 80.1s elapsed, stack_depth=5, top_level=4, yielded=3023, combos_checked=3152, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 100.1s elapsed, stack_depth=5, top_level=4, yielded=3565, combos_checked=3718, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 120.1s elapsed, stack_depth=5, top_level=4, yielded=4226, combos_checked=4407, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 140.2s elapsed, stack_depth=5, top_level=4, yielded=4896, combos_checked=5103, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 160.2s elapsed, stack_depth=5, top_level=4, yielded=5566, combos_checked=5801, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 180.3s elapsed, stack_depth=5, top_level=4, yielded=6099, combos_checked=6357, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 200.3s elapsed, stack_depth=5, top_level=4, yielded=6651, combos_checked=6933, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 220.3s elapsed, stack_depth=5, top_level=4, yielded=7319, combos_checked=7629, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 240.3s elapsed, stack_depth=5, top_level=4, yielded=7992, combos_checked=8330, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 260.3s elapsed, stack_depth=5, top_level=4, yielded=8668, combos_checked=9034, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 280.3s elapsed, stack_depth=5, top_level=4, yielded=9182, combos_checked=9569, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 300.3s elapsed, stack_depth=5, top_level=4, yielded=9620, combos_checked=10028, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 320.3s elapsed, stack_depth=5, top_level=4, yielded=10120, combos_checked=10549, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 340.4s elapsed, stack_depth=5, top_level=4, yielded=10622, combos_checked=11071, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 360.4s elapsed, stack_depth=5, top_level=4, yielded=11124, combos_checked=11594, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 380.4s elapsed, stack_depth=5, top_level=4, yielded=11628, combos_checked=12120, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 400.4s elapsed, stack_depth=5, top_level=4, yielded=12128, combos_checked=12640, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 420.4s elapsed, stack_depth=5, top_level=4, yielded=12430, combos_checked=12956, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 440.5s elapsed, stack_depth=5, top_level=4, yielded=12880, combos_checked=13425, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 460.5s elapsed, stack_depth=5, top_level=4, yielded=13323, combos_checked=13886, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 480.5s elapsed, stack_depth=5, top_level=4, yielded=13775, combos_checked=14357, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 500.5s elapsed, stack_depth=5, top_level=4, yielded=14229, combos_checked=14830, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 520.5s elapsed, stack_depth=5, top_level=4, yielded=14682, combos_checked=15301, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 540.5s elapsed, stack_depth=5, top_level=4, yielded=15132, combos_checked=15770, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 560.6s elapsed, stack_depth=5, top_level=4, yielded=15414, combos_checked=16065, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 580.6s elapsed, stack_depth=5, top_level=4, yielded=15858, combos_checked=16528, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 600.6s elapsed, stack_depth=5, top_level=4, yielded=16310, combos_checked=16998, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 620.6s elapsed, stack_depth=5, top_level=4, yielded=16762, combos_checked=17469, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 640.7s elapsed, stack_depth=5, top_level=4, yielded=17216, combos_checked=17943, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 660.7s elapsed, stack_depth=5, top_level=4, yielded=17665, combos_checked=18411, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 680.7s elapsed, stack_depth=5, top_level=4, yielded=18121, combos_checked=18885, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 700.7s elapsed, stack_depth=5, top_level=4, yielded=18424, combos_checked=19200, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 720.7s elapsed, stack_depth=5, top_level=4, yielded=18909, combos_checked=19707, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 740.8s elapsed, stack_depth=5, top_level=4, yielded=19408, combos_checked=20228, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 760.8s elapsed, stack_depth=5, top_level=4, yielded=19904, combos_checked=20745, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 780.8s elapsed, stack_depth=5, top_level=4, yielded=20406, combos_checked=21267, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 800.9s elapsed, stack_depth=5, top_level=4, yielded=20908, combos_checked=21790, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 821.0s elapsed, stack_depth=5, top_level=4, yielded=21408, combos_checked=22310, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 841.0s elapsed, stack_depth=5, top_level=4, yielded=21703, combos_checked=22620, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 861.0s elapsed, stack_depth=5, top_level=4, yielded=22154, combos_checked=23089, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 881.1s elapsed, stack_depth=5, top_level=4, yielded=22606, combos_checked=23560, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 901.1s elapsed, stack_depth=5, top_level=4, yielded=23058, combos_checked=24031, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 921.1s elapsed, stack_depth=5, top_level=4, yielded=23512, combos_checked=24503, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 941.1s elapsed, stack_depth=5, top_level=4, yielded=23967, combos_checked=24977, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 961.2s elapsed, stack_depth=5, top_level=4, yielded=24416, combos_checked=25445, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 981.2s elapsed, stack_depth=5, top_level=4, yielded=24704, combos_checked=25746, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1001.2s elapsed, stack_depth=5, top_level=4, yielded=25153, combos_checked=26215, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1021.3s elapsed, stack_depth=5, top_level=4, yielded=25607, combos_checked=26687, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1041.3s elapsed, stack_depth=5, top_level=4, yielded=26056, combos_checked=27155, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1061.3s elapsed, stack_depth=5, top_level=4, yielded=26504, combos_checked=27622, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1081.3s elapsed, stack_depth=5, top_level=4, yielded=26959, combos_checked=28095, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1101.3s elapsed, stack_depth=5, top_level=4, yielded=27415, combos_checked=28570, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1121.4s elapsed, stack_depth=5, top_level=4, yielded=27698, combos_checked=28867, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1141.4s elapsed, stack_depth=5, top_level=4, yielded=28195, combos_checked=29385, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1161.4s elapsed, stack_depth=5, top_level=4, yielded=28697, combos_checked=29907, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1181.5s elapsed, stack_depth=5, top_level=4, yielded=29197, combos_checked=30429, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1201.5s elapsed, stack_depth=5, top_level=4, yielded=29701, combos_checked=30954, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1221.5s elapsed, stack_depth=5, top_level=4, yielded=30205, combos_checked=31478, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1241.6s elapsed, stack_depth=5, top_level=4, yielded=30651, combos_checked=31943, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1261.6s elapsed, stack_depth=5, top_level=4, yielded=30990, combos_checked=32297, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1281.6s elapsed, stack_depth=5, top_level=4, yielded=31434, combos_checked=32760, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1301.6s elapsed, stack_depth=5, top_level=4, yielded=31885, combos_checked=33230, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1321.6s elapsed, stack_depth=5, top_level=4, yielded=32337, combos_checked=33700, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1341.7s elapsed, stack_depth=5, top_level=4, yielded=32792, combos_checked=34174, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1361.7s elapsed, stack_depth=5, top_level=4, yielded=33239, combos_checked=34640, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1381.7s elapsed, stack_depth=5, top_level=4, yielded=33692, combos_checked=35111, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1401.8s elapsed, stack_depth=5, top_level=4, yielded=33974, combos_checked=35406, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1421.8s elapsed, stack_depth=5, top_level=4, yielded=34427, combos_checked=35878, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1441.9s elapsed, stack_depth=5, top_level=4, yielded=34880, combos_checked=36350, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1461.9s elapsed, stack_depth=5, top_level=4, yielded=35330, combos_checked=36820, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1481.9s elapsed, stack_depth=5, top_level=4, yielded=35786, combos_checked=37294, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1501.9s elapsed, stack_depth=5, top_level=4, yielded=36242, combos_checked=37769, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1522.0s elapsed, stack_depth=5, top_level=4, yielded=36696, combos_checked=38242, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1542.0s elapsed, stack_depth=5, top_level=4, yielded=36981, combos_checked=38541, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1562.0s elapsed, stack_depth=5, top_level=4, yielded=37480, combos_checked=39061, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1582.0s elapsed, stack_depth=5, top_level=4, yielded=37982, combos_checked=39583, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1602.0s elapsed, stack_depth=5, top_level=4, yielded=38481, combos_checked=40103, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1622.1s elapsed, stack_depth=5, top_level=4, yielded=38983, combos_checked=40627, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1642.1s elapsed, stack_depth=5, top_level=4, yielded=39488, combos_checked=41152, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1662.1s elapsed, stack_depth=5, top_level=4, yielded=39889, combos_checked=41570, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1682.1s elapsed, stack_depth=5, top_level=4, yielded=40259, combos_checked=41957, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1702.2s elapsed, stack_depth=5, top_level=4, yielded=40709, combos_checked=42426, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1722.2s elapsed, stack_depth=5, top_level=4, yielded=41153, combos_checked=42888, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1742.2s elapsed, stack_depth=5, top_level=4, yielded=41605, combos_checked=43359, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1762.2s elapsed, stack_depth=5, top_level=4, yielded=42057, combos_checked=43830, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1782.2s elapsed, stack_depth=5, top_level=4, yielded=42511, combos_checked=44302, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1802.3s elapsed, stack_depth=5, top_level=4, yielded=42931, combos_checked=44740, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1822.3s elapsed, stack_depth=5, top_level=4, yielded=43244, combos_checked=45067, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1842.4s elapsed, stack_depth=5, top_level=4, yielded=43692, combos_checked=45534, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1862.4s elapsed, stack_depth=5, top_level=4, yielded=44144, combos_checked=46004, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1882.4s elapsed, stack_depth=5, top_level=4, yielded=44597, combos_checked=46476, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1902.4s elapsed, stack_depth=5, top_level=4, yielded=45052, combos_checked=46950, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1922.4s elapsed, stack_depth=5, top_level=4, yielded=45504, combos_checked=47420, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1942.4s elapsed, stack_depth=5, top_level=4, yielded=45959, combos_checked=47895, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1962.4s elapsed, stack_depth=5, top_level=4, yielded=46257, combos_checked=48207, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 1982.6s elapsed, stack_depth=5, top_level=4, yielded=46752, combos_checked=48722, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2002.6s elapsed, stack_depth=5, top_level=4, yielded=47253, combos_checked=49245, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2022.6s elapsed, stack_depth=5, top_level=4, yielded=47753, combos_checked=49766, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2042.7s elapsed, stack_depth=5, top_level=4, yielded=48256, combos_checked=50289, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2062.7s elapsed, stack_depth=5, top_level=4, yielded=48759, combos_checked=50813, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2082.7s elapsed, stack_depth=5, top_level=4, yielded=49126, combos_checked=51196, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2102.7s elapsed, stack_depth=5, top_level=4, yielded=49536, combos_checked=51623, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2122.8s elapsed, stack_depth=5, top_level=4, yielded=49986, combos_checked=52093, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2142.8s elapsed, stack_depth=5, top_level=4, yielded=50438, combos_checked=52564, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2162.8s elapsed, stack_depth=5, top_level=4, yielded=50890, combos_checked=53035, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2182.8s elapsed, stack_depth=5, top_level=4, yielded=51339, combos_checked=53502, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2202.8s elapsed, stack_depth=5, top_level=4, yielded=51794, combos_checked=53976, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2222.9s elapsed, stack_depth=5, top_level=4, yielded=52171, combos_checked=54369, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2242.9s elapsed, stack_depth=5, top_level=4, yielded=52534, combos_checked=54748, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2262.9s elapsed, stack_depth=5, top_level=4, yielded=52978, combos_checked=55210, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2283.0s elapsed, stack_depth=5, top_level=4, yielded=53431, combos_checked=55682, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2303.0s elapsed, stack_depth=5, top_level=4, yielded=53885, combos_checked=56155, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2323.0s elapsed, stack_depth=5, top_level=4, yielded=54325, combos_checked=56613, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2343.0s elapsed, stack_depth=5, top_level=4, yielded=54781, combos_checked=57088, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2363.2s elapsed, stack_depth=5, top_level=4, yielded=55212, combos_checked=57538, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2383.2s elapsed, stack_depth=5, top_level=4, yielded=55542, combos_checked=57883, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2403.2s elapsed, stack_depth=5, top_level=4, yielded=56039, combos_checked=58401, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2423.2s elapsed, stack_depth=5, top_level=4, yielded=56539, combos_checked=58921, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2443.2s elapsed, stack_depth=5, top_level=4, yielded=57039, combos_checked=59443, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2463.2s elapsed, stack_depth=5, top_level=4, yielded=57542, combos_checked=59967, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2483.3s elapsed, stack_depth=5, top_level=4, yielded=58045, combos_checked=60490, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2503.3s elapsed, stack_depth=5, top_level=4, yielded=58364, combos_checked=60822, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2523.4s elapsed, stack_depth=5, top_level=4, yielded=58808, combos_checked=61286, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2543.4s elapsed, stack_depth=5, top_level=4, yielded=59259, combos_checked=61756, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2563.4s elapsed, stack_depth=5, top_level=4, yielded=59701, combos_checked=62216, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2583.4s elapsed, stack_depth=5, top_level=4, yielded=60156, combos_checked=62690, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2603.4s elapsed, stack_depth=5, top_level=4, yielded=60608, combos_checked=63162, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2623.4s elapsed, stack_depth=5, top_level=4, yielded=61060, combos_checked=63633, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2643.5s elapsed, stack_depth=5, top_level=4, yielded=61405, combos_checked=63991, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2663.5s elapsed, stack_depth=5, top_level=4, yielded=61794, combos_checked=64398, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2683.5s elapsed, stack_depth=5, top_level=4, yielded=62246, combos_checked=64869, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2703.5s elapsed, stack_depth=5, top_level=4, yielded=62697, combos_checked=65339, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2723.5s elapsed, stack_depth=5, top_level=4, yielded=63151, combos_checked=65811, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2743.6s elapsed, stack_depth=5, top_level=4, yielded=63608, combos_checked=66287, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2763.6s elapsed, stack_depth=5, top_level=4, yielded=64064, combos_checked=66762, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2783.7s elapsed, stack_depth=5, top_level=4, yielded=64453, combos_checked=67168, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2803.7s elapsed, stack_depth=5, top_level=4, yielded=64838, combos_checked=67571, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2823.7s elapsed, stack_depth=5, top_level=4, yielded=65333, combos_checked=68086, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2843.8s elapsed, stack_depth=5, top_level=4, yielded=65832, combos_checked=68606, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2863.8s elapsed, stack_depth=5, top_level=4, yielded=66329, combos_checked=69123, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2883.8s elapsed, stack_depth=5, top_level=4, yielded=66832, combos_checked=69648, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2903.8s elapsed, stack_depth=5, top_level=4, yielded=67336, combos_checked=70173, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2923.9s elapsed, stack_depth=5, top_level=4, yielded=67635, combos_checked=70485, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2943.9s elapsed, stack_depth=5, top_level=4, yielded=68078, combos_checked=70947, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2963.9s elapsed, stack_depth=5, top_level=4, yielded=68528, combos_checked=71415, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 2983.9s elapsed, stack_depth=5, top_level=4, yielded=68979, combos_checked=71885, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3003.9s elapsed, stack_depth=5, top_level=4, yielded=69432, combos_checked=72357, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3023.9s elapsed, stack_depth=5, top_level=4, yielded=69883, combos_checked=72826, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3044.0s elapsed, stack_depth=5, top_level=4, yielded=70336, combos_checked=73298, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3064.0s elapsed, stack_depth=5, top_level=4, yielded=70644, combos_checked=73619, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3084.0s elapsed, stack_depth=5, top_level=4, yielded=71076, combos_checked=74071, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3104.1s elapsed, stack_depth=5, top_level=4, yielded=71525, combos_checked=74539, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3124.1s elapsed, stack_depth=5, top_level=4, yielded=71976, combos_checked=75008, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3144.1s elapsed, stack_depth=5, top_level=4, yielded=72429, combos_checked=75480, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3164.1s elapsed, stack_depth=5, top_level=4, yielded=72873, combos_checked=75943, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3184.1s elapsed, stack_depth=5, top_level=4, yielded=73327, combos_checked=76415, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3204.2s elapsed, stack_depth=5, top_level=4, yielded=73684, combos_checked=76787, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3224.2s elapsed, stack_depth=5, top_level=4, yielded=74093, combos_checked=77215, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3244.2s elapsed, stack_depth=5, top_level=4, yielded=74592, combos_checked=77734, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3264.2s elapsed, stack_depth=5, top_level=4, yielded=75093, combos_checked=78257, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3284.2s elapsed, stack_depth=5, top_level=4, yielded=75594, combos_checked=78779, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3304.3s elapsed, stack_depth=5, top_level=4, yielded=76096, combos_checked=79301, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3324.3s elapsed, stack_depth=5, top_level=4, yielded=76598, combos_checked=79824, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3344.3s elapsed, stack_depth=5, top_level=4, yielded=76890, combos_checked=80129, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3364.4s elapsed, stack_depth=5, top_level=4, yielded=77341, combos_checked=80599, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3384.5s elapsed, stack_depth=5, top_level=4, yielded=77792, combos_checked=81069, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3404.5s elapsed, stack_depth=4, top_level=3, yielded=78240, combos_checked=81536, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3424.5s elapsed, stack_depth=5, top_level=4, yielded=78694, combos_checked=82009, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3444.5s elapsed, stack_depth=5, top_level=4, yielded=79149, combos_checked=82483, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3464.6s elapsed, stack_depth=5, top_level=4, yielded=79594, combos_checked=82947, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3484.6s elapsed, stack_depth=5, top_level=4, yielded=79880, combos_checked=83246, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3504.6s elapsed, stack_depth=5, top_level=4, yielded=80333, combos_checked=83717, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3524.6s elapsed, stack_depth=5, top_level=4, yielded=80771, combos_checked=84174, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3544.6s elapsed, stack_depth=5, top_level=4, yielded=81220, combos_checked=84642, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3564.7s elapsed, stack_depth=5, top_level=4, yielded=81675, combos_checked=85115, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3584.7s elapsed, stack_depth=5, top_level=4, yielded=82131, combos_checked=85590, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3604.7s elapsed, stack_depth=5, top_level=4, yielded=82586, combos_checked=86064, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3624.8s elapsed, stack_depth=5, top_level=4, yielded=82917, combos_checked=86409, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3644.9s elapsed, stack_depth=5, top_level=4, yielded=83360, combos_checked=86872, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3664.9s elapsed, stack_depth=5, top_level=4, yielded=83859, combos_checked=87392, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3684.9s elapsed, stack_depth=5, top_level=4, yielded=84355, combos_checked=87909, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3704.9s elapsed, stack_depth=5, top_level=4, yielded=84859, combos_checked=88433, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3724.9s elapsed, stack_depth=5, top_level=4, yielded=85361, combos_checked=88957, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3745.0s elapsed, stack_depth=5, top_level=4, yielded=85862, combos_checked=89479, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3765.0s elapsed, stack_depth=5, top_level=4, yielded=86151, combos_checked=89781, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3785.0s elapsed, stack_depth=5, top_level=4, yielded=86600, combos_checked=90249, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3805.0s elapsed, stack_depth=5, top_level=4, yielded=87051, combos_checked=90718, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3825.1s elapsed, stack_depth=5, top_level=4, yielded=87503, combos_checked=91189, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3845.1s elapsed, stack_depth=5, top_level=4, yielded=87956, combos_checked=91661, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3865.1s elapsed, stack_depth=5, top_level=4, yielded=88408, combos_checked=92131, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3885.1s elapsed, stack_depth=5, top_level=4, yielded=88863, combos_checked=92605, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3905.1s elapsed, stack_depth=5, top_level=4, yielded=89143, combos_checked=92898, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3925.1s elapsed, stack_depth=5, top_level=4, yielded=89595, combos_checked=93369, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3945.2s elapsed, stack_depth=5, top_level=4, yielded=90045, combos_checked=93837, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3965.2s elapsed, stack_depth=5, top_level=4, yielded=90496, combos_checked=94307, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 3985.2s elapsed, stack_depth=5, top_level=4, yielded=90951, combos_checked=94782, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4005.2s elapsed, stack_depth=5, top_level=4, yielded=91404, combos_checked=95254, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4025.2s elapsed, stack_depth=5, top_level=4, yielded=91859, combos_checked=95727, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4045.3s elapsed, stack_depth=5, top_level=4, yielded=92155, combos_checked=96035, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4065.4s elapsed, stack_depth=5, top_level=4, yielded=92640, combos_checked=96542, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4085.4s elapsed, stack_depth=5, top_level=4, yielded=93141, combos_checked=97065, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4105.4s elapsed, stack_depth=5, top_level=4, yielded=93640, combos_checked=97585, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4125.5s elapsed, stack_depth=5, top_level=4, yielded=94137, combos_checked=98102, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4145.5s elapsed, stack_depth=5, top_level=4, yielded=94637, combos_checked=98623, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4165.5s elapsed, stack_depth=5, top_level=4, yielded=95133, combos_checked=99139, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4185.5s elapsed, stack_depth=5, top_level=4, yielded=95426, combos_checked=99447, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4205.6s elapsed, stack_depth=5, top_level=4, yielded=95878, combos_checked=99917, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4225.6s elapsed, stack_depth=5, top_level=4, yielded=96322, combos_checked=100380, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4245.6s elapsed, stack_depth=5, top_level=4, yielded=96769, combos_checked=100846, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4265.6s elapsed, stack_depth=5, top_level=4, yielded=97223, combos_checked=101318, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4285.6s elapsed, stack_depth=5, top_level=4, yielded=97677, combos_checked=101791, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4305.7s elapsed, stack_depth=5, top_level=4, yielded=98130, combos_checked=102263, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4325.7s elapsed, stack_depth=5, top_level=4, yielded=98408, combos_checked=102554, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4345.7s elapsed, stack_depth=5, top_level=4, yielded=98852, combos_checked=103016, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4365.7s elapsed, stack_depth=5, top_level=4, yielded=99304, combos_checked=103487, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4385.7s elapsed, stack_depth=5, top_level=4, yielded=99754, combos_checked=103956, pruned=0, cache_hits=0
+    merge or1200_rfram_generic group 0: yielded 100000, checked 104213, pruned 0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4405.7s elapsed, stack_depth=5, top_level=4, yielded=100208, combos_checked=104428, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4425.8s elapsed, stack_depth=5, top_level=4, yielded=100663, combos_checked=104902, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4445.8s elapsed, stack_depth=5, top_level=4, yielded=101118, combos_checked=105376, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4465.8s elapsed, stack_depth=5, top_level=4, yielded=101408, combos_checked=105680, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4485.9s elapsed, stack_depth=5, top_level=4, yielded=101907, combos_checked=106200, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4505.9s elapsed, stack_depth=5, top_level=4, yielded=102404, combos_checked=106718, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4525.9s elapsed, stack_depth=5, top_level=4, yielded=102896, combos_checked=107230, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4545.9s elapsed, stack_depth=5, top_level=4, yielded=103396, combos_checked=107752, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4566.0s elapsed, stack_depth=5, top_level=4, yielded=103903, combos_checked=108279, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4586.0s elapsed, stack_depth=5, top_level=4, yielded=104369, combos_checked=108765, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4606.1s elapsed, stack_depth=5, top_level=4, yielded=104694, combos_checked=109104, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4626.1s elapsed, stack_depth=5, top_level=4, yielded=105144, combos_checked=109573, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4646.1s elapsed, stack_depth=5, top_level=4, yielded=105593, combos_checked=110040, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4666.1s elapsed, stack_depth=5, top_level=4, yielded=106034, combos_checked=110500, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4686.2s elapsed, stack_depth=5, top_level=4, yielded=106487, combos_checked=110972, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4706.2s elapsed, stack_depth=5, top_level=4, yielded=106939, combos_checked=111442, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4726.2s elapsed, stack_depth=5, top_level=4, yielded=107385, combos_checked=111907, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4746.2s elapsed, stack_depth=5, top_level=4, yielded=107663, combos_checked=112198, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4766.2s elapsed, stack_depth=5, top_level=4, yielded=108106, combos_checked=112660, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4786.2s elapsed, stack_depth=5, top_level=4, yielded=108558, combos_checked=113130, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4806.3s elapsed, stack_depth=5, top_level=4, yielded=109010, combos_checked=113601, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4826.3s elapsed, stack_depth=5, top_level=4, yielded=109465, combos_checked=114075, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4846.3s elapsed, stack_depth=5, top_level=4, yielded=109918, combos_checked=114546, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4866.3s elapsed, stack_depth=5, top_level=4, yielded=110370, combos_checked=115018, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4886.3s elapsed, stack_depth=5, top_level=4, yielded=110665, combos_checked=115327, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4906.4s elapsed, stack_depth=5, top_level=4, yielded=111166, combos_checked=115848, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4926.4s elapsed, stack_depth=5, top_level=4, yielded=111665, combos_checked=116369, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4946.4s elapsed, stack_depth=5, top_level=4, yielded=112149, combos_checked=116873, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4966.4s elapsed, stack_depth=5, top_level=4, yielded=112650, combos_checked=117395, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 4986.4s elapsed, stack_depth=5, top_level=4, yielded=113152, combos_checked=117917, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5006.4s elapsed, stack_depth=5, top_level=4, yielded=113598, combos_checked=118382, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5026.5s elapsed, stack_depth=5, top_level=4, yielded=113940, combos_checked=118739, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5046.5s elapsed, stack_depth=5, top_level=4, yielded=114392, combos_checked=119210, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5066.5s elapsed, stack_depth=5, top_level=4, yielded=114842, combos_checked=119679, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5086.5s elapsed, stack_depth=5, top_level=4, yielded=115292, combos_checked=120147, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5106.5s elapsed, stack_depth=5, top_level=4, yielded=115744, combos_checked=120619, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5126.5s elapsed, stack_depth=5, top_level=4, yielded=116197, combos_checked=121091, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5146.6s elapsed, stack_depth=4, top_level=3, yielded=116640, combos_checked=121552, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5166.7s elapsed, stack_depth=5, top_level=4, yielded=116923, combos_checked=121847, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5186.7s elapsed, stack_depth=5, top_level=4, yielded=117375, combos_checked=122318, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5206.7s elapsed, stack_depth=5, top_level=4, yielded=117824, combos_checked=122787, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5226.7s elapsed, stack_depth=5, top_level=4, yielded=118273, combos_checked=123255, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5246.7s elapsed, stack_depth=5, top_level=4, yielded=118728, combos_checked=123728, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5266.7s elapsed, stack_depth=5, top_level=4, yielded=119170, combos_checked=124189, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5286.7s elapsed, stack_depth=5, top_level=4, yielded=119622, combos_checked=124660, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5306.7s elapsed, stack_depth=5, top_level=4, yielded=119911, combos_checked=124963, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5326.8s elapsed, stack_depth=5, top_level=4, yielded=120413, combos_checked=125485, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5346.8s elapsed, stack_depth=5, top_level=4, yielded=120910, combos_checked=126003, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5366.8s elapsed, stack_depth=5, top_level=4, yielded=121408, combos_checked=126522, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5386.8s elapsed, stack_depth=5, top_level=4, yielded=121912, combos_checked=127046, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5406.8s elapsed, stack_depth=5, top_level=4, yielded=122413, combos_checked=127569, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5426.9s elapsed, stack_depth=5, top_level=4, yielded=122829, combos_checked=128002, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5446.9s elapsed, stack_depth=5, top_level=4, yielded=123190, combos_checked=128379, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5466.9s elapsed, stack_depth=5, top_level=4, yielded=123639, combos_checked=128846, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5486.9s elapsed, stack_depth=5, top_level=4, yielded=124091, combos_checked=129317, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5507.0s elapsed, stack_depth=5, top_level=4, yielded=124544, combos_checked=129789, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5527.0s elapsed, stack_depth=5, top_level=4, yielded=124994, combos_checked=130259, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5547.0s elapsed, stack_depth=5, top_level=4, yielded=125442, combos_checked=130725, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5567.0s elapsed, stack_depth=5, top_level=4, yielded=125870, combos_checked=131171, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5587.0s elapsed, stack_depth=5, top_level=4, yielded=126183, combos_checked=131498, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5607.1s elapsed, stack_depth=5, top_level=4, yielded=126625, combos_checked=131959, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5627.1s elapsed, stack_depth=5, top_level=4, yielded=127079, combos_checked=132431, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5647.1s elapsed, stack_depth=5, top_level=4, yielded=127534, combos_checked=132905, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5667.1s elapsed, stack_depth=5, top_level=4, yielded=127989, combos_checked=133379, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5687.2s elapsed, stack_depth=5, top_level=4, yielded=128444, combos_checked=133852, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5707.2s elapsed, stack_depth=5, top_level=4, yielded=128896, combos_checked=134324, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5727.2s elapsed, stack_depth=5, top_level=4, yielded=129201, combos_checked=134643, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5747.2s elapsed, stack_depth=5, top_level=4, yielded=129697, combos_checked=135161, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5767.2s elapsed, stack_depth=5, top_level=4, yielded=130200, combos_checked=135684, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5787.2s elapsed, stack_depth=5, top_level=4, yielded=130699, combos_checked=136204, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5807.2s elapsed, stack_depth=5, top_level=4, yielded=131200, combos_checked=136726, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5827.3s elapsed, stack_depth=5, top_level=4, yielded=131704, combos_checked=137250, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5847.3s elapsed, stack_depth=5, top_level=4, yielded=132067, combos_checked=137629, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5867.3s elapsed, stack_depth=5, top_level=4, yielded=132465, combos_checked=138044, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5887.4s elapsed, stack_depth=5, top_level=4, yielded=132916, combos_checked=138514, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5907.4s elapsed, stack_depth=5, top_level=4, yielded=133367, combos_checked=138984, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5927.4s elapsed, stack_depth=5, top_level=4, yielded=133804, combos_checked=139439, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5947.4s elapsed, stack_depth=5, top_level=4, yielded=134258, combos_checked=139912, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5967.4s elapsed, stack_depth=5, top_level=4, yielded=134711, combos_checked=140384, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 5987.5s elapsed, stack_depth=5, top_level=4, yielded=135105, combos_checked=140795, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6007.5s elapsed, stack_depth=5, top_level=4, yielded=135452, combos_checked=141156, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6027.6s elapsed, stack_depth=5, top_level=4, yielded=135904, combos_checked=141627, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6047.7s elapsed, stack_depth=5, top_level=4, yielded=136355, combos_checked=142098, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6067.7s elapsed, stack_depth=5, top_level=4, yielded=136806, combos_checked=142568, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6087.7s elapsed, stack_depth=5, top_level=4, yielded=137261, combos_checked=143041, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6107.7s elapsed, stack_depth=5, top_level=4, yielded=137716, combos_checked=143515, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6127.8s elapsed, stack_depth=5, top_level=4, yielded=138152, combos_checked=143970, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6147.8s elapsed, stack_depth=5, top_level=4, yielded=138471, combos_checked=144304, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6167.8s elapsed, stack_depth=5, top_level=4, yielded=138963, combos_checked=144816, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6187.8s elapsed, stack_depth=5, top_level=4, yielded=139461, combos_checked=145335, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6207.9s elapsed, stack_depth=5, top_level=4, yielded=139963, combos_checked=145857, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6227.9s elapsed, stack_depth=5, top_level=4, yielded=140465, combos_checked=146381, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6247.9s elapsed, stack_depth=5, top_level=4, yielded=140968, combos_checked=146905, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6268.0s elapsed, stack_depth=5, top_level=4, yielded=141304, combos_checked=147254, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6288.0s elapsed, stack_depth=5, top_level=4, yielded=141741, combos_checked=147711, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6308.0s elapsed, stack_depth=5, top_level=4, yielded=142191, combos_checked=148180, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6328.1s elapsed, stack_depth=5, top_level=4, yielded=142642, combos_checked=148649, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6348.1s elapsed, stack_depth=5, top_level=4, yielded=143095, combos_checked=149121, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6368.1s elapsed, stack_depth=5, top_level=4, yielded=143540, combos_checked=149585, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6388.2s elapsed, stack_depth=5, top_level=4, yielded=143993, combos_checked=150056, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6408.2s elapsed, stack_depth=5, top_level=4, yielded=144346, combos_checked=150424, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6428.3s elapsed, stack_depth=5, top_level=4, yielded=144733, combos_checked=150828, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6448.3s elapsed, stack_depth=5, top_level=4, yielded=145184, combos_checked=151298, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6468.3s elapsed, stack_depth=5, top_level=4, yielded=145628, combos_checked=151760, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6488.3s elapsed, stack_depth=5, top_level=4, yielded=146080, combos_checked=152231, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6508.3s elapsed, stack_depth=5, top_level=4, yielded=146535, combos_checked=152706, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6528.4s elapsed, stack_depth=5, top_level=4, yielded=146989, combos_checked=153179, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6548.5s elapsed, stack_depth=5, top_level=4, yielded=147392, combos_checked=153598, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6568.6s elapsed, stack_depth=5, top_level=4, yielded=147767, combos_checked=153991, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6588.6s elapsed, stack_depth=5, top_level=4, yielded=148259, combos_checked=154504, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6608.6s elapsed, stack_depth=5, top_level=4, yielded=148763, combos_checked=155028, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6628.6s elapsed, stack_depth=5, top_level=4, yielded=149266, combos_checked=155552, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6648.7s elapsed, stack_depth=5, top_level=4, yielded=149763, combos_checked=156071, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6668.7s elapsed, stack_depth=5, top_level=4, yielded=150272, combos_checked=156600, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6688.7s elapsed, stack_depth=5, top_level=4, yielded=150585, combos_checked=156927, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6708.7s elapsed, stack_depth=5, top_level=4, yielded=151031, combos_checked=157392, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6728.8s elapsed, stack_depth=5, top_level=4, yielded=151484, combos_checked=157863, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6748.8s elapsed, stack_depth=5, top_level=4, yielded=151936, combos_checked=158334, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6768.8s elapsed, stack_depth=5, top_level=4, yielded=152384, combos_checked=158802, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6788.9s elapsed, stack_depth=5, top_level=4, yielded=152838, combos_checked=159275, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6808.9s elapsed, stack_depth=5, top_level=4, yielded=153295, combos_checked=159750, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6828.9s elapsed, stack_depth=5, top_level=4, yielded=153594, combos_checked=160061, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6848.9s elapsed, stack_depth=5, top_level=4, yielded=154029, combos_checked=160516, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6868.9s elapsed, stack_depth=5, top_level=4, yielded=154482, combos_checked=160988, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6888.9s elapsed, stack_depth=5, top_level=4, yielded=154936, combos_checked=161460, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6909.0s elapsed, stack_depth=5, top_level=4, yielded=155392, combos_checked=161935, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6929.0s elapsed, stack_depth=5, top_level=4, yielded=155843, combos_checked=162406, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6949.0s elapsed, stack_depth=5, top_level=4, yielded=156294, combos_checked=162876, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6969.0s elapsed, stack_depth=5, top_level=4, yielded=156640, combos_checked=163235, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 6989.1s elapsed, stack_depth=5, top_level=4, yielded=157079, combos_checked=163695, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7009.1s elapsed, stack_depth=5, top_level=4, yielded=157581, combos_checked=164218, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7029.1s elapsed, stack_depth=5, top_level=4, yielded=158082, combos_checked=164740, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7049.1s elapsed, stack_depth=5, top_level=4, yielded=158589, combos_checked=165267, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7069.1s elapsed, stack_depth=5, top_level=4, yielded=159077, combos_checked=165777, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7089.1s elapsed, stack_depth=5, top_level=4, yielded=159584, combos_checked=166305, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7109.2s elapsed, stack_depth=5, top_level=4, yielded=159879, combos_checked=166613, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7129.2s elapsed, stack_depth=5, top_level=4, yielded=160331, combos_checked=167084, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7149.2s elapsed, stack_depth=5, top_level=4, yielded=160784, combos_checked=167555, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7169.2s elapsed, stack_depth=5, top_level=4, yielded=161238, combos_checked=168028, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7189.3s elapsed, stack_depth=5, top_level=4, yielded=161695, combos_checked=168504, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7209.3s elapsed, stack_depth=5, top_level=4, yielded=162143, combos_checked=168970, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7229.3s elapsed, stack_depth=5, top_level=4, yielded=162597, combos_checked=169444, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7249.3s elapsed, stack_depth=5, top_level=4, yielded=162885, combos_checked=169745, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7269.3s elapsed, stack_depth=5, top_level=4, yielded=163338, combos_checked=170217, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7289.4s elapsed, stack_depth=5, top_level=4, yielded=163791, combos_checked=170689, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7309.4s elapsed, stack_depth=5, top_level=4, yielded=164244, combos_checked=171160, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7329.4s elapsed, stack_depth=5, top_level=4, yielded=164701, combos_checked=171636, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7349.4s elapsed, stack_depth=5, top_level=4, yielded=165149, combos_checked=172103, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7369.4s elapsed, stack_depth=5, top_level=4, yielded=165597, combos_checked=172569, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7389.5s elapsed, stack_depth=5, top_level=4, yielded=165888, combos_checked=172872, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7409.6s elapsed, stack_depth=5, top_level=4, yielded=166392, combos_checked=173400, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7429.6s elapsed, stack_depth=5, top_level=4, yielded=166893, combos_checked=173922, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7449.6s elapsed, stack_depth=5, top_level=4, yielded=167394, combos_checked=174444, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7469.6s elapsed, stack_depth=5, top_level=4, yielded=167901, combos_checked=174971, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7489.6s elapsed, stack_depth=5, top_level=4, yielded=168406, combos_checked=175498, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7509.7s elapsed, stack_depth=5, top_level=4, yielded=168879, combos_checked=175991, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7529.7s elapsed, stack_depth=5, top_level=4, yielded=169204, combos_checked=176330, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7549.7s elapsed, stack_depth=5, top_level=4, yielded=169657, combos_checked=176802, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7569.8s elapsed, stack_depth=5, top_level=4, yielded=170108, combos_checked=177271, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7589.8s elapsed, stack_depth=5, top_level=4, yielded=170560, combos_checked=177743, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7609.8s elapsed, stack_depth=5, top_level=4, yielded=171017, combos_checked=178219, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7629.8s elapsed, stack_depth=5, top_level=4, yielded=171472, combos_checked=178693, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7649.8s elapsed, stack_depth=5, top_level=4, yielded=171911, combos_checked=179150, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7669.9s elapsed, stack_depth=5, top_level=4, yielded=172187, combos_checked=179438, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7689.9s elapsed, stack_depth=5, top_level=4, yielded=172640, combos_checked=179910, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7709.9s elapsed, stack_depth=5, top_level=4, yielded=173090, combos_checked=180380, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7730.0s elapsed, stack_depth=5, top_level=4, yielded=173545, combos_checked=180853, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7750.0s elapsed, stack_depth=5, top_level=4, yielded=174002, combos_checked=181329, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7770.0s elapsed, stack_depth=5, top_level=4, yielded=174459, combos_checked=181805, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7790.0s elapsed, stack_depth=4, top_level=3, yielded=174912, combos_checked=182277, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7810.0s elapsed, stack_depth=5, top_level=4, yielded=175212, combos_checked=182592, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7830.0s elapsed, stack_depth=5, top_level=4, yielded=175714, combos_checked=183115, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7850.0s elapsed, stack_depth=5, top_level=4, yielded=176217, combos_checked=183638, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7870.1s elapsed, stack_depth=5, top_level=4, yielded=176718, combos_checked=184160, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7890.1s elapsed, stack_depth=5, top_level=4, yielded=177222, combos_checked=184686, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7910.1s elapsed, stack_depth=5, top_level=4, yielded=177729, combos_checked=185214, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7930.2s elapsed, stack_depth=5, top_level=4, yielded=178130, combos_checked=185631, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7950.2s elapsed, stack_depth=5, top_level=4, yielded=178508, combos_checked=186026, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7970.2s elapsed, stack_depth=5, top_level=4, yielded=178952, combos_checked=186489, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 7990.2s elapsed, stack_depth=5, top_level=4, yielded=179406, combos_checked=186961, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8010.2s elapsed, stack_depth=5, top_level=4, yielded=179861, combos_checked=187435, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8030.3s elapsed, stack_depth=5, top_level=4, yielded=180319, combos_checked=187912, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8050.3s elapsed, stack_depth=5, top_level=4, yielded=180770, combos_checked=188383, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8070.4s elapsed, stack_depth=5, top_level=4, yielded=181180, combos_checked=188809, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8090.4s elapsed, stack_depth=5, top_level=4, yielded=181516, combos_checked=189160, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8110.4s elapsed, stack_depth=5, top_level=4, yielded=181971, combos_checked=189634, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8130.5s elapsed, stack_depth=5, top_level=4, yielded=182426, combos_checked=190108, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8150.6s elapsed, stack_depth=5, top_level=4, yielded=182880, combos_checked=190580, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8170.6s elapsed, stack_depth=5, top_level=4, yielded=183336, combos_checked=191056, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8190.6s elapsed, stack_depth=5, top_level=4, yielded=183783, combos_checked=191522, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8210.6s elapsed, stack_depth=5, top_level=4, yielded=184228, combos_checked=191986, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8230.7s elapsed, stack_depth=5, top_level=4, yielded=184551, combos_checked=192324, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8250.7s elapsed, stack_depth=5, top_level=4, yielded=185054, combos_checked=192847, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8270.7s elapsed, stack_depth=5, top_level=4, yielded=185536, combos_checked=193349, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8290.8s elapsed, stack_depth=5, top_level=4, yielded=186040, combos_checked=193874, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8310.8s elapsed, stack_depth=5, top_level=4, yielded=186545, combos_checked=194401, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8330.8s elapsed, stack_depth=5, top_level=4, yielded=187051, combos_checked=194928, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8350.8s elapsed, stack_depth=5, top_level=4, yielded=187385, combos_checked=195275, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8370.9s elapsed, stack_depth=5, top_level=4, yielded=187827, combos_checked=195737, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8390.9s elapsed, stack_depth=5, top_level=4, yielded=188281, combos_checked=196210, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8410.9s elapsed, stack_depth=5, top_level=4, yielded=188733, combos_checked=196680, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8430.9s elapsed, stack_depth=5, top_level=4, yielded=189186, combos_checked=197153, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8450.9s elapsed, stack_depth=5, top_level=4, yielded=189630, combos_checked=197615, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8471.0s elapsed, stack_depth=5, top_level=4, yielded=190080, combos_checked=198085, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8491.1s elapsed, stack_depth=5, top_level=4, yielded=190431, combos_checked=198449, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8511.1s elapsed, stack_depth=5, top_level=4, yielded=190825, combos_checked=198861, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8531.1s elapsed, stack_depth=5, top_level=4, yielded=191279, combos_checked=199334, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8551.1s elapsed, stack_depth=5, top_level=4, yielded=191733, combos_checked=199807, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8571.2s elapsed, stack_depth=5, top_level=4, yielded=192181, combos_checked=200273, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8591.2s elapsed, stack_depth=5, top_level=4, yielded=192639, combos_checked=200750, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8611.2s elapsed, stack_depth=5, top_level=4, yielded=193094, combos_checked=201225, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8631.3s elapsed, stack_depth=5, top_level=4, yielded=193480, combos_checked=201627, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8651.3s elapsed, stack_depth=5, top_level=4, yielded=193871, combos_checked=202036, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8671.3s elapsed, stack_depth=5, top_level=4, yielded=194371, combos_checked=202557, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8691.4s elapsed, stack_depth=5, top_level=4, yielded=194875, combos_checked=203081, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8711.4s elapsed, stack_depth=5, top_level=4, yielded=195379, combos_checked=203607, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8731.4s elapsed, stack_depth=5, top_level=4, yielded=195873, combos_checked=204122, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8751.4s elapsed, stack_depth=5, top_level=4, yielded=196381, combos_checked=204650, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8771.5s elapsed, stack_depth=5, top_level=4, yielded=196679, combos_checked=204962, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8791.5s elapsed, stack_depth=5, top_level=4, yielded=197133, combos_checked=205435, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8811.5s elapsed, stack_depth=5, top_level=4, yielded=197584, combos_checked=205905, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8831.5s elapsed, stack_depth=5, top_level=4, yielded=198037, combos_checked=206376, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8851.5s elapsed, stack_depth=5, top_level=4, yielded=198486, combos_checked=206844, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8871.5s elapsed, stack_depth=5, top_level=4, yielded=198943, combos_checked=207320, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8891.6s elapsed, stack_depth=5, top_level=4, yielded=199393, combos_checked=207790, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8911.6s elapsed, stack_depth=5, top_level=4, yielded=199681, combos_checked=208091, pruned=0, cache_hits=0
+    merge or1200_rfram_generic group 0: yielded 200000, checked 208424, pruned 0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8931.6s elapsed, stack_depth=5, top_level=4, yielded=200137, combos_checked=208565, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8951.6s elapsed, stack_depth=5, top_level=4, yielded=200591, combos_checked=209038, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8971.6s elapsed, stack_depth=5, top_level=4, yielded=201045, combos_checked=209511, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 8991.6s elapsed, stack_depth=5, top_level=4, yielded=201486, combos_checked=209970, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9011.7s elapsed, stack_depth=5, top_level=4, yielded=201943, combos_checked=210446, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9031.7s elapsed, stack_depth=5, top_level=4, yielded=202400, combos_checked=210922, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9051.8s elapsed, stack_depth=5, top_level=4, yielded=202728, combos_checked=211264, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9071.8s elapsed, stack_depth=5, top_level=4, yielded=203171, combos_checked=211728, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9091.8s elapsed, stack_depth=5, top_level=4, yielded=203673, combos_checked=212250, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9111.8s elapsed, stack_depth=5, top_level=4, yielded=204173, combos_checked=212771, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9131.8s elapsed, stack_depth=5, top_level=4, yielded=204676, combos_checked=213296, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9151.9s elapsed, stack_depth=5, top_level=4, yielded=205184, combos_checked=213824, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9171.9s elapsed, stack_depth=5, top_level=4, yielded=205681, combos_checked=214342, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9191.9s elapsed, stack_depth=5, top_level=4, yielded=205983, combos_checked=214657, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9211.9s elapsed, stack_depth=5, top_level=4, yielded=206434, combos_checked=215128, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9231.9s elapsed, stack_depth=5, top_level=4, yielded=206884, combos_checked=215597, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9252.0s elapsed, stack_depth=5, top_level=4, yielded=207338, combos_checked=216069, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9272.0s elapsed, stack_depth=5, top_level=4, yielded=207794, combos_checked=216544, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9292.0s elapsed, stack_depth=5, top_level=4, yielded=208250, combos_checked=217019, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9312.1s elapsed, stack_depth=5, top_level=4, yielded=208704, combos_checked=217491, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9332.1s elapsed, stack_depth=5, top_level=4, yielded=208983, combos_checked=217783, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9352.1s elapsed, stack_depth=5, top_level=4, yielded=209438, combos_checked=218257, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9372.2s elapsed, stack_depth=5, top_level=4, yielded=209889, combos_checked=218728, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9392.2s elapsed, stack_depth=5, top_level=4, yielded=210340, combos_checked=219198, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9412.2s elapsed, stack_depth=5, top_level=4, yielded=210798, combos_checked=219674, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9432.3s elapsed, stack_depth=5, top_level=4, yielded=211256, combos_checked=220151, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9452.3s elapsed, stack_depth=5, top_level=4, yielded=211706, combos_checked=220620, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9472.3s elapsed, stack_depth=5, top_level=4, yielded=211991, combos_checked=220919, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9492.3s elapsed, stack_depth=5, top_level=4, yielded=212484, combos_checked=221433, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9512.3s elapsed, stack_depth=5, top_level=4, yielded=212988, combos_checked=221957, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9532.4s elapsed, stack_depth=5, top_level=4, yielded=213489, combos_checked=222479, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9552.4s elapsed, stack_depth=5, top_level=4, yielded=213995, combos_checked=223007, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9572.4s elapsed, stack_depth=5, top_level=4, yielded=214502, combos_checked=223535, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9592.5s elapsed, stack_depth=5, top_level=4, yielded=214966, combos_checked=224018, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9612.5s elapsed, stack_depth=5, top_level=4, yielded=215291, combos_checked=224357, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9632.5s elapsed, stack_depth=5, top_level=4, yielded=215744, combos_checked=224829, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9652.5s elapsed, stack_depth=5, top_level=4, yielded=216195, combos_checked=225300, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9672.6s elapsed, stack_depth=5, top_level=4, yielded=216651, combos_checked=225774, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9692.6s elapsed, stack_depth=5, top_level=4, yielded=217108, combos_checked=226250, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9712.6s elapsed, stack_depth=5, top_level=4, yielded=217565, combos_checked=226726, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9732.6s elapsed, stack_depth=4, top_level=3, yielded=218016, combos_checked=227196, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9752.6s elapsed, stack_depth=5, top_level=4, yielded=218305, combos_checked=227499, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9772.6s elapsed, stack_depth=5, top_level=4, yielded=218752, combos_checked=227964, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9792.7s elapsed, stack_depth=5, top_level=4, yielded=219207, combos_checked=228438, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9812.7s elapsed, stack_depth=5, top_level=4, yielded=219661, combos_checked=228911, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9832.7s elapsed, stack_depth=5, top_level=4, yielded=220118, combos_checked=229386, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9852.7s elapsed, stack_depth=5, top_level=4, yielded=220575, combos_checked=229862, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9872.8s elapsed, stack_depth=5, top_level=4, yielded=221029, combos_checked=230336, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9892.8s elapsed, stack_depth=5, top_level=4, yielded=221332, combos_checked=230653, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9912.8s elapsed, stack_depth=5, top_level=4, yielded=221823, combos_checked=231164, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9932.8s elapsed, stack_depth=5, top_level=4, yielded=222323, combos_checked=231685, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9952.8s elapsed, stack_depth=5, top_level=4, yielded=222825, combos_checked=232209, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9972.9s elapsed, stack_depth=5, top_level=4, yielded=223330, combos_checked=232735, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 9992.9s elapsed, stack_depth=5, top_level=4, yielded=223837, combos_checked=233262, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 10013.0s elapsed, stack_depth=5, top_level=4, yielded=224223, combos_checked=233664, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 10033.0s elapsed, stack_depth=5, top_level=4, yielded=224620, combos_checked=234079, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 10053.0s elapsed, stack_depth=5, top_level=4, yielded=225066, combos_checked=234544, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 10073.1s elapsed, stack_depth=5, top_level=4, yielded=225510, combos_checked=235007, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 10093.1s elapsed, stack_depth=5, top_level=4, yielded=225966, combos_checked=235481, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 10113.1s elapsed, stack_depth=5, top_level=4, yielded=226422, combos_checked=235956, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 10133.1s elapsed, stack_depth=5, top_level=4, yielded=226879, combos_checked=236432, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 10153.2s elapsed, stack_depth=5, top_level=4, yielded=227268, combos_checked=236838, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 10173.2s elapsed, stack_depth=5, top_level=4, yielded=227618, combos_checked=237204, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 10193.2s elapsed, stack_depth=5, top_level=4, yielded=228072, combos_checked=237676, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 10213.3s elapsed, stack_depth=5, top_level=4, yielded=228526, combos_checked=238149, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 10233.3s elapsed, stack_depth=5, top_level=4, yielded=228975, combos_checked=238617, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 10253.4s elapsed, stack_depth=5, top_level=4, yielded=229432, combos_checked=239092, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 10273.5s elapsed, stack_depth=5, top_level=4, yielded=229888, combos_checked=239567, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 10293.6s elapsed, stack_depth=5, top_level=4, yielded=230314, combos_checked=240012, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 10313.6s elapsed, stack_depth=5, top_level=4, yielded=230647, combos_checked=240360, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 10333.6s elapsed, stack_depth=5, top_level=4, yielded=231147, combos_checked=240881, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 10353.6s elapsed, stack_depth=5, top_level=4, yielded=231642, combos_checked=241396, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 10373.6s elapsed, stack_depth=5, top_level=4, yielded=232145, combos_checked=241921, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 10393.7s elapsed, stack_depth=5, top_level=4, yielded=232650, combos_checked=242447, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 10413.7s elapsed, stack_depth=5, top_level=4, yielded=233154, combos_checked=242972, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 10433.7s elapsed, stack_depth=5, top_level=4, yielded=233473, combos_checked=243306, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 10453.7s elapsed, stack_depth=5, top_level=4, yielded=233927, combos_checked=243778, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 10473.7s elapsed, stack_depth=5, top_level=4, yielded=234380, combos_checked=244250, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 10493.7s elapsed, stack_depth=5, top_level=4, yielded=234832, combos_checked=244721, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 10513.8s elapsed, stack_depth=5, top_level=4, yielded=235287, combos_checked=245194, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 10533.8s elapsed, stack_depth=5, top_level=4, yielded=235734, combos_checked=245660, pruned=0, cache_hits=0
+    [merge-heartbeat] or1200_rfram_generic_g0: 10553.8s elapsed, stack_depth=5, top_level=4, yielded=236190, combos_checked=246135, pruned=0, cache_hits=0
