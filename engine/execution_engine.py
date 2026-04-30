@@ -5,6 +5,7 @@ from z3 import z3util
 from .execution_manager import ExecutionManager
 from .symbolic_state import SymbolicState
 from .cfg import CFG
+from .combinational import build_comb_metadata, evaluate_dirty_comb
 from .dfs_iterator import (
     DFSCrossModuleIterator,
     LazyProduct,
@@ -139,6 +140,10 @@ class ExecutionEngine:
                 path_state = state_template.fresh_for_block(module_name,
                     state_template.snapshot(module_name))
 
+                # base_store already has CA outputs baked in (one-shot pass in
+                # execute_sv). Starts clean — only writes during the path dirty
+                # their dependents, and evaluate_dirty_comb re-runs just those.
+
                 self._execute_cfg_path(visitor, manager, path_state, module_name,
                                        cfg, path, modules_dict)
 
@@ -198,8 +203,10 @@ class ExecutionEngine:
 
             prev_bb_idx = bb_idx
 
-        # TODO: For Jacob to check
-        path_state.flush_pending_nba(module_name)
+        # End-of-path NBA commit, then re-evaluate every continuous assign whose
+        # RHS depends on a signal that was written during the path (paper §4.4).
+        path_state.flush_pending_nba(module_name, manager)
+        evaluate_dirty_comb(path_state, module_name, manager)
 
     @staticmethod
     def _to_bool(z3_expr):
@@ -229,7 +236,6 @@ class ExecutionEngine:
 
         cond_expr_node = None
 
-        #TODO(c): For Jacob to check
         # Exact guard node carried by CFG edge metadata.
         guard_node_idx = edge_data.get('guard_node_idx')
         if isinstance(guard_node_idx, int) and 0 <= guard_node_idx < len(cfg.all_nodes):
@@ -261,7 +267,6 @@ class ExecutionEngine:
         path_state.assertion_counter += 1
         tag = "cfg_p{}".format(path_state.assertion_counter)
 
-        # TODO(d): For Jacob to check
         # Temp debug: map cfg_pN -> edge/source/condition for one module
         if manager.curr_module == "or1200_dpram_256x32":
             try:
@@ -595,7 +600,6 @@ class ExecutionEngine:
         self.module_depth += 1
         state: SymbolicState = SymbolicState()
 
-        # TODO: For Jacob to check
         state.pending_nba = {}
 
         if manager is not None:
@@ -720,6 +724,42 @@ class ExecutionEngine:
             comb_lookup[module_name] = state.snapshot(module_name)
 
         print(f"Phase: base_store — {len(keys)} module(s)", flush=True)
+
+        # --- Continuous-assign dependency map (paper §4.4) ---
+        # Per module: list of ContinuousAssign nodes, {idx→lhs}, {rhs_signal→[idx,…]}.
+        # Writes consult comb_deps to OR dirty bits; evaluate_dirty_comb drains them
+        # at end of each path.
+        # TODO Param look at this section down to line # 746
+        manager.comb_assigns = {}
+        manager.comb_lhs = {}
+        manager.comb_deps = {}
+        for module_name in keys:
+            cfgs = cfgs_by_module[module_name]
+            comb_nodes = cfgs[0].comb if cfgs else []
+            assigns, lhs, deps = build_comb_metadata(comb_nodes)
+            manager.comb_assigns[module_name] = assigns
+            manager.comb_lhs[module_name] = lhs
+            manager.comb_deps[module_name] = deps
+        total_ca = sum(len(v) for v in manager.comb_assigns.values())
+        if total_ca > 0:
+            print(
+                f"  continuous-assign dep map: {total_ca} CAs across {len(keys)} module(s)",
+                flush=True,
+            )
+
+        # One-shot: evaluate every CA against each module's base_store so path
+        # starts inherit CA outputs baked in. Without this, each path would have
+        # to re-evaluate every CA itself (paths × CAs Z3 builds per module).
+        from types import SimpleNamespace
+        for module_name in keys:
+            n_ca = len(manager.comb_assigns[module_name])
+            if n_ca == 0:
+                continue
+            seed = SimpleNamespace(
+                store={module_name: base_store[module_name]},
+                dirty={module_name: (1 << n_ca) - 1}, # Marks all CAs as dirty so they get evaluated
+            )
+            evaluate_dirty_comb(seed, module_name, manager)
 
         # Count sequential vs combinational CFGs for reporting
         n_seq = sum(1 for m in keys for c in cfgs_by_module[m] if not c.is_combinational)

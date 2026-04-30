@@ -417,7 +417,6 @@ class SymbolicDFS:
                 lhs_name = lhs_sym.name
                 rhs = expr.right
 
-                # TODO: For Jacob to check
                 is_nb = bool(getattr(expr, "isNonBlocking", False))
                 if getattr(s, "pending_nba", None) is None:
                     s.pending_nba = {}
@@ -428,6 +427,10 @@ class SymbolicDFS:
                         pend[lhs_name] = val
                     else:
                         s.store[m.curr_module][lhs_name] = val
+                        # Blocking write is visible immediately; dirty its comb dependents.
+                        # NBA dirties are deferred to flush_pending_nba.
+                        # TODO: Param check 
+                        s.mark_dirty(m.curr_module, lhs_name, m)
 
                 rhs_sym = getattr(rhs, 'symbol', None)
                 if rhs_sym is not None:

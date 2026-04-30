@@ -54,12 +54,33 @@ class SymbolicState:
         s.store = {module_name: dict(base_store)}
         s.pc = Solver()
 
-        # TODO: For Jacob to check
         s.pending_nba = {}
+        # Dirty bitset per module: bit i set ⇒ continuous assign i must be re-evaluated.
+        s.dirty = {}
         return s
 
-    # TODO: For Jacob to check
-    def flush_pending_nba(self, module_name: str) -> None:
+    def mark_dirty(self, module_name: str, signal_name: str, manager) -> None:
+        """OR the bits of every comb assign that reads *signal_name* into state.dirty."""
+        if manager is None:
+            return
+        mod_deps = getattr(manager, "comb_deps", None)
+        if not mod_deps:
+            return
+        deps_by_signal = mod_deps.get(module_name)
+        if not deps_by_signal:
+            return
+        dep_idxs = deps_by_signal.get(signal_name)
+        if not dep_idxs:
+            return
+
+        if not hasattr(self, "dirty") or self.dirty is None:
+            self.dirty = {}
+        bits = 0
+        for idx in dep_idxs:
+            bits |= 1 << idx
+        self.dirty[module_name] = self.dirty.get(module_name, 0) | bits
+
+    def flush_pending_nba(self, module_name: str, manager=None) -> None:
         """Apply deferred nonblocking assignments (`<=`) for one module to the store.
 
         Reads during the same simulated clock edge use ``store`` only; this merges
@@ -69,6 +90,9 @@ class SymbolicState:
         timestep: other always blocks in the module are not executed in the same
         ``SymbolicState`` walk, so there is no single global NBA queue across blocks
         here (see ``execute_sv`` explore-phase comment in ``execution_engine.py``).
+
+        If manager is provided, each flushed NBA target also dirties its comb
+        dependents so the subsequent evaluate_dirty_comb pass re-runs them.
         """
         pend = getattr(self, "pending_nba", None)
         if not pend:
@@ -79,4 +103,7 @@ class SymbolicState:
         mod_store = self.store.setdefault(module_name, {})
         for k, v in bucket.items():
             mod_store[k] = v
+            # TODO: Param Check 
+            if manager is not None:
+                self.mark_dirty(module_name, k, manager)
         bucket.clear()
