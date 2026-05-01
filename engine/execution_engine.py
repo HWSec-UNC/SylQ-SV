@@ -21,6 +21,7 @@ from helpers.utils import to_binary
 import pyslang.syntax as ps_stx
 import pyslang.ast as ps_ast
 from helpers.slang_helpers import get_module_name, init_state
+from logger import logger
 
 # Tuple of PySlang AST node types that represent conditional/loop statements
 CONDITIONALS = (
@@ -127,14 +128,14 @@ class ExecutionEngine:
         prev_curr_module = manager.curr_module
         manager.curr_module = module_name
         num_paths = cfg.get_path_count()
-        print("explore_block: {} ({} paths)".format(module_name, num_paths), flush=True)
+        logger.debug("explore_block: {} ({} paths)".format(module_name, num_paths))
         results = []
         try:
             for path_idx, path in enumerate(cfg.get_paths()):
                 if self.debug and (
                     path_idx == 0 or (path_idx + 1) % 100 == 0 or path_idx == num_paths - 1
                 ):
-                    print("  path {}/{}".format(path_idx + 1, num_paths), flush=True)
+                    logger.debug("  path {}/{}".format(path_idx + 1, num_paths))
                 manager.ignore = False
                 manager.abandon = False
                 path_state = state_template.fresh_for_block(module_name,
@@ -270,7 +271,7 @@ class ExecutionEngine:
         # Temp debug: map cfg_pN -> edge/source/condition for one module
         if manager.curr_module == "or1200_dpram_256x32":
             try:
-                print(f"[CFG_ASSERT] {tag} src_bb={source_bb_idx} guard_idx={guard_node_idx} cond={cond} cond_z3={cond_z3}", flush=True)
+                logger.debug(f"[CFG_ASSERT] {tag} src_bb={source_bb_idx} guard_idx={guard_node_idx} cond={cond} cond_z3={cond_z3}")
             except Exception:
                 pass
         
@@ -596,7 +597,7 @@ class ExecutionEngine:
         """Main entry point for PySlang execution
         Drives symbolic execution for SystemVerilog designs."""
         gc.collect()
-        print(f"Executing for {num_cycles} clock cycle(s)", flush=True)
+        logger.info(f"Executing for {num_cycles} clock cycle(s)")
         self.module_depth += 1
         state: SymbolicState = SymbolicState()
 
@@ -692,7 +693,7 @@ class ExecutionEngine:
 
         keys = list(cfgs_by_module.keys())
         if not keys or not manager.names_list:
-            print("No modules or no CFGs; skipping path exploration.", flush=True)
+            logger.warning("No modules or no CFGs; skipping path exploration.")
             self.module_depth -= 1
             return
 
@@ -700,12 +701,12 @@ class ExecutionEngine:
 
         # --- Piecewise composition (sole execution mode) ---
         manager.prev_store = state.store
-        print("Phase: init_state", flush=True)
+        logger.info("Phase: init_state")
         init_state(state, manager.prev_store, first_module, visitor)
         for module_name in manager.names_list:
             manager.curr_module = module_name
             visitor.dfs(modules_dict[module_name])
-        print(f"Phase: hierarchy traversal — {len(manager.names_list)} module(s)", flush=True)
+        logger.info(f"Phase: hierarchy traversal — {len(manager.names_list)} module(s)")
         base_store = {}
         # --- always_comb look-up table (Paper §4.4) ---
         # On first pass, evaluate decls and comb nodes; store results in a look-up
@@ -723,7 +724,7 @@ class ExecutionEngine:
             base_store[module_name] = state.snapshot(module_name)
             comb_lookup[module_name] = state.snapshot(module_name)
 
-        print(f"Phase: base_store — {len(keys)} module(s)", flush=True)
+        logger.info(f"Phase: base_store — {len(keys)} module(s)")
 
         # --- Continuous-assign dependency map (paper §4.4) ---
         # Per module: list of ContinuousAssign nodes, {idx→lhs}, {rhs_signal→[idx,…]}.
@@ -742,9 +743,8 @@ class ExecutionEngine:
             manager.comb_deps[module_name] = deps
         total_ca = sum(len(v) for v in manager.comb_assigns.values())
         if total_ca > 0:
-            print(
-                f"  continuous-assign dep map: {total_ca} CAs across {len(keys)} module(s)",
-                flush=True,
+            logger.debug(
+                f"  continuous-assign dep map: {total_ca} CAs across {len(keys)} module(s)"
             )
 
         # One-shot: evaluate every CA against each module's base_store so path
@@ -765,11 +765,11 @@ class ExecutionEngine:
         n_seq = sum(1 for m in keys for c in cfgs_by_module[m] if not c.is_combinational)
         n_comb = sum(1 for m in keys for c in cfgs_by_module[m] if c.is_combinational)
         if n_comb > 0:
-            print(f"  always_comb optimization: {n_comb} combinational CFGs, {n_seq} sequential CFGs", flush=True)
-            print(f"  Look-up table built for {len(comb_lookup)} module(s)", flush=True)
+            logger.debug(f"  always_comb optimization: {n_comb} combinational CFGs, {n_seq} sequential CFGs")
+            logger.debug(f"  Look-up table built for {len(comb_lookup)} module(s)")
 
         # --- Phase: Collect SVA assertions from all modules ---
-        print("Phase: collecting SVA assertions", flush=True)
+        logger.info("Phase: collecting SVA assertions")
         manager.assertions = []
         for module_name in manager.names_list:
             # 1) Module-level syntax walk (concurrent assertions, SVA properties)
@@ -793,10 +793,10 @@ class ExecutionEngine:
         n_with_z3 = sum(1 for a in manager.assertions if a.get('z3_expr') is not None)
         n_immediate = sum(1 for a in manager.assertions if a.get('kind') == 'immediate')
         n_concurrent = n_total - n_immediate
-        print(f"  Found {n_total} assertion(s) ({n_immediate} immediate, {n_concurrent} concurrent), "
-              f"{n_with_z3} with Z3 expressions", flush=True)
+        logger.info(f"  Found {n_total} assertion(s) ({n_immediate} immediate, {n_concurrent} concurrent), "
+              f"{n_with_z3} with Z3 expressions")
 
-        print("Phase: explore_block", flush=True)
+        logger.info("Phase: explore_block")
         # Per paper §3.3: explore full path tree per always block; materialize list per block.
         #
         # RTL timestep (ideal): one shared register snapshot for the posedge; every
@@ -821,7 +821,7 @@ class ExecutionEngine:
                 for cfg in cfgs
             ]
 
-        print("Phase: merge_block_results", flush=True)
+        logger.info("Phase: merge_block_results")
         merge_prof = os.environ.get("SYLQ_MERGE_PROFILE", "").strip().lower() in (
             "1", "true", "yes", "on",
         )
@@ -830,10 +830,9 @@ class ExecutionEngine:
             _mp_solver0 = manager.solver_time
             _mp_zm0 = manager.feasibility_z3_at_merge
             _mp_zlp0 = manager.feasibility_z3_at_lazy_product
-            print(
+            logger.debug(
                 "  [merge-profile] per-module lines print after each instance; "
-                "cumulative line prints after all merges (export SYLQ_MERGE_PROFILE=1).",
-                flush=True,
+                "cumulative line prints after all merges (export SYLQ_MERGE_PROFILE=1)."
             )
         merged_by_module = {}
         for idx, module_name in enumerate(keys):
@@ -860,20 +859,17 @@ class ExecutionEngine:
                 merge_kind = ""
 
             if merge_kind:
-                print(
-                    f"  merge {module_name} ({idx+1}/{len(keys)}): {n_blocks} blocks → {merge_kind}",
-                    flush=True,
+                logger.debug(
+                    f"  merge {module_name} ({idx+1}/{len(keys)}): {n_blocks} blocks → {merge_kind}"
                 )
                 if explorer_product <= max_log_product:
                     n_paths = sum(1 for _ in merged)
-                    print(
-                        f"      → {n_paths} feasible merged paths",
-                        flush=True,
+                    logger.debug(
+                        f"      → {n_paths} feasible merged paths"
                     )
             else:
-                print(
-                    f"  merge {module_name} ({idx+1}/{len(keys)}): {n_blocks} blocks → {len(merged)} paths",
-                    flush=True,
+                logger.debug(
+                    f"  merge {module_name} ({idx+1}/{len(keys)}): {n_blocks} blocks → {len(merged)} paths"
                 )
 
             if merge_prof:
@@ -883,11 +879,10 @@ class ExecutionEngine:
                 mod_zlp = manager.feasibility_z3_at_lazy_product - _mod_zlp0
                 mod_ovh = max(0.0, mod_wall - mod_z3)
                 mod_pct = 100.0 * mod_ovh / mod_wall if mod_wall > 1e-9 else 0.0
-                print(
+                logger.debug(
                     f"  [merge-profile] {module_name}: wall={mod_wall:.2f}s "
                     f"feasibility_Z3_wall={mod_z3:.2f}s merge_calls={mod_zm} "
-                    f"lazy_product_calls={mod_zlp} non_Z3≈{mod_ovh:.2f}s ({mod_pct:.0f}%)",
-                    flush=True,
+                    f"lazy_product_calls={mod_zlp} non_Z3≈{mod_ovh:.2f}s ({mod_pct:.0f}%)"
                 )
 
         if merge_prof:
@@ -897,26 +892,24 @@ class ExecutionEngine:
             zm = manager.feasibility_z3_at_merge - _mp_zm0
             zlp = manager.feasibility_z3_at_lazy_product - _mp_zlp0
             pct = 100.0 * ovh / wall if wall > 1e-9 else 0.0
-            print(
+            logger.debug(
                 f"  [merge-profile] phase_wall={wall:.2f}s feasibility_Z3_wall={z3:.2f}s "
                 f"(merge_calls={zm} lazy_product_calls={zlp}) "
-                f"non_Z3_wall≈{ovh:.2f}s ({pct:.0f}% of phase; Python/keys/cache/disjoint+iter)",
-                flush=True,
+                f"non_Z3_wall≈{ovh:.2f}s ({pct:.0f}% of phase; Python/keys/cache/disjoint+iter)"
             )
 
         valid_assertions = [a for a in manager.assertions
                             if a.get("z3_expr") is not None]
 
-        print("Phase: cross-module path iteration (DFS)", flush=True)
+        logger.info("Phase: cross-module path iteration (DFS)")
         if valid_assertions:
-            print(f"  Checking {len(valid_assertions)} assertion(s)", flush=True)
+            logger.info(f"  Checking {len(valid_assertions)} assertion(s)")
         else:
-            print("  Mode: no assertions — enumerating all feasible global path combinations "
-                  "(path_count and DFS stats updated)", flush=True)
-            print(f"  Per-module merged results: {len(merged_by_module)} module(s)", flush=True)
+            logger.info("  Mode: no assertions — enumerating all feasible global path combinations "
+                        "(path_count and DFS stats updated)")
+            logger.info(f"  Per-module merged results: {len(merged_by_module)} module(s)")
             if max_cross_module_paths is not None:
-                print(f"  Stopping after {max_cross_module_paths:,} global path combination(s).",
-                      flush=True)
+                logger.info(f"  Stopping after {max_cross_module_paths:,} global path combination(s).")
         dfs_xmod = DFSCrossModuleIterator(
             per_module_results=merged_by_module,
             num_cycles=int(num_cycles),
@@ -938,7 +931,7 @@ class ExecutionEngine:
                 manager.path_count <= 10 or manager.path_count % 100_000 == 0
             )
             if sparse or frequent:
-                print(
+                logger.debug(
                     "  cross-module: {} global path(s) completed; "
                     "outcome_pulls={} (each pull = next merged outcome for one module in this search; "
                     "not intra-module merge steps), "
@@ -947,8 +940,7 @@ class ExecutionEngine:
                         stats["combos_checked"],
                         stats["combos_pruned"],
                         stats["cache_hits"],
-                    ),
-                    flush=True,
+                    )
                 )
 
             if valid_assertions:
@@ -957,7 +949,7 @@ class ExecutionEngine:
                 if violation:
                     stats = dfs_xmod.get_stats()
                     manager.cross_module_stopped_reason = "violation"
-                    print(
+                    logger.warning(
                         "Phase: cross-module iteration stopped (assertion violation). "
                         "paths_checked={} ast_branch_visits={} DFS(pulls/pruned/cache_hits)={}/{}/{}".format(
                             manager.path_count,
@@ -965,8 +957,7 @@ class ExecutionEngine:
                             stats["combos_checked"],
                             stats["combos_pruned"],
                             stats["cache_hits"],
-                        ),
-                        flush=True,
+                        )
                     )
                     self.module_depth -= 1
                     return
@@ -976,10 +967,9 @@ class ExecutionEngine:
                 and max_cross_module_paths > 0
                 and manager.path_count >= max_cross_module_paths
             ):
-                print(
+                logger.info(
                     f"Phase: cross-module iteration stopped — --max-cross-module-paths "
-                    f"({max_cross_module_paths:,}) reached after {manager.path_count:,} path(s).",
-                    flush=True,
+                    f"({max_cross_module_paths:,}) reached after {manager.path_count:,} path(s)."
                 )
                 cross_stop = "max_paths"
                 break
@@ -998,7 +988,7 @@ class ExecutionEngine:
         else:
             status = "complete (exhausted iterator)"
             manager.cross_module_stopped_reason = "complete"
-        print(
+        logger.info(
             "Phase: cross-module iteration {} — paths_checked={} "
             "ast_branch_visits={} (SymbolicDFS if/case/while; 0 common: CFG branches are edge constraints) "
             "DFS(pulls/pruned/cache_hits)={}/{}/{}".format(
@@ -1008,8 +998,7 @@ class ExecutionEngine:
                 stats["combos_checked"],
                 stats["combos_pruned"],
                 stats["cache_hits"],
-            ),
-            flush=True,
+            )
         )
         self.module_depth -= 1
 
@@ -1067,23 +1056,21 @@ class ExecutionEngine:
                 z3_s = str(assertion_z3)
                 if len(z3_s) > 400:
                     z3_s = z3_s[:400] + " ... [truncated]"
-                print(f"\n=== ASSERTION VIOLATION FOUND ===", flush=True)
-                print(
-                    f"  Assertion: #{a_idx + 1} of {n_assertions} (index in collected assertion list)",
-                    flush=True,
+                logger.warning(f"\n=== ASSERTION VIOLATION FOUND ===")
+                logger.warning(
+                    f"  Assertion: #{a_idx + 1} of {n_assertions} (index in collected assertion list)"
                 )
-                print(f"  Module: {module}", flush=True)
-                print(f"  Kind: {assertion_info.get('kind', '?')}", flush=True)
-                print(f"  Source: {source_pretty}", flush=True)
-                print(f"  Property (Z3, must hold; violation uses NOT this): {z3_s}", flush=True)
-                print(f"  Counterexample: {counterexample}", flush=True)
-                print(
+                logger.warning(f"  Module: {module}")
+                logger.warning(f"  Kind: {assertion_info.get('kind', '?')}")
+                logger.warning(f"  Source: {source_pretty}")
+                logger.warning(f"  Property (Z3, must hold; violation uses NOT this): {z3_s}")
+                logger.warning(f"  Counterexample: {counterexample}")
+                logger.warning(
                     f"  Solver time: feasibility={manager.solver_time:.4f}s, "
                     f"assertions={manager.assertion_solver_time:.4f}s "
                     f"(total {manager.solver_time + manager.assertion_solver_time:.4f}s)",
-                    flush=True,
                 )
-                print(f"=================================\n", flush=True)
+                logger.warning(f"=================================\n")
                 manager.assertion_violation = True
                 return True
             s.pop()
@@ -1092,21 +1079,20 @@ class ExecutionEngine:
     def check_state(self, manager, state):
         """Checks the status of the execution and displays the state."""
         if self.done and manager.debug and not manager.is_child and not manager.init_run_flag and not manager.ignore and not manager.abandon:
-            print(f"Cycle {manager.cycle} final state:")
-            print(state.store)
+            logger.debug(f"Cycle {manager.cycle} final state:")
+            logger.debug(state.store)
     
-            print(f"Cycle {manager.cycle} final path condition:")
-            print(state.pc)
+            logger.debug(f"Cycle {manager.cycle} final path condition:")
+            logger.debug(state.pc)
         elif self.done and not manager.is_child and manager.assertion_violation and not manager.ignore and not manager.abandon:
-            print(f"Cycle {manager.cycle} initial state:")
-            print(manager.initial_store)
+            logger.debug(f"Cycle {manager.cycle} initial state:")
+            logger.debug(manager.initial_store)
 
-            print(f"Cycle {manager.cycle} final state:")
-            print(state.store)
+            logger.debug(f"Cycle {manager.cycle} final state:")
+            logger.debug(state.store)
     
-            print(f"Cycle {manager.cycle} final path condition:")
-            print(state.pc)
+            logger.debug(f"Cycle {manager.cycle} final path condition:")
+            logger.debug(state.pc)
         elif manager.debug and not manager.is_child and not manager.init_run_flag and not manager.ignore:
-            print("Initial state:")
-            print(state.store)
-                
+            logger.debug("Initial state:")
+            logger.debug(state.store)

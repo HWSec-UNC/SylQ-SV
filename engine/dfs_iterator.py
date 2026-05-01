@@ -21,6 +21,7 @@ import time
 from typing import List, Dict, Iterator, Optional, Any, Callable, Tuple
 from z3 import Solver, ExprRef, sat, unsat
 from z3 import z3util
+from logger import logger
 
 try:
     from z3 import unknown as z3_unknown
@@ -87,10 +88,9 @@ def sat_check_full_pc(
         return False
     if z3_unknown is not None and r == z3_unknown:
         if not _SAT_UNKNOWN_LOGGED:
-            print(
+            logger.warning(
                 "[sylq] Z3 returned unknown (timeout/incomplete); "
                 "treating as infeasible for feasibility checks (sound, may lose complete paths).",
-                flush=True,
             )
             _SAT_UNKNOWN_LOGGED = True
         return False
@@ -98,9 +98,8 @@ def sat_check_full_pc(
     rs = str(r)
     if rs == "unknown":
         if not _SAT_UNKNOWN_LOGGED:
-            print(
-                "[sylq] Z3 returned unknown; treating as infeasible for feasibility checks.",
-                flush=True,
+            logger.warning(
+                "[sylq] Z3 returned unknown; treating as infeasible for feasibility checks."
             )
             _SAT_UNKNOWN_LOGGED = True
         return False
@@ -446,10 +445,9 @@ class DFSMergeIterator:
         )
         dt = time.monotonic() - t0
         if _SLOW_SAT_WARN_SEC > 0 and dt >= _SLOW_SAT_WARN_SEC:
-            print(
+            logger.warning(
                 f"    [merge-slow-sat] {self.module_name}: {dt:.1f}s for "
-                f"{len(constraints)} constraint(s), result={'sat' if out else 'unsat/unknown'}",
-                flush=True,
+                f"{len(constraints)} constraint(s), result={'sat' if out else 'unsat/unknown'}"
             )
         return out
 
