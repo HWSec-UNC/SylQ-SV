@@ -107,6 +107,16 @@ def sat_check_full_pc(
 _SLOW_SAT_WARN_SEC = float(os.environ.get("SYLQ_SLOW_SAT_WARN_SEC", "5"))
 
 
+def _timeout_requested(manager: Any) -> bool:
+    """Return whether the owning execution engine requested cooperative stop."""
+    if manager is None:
+        return False
+    return bool(
+        getattr(manager, "timeout", False)
+        or getattr(getattr(manager, "engine", None), "timeout", False)
+    )
+
+
 @dataclass
 class DFSFrame:
     """A single frame in the DFS stack.
@@ -309,10 +319,15 @@ class LazyProduct:
             return
         
         if len(self.component_results) == 1:
-            yield from self.component_results[0]
+            for result in self.component_results[0]:
+                if _timeout_requested(self.manager):
+                    return
+                yield result
             return
 
         def rec(i: int, acc_pc: list, acc_store: dict) -> Iterator[dict]:
+            if _timeout_requested(self.manager):
+                return
             if i == len(self.component_results):
                 if self.manager is not None and acc_pc:
                     if not sat_check_full_pc(
@@ -326,6 +341,8 @@ class LazyProduct:
                 yield {"pc": acc_pc, "store": dict(acc_store)}
                 return
             for r in self.component_results[i]:
+                if _timeout_requested(self.manager):
+                    return
                 yield from rec(i + 1, acc_pc + r["pc"], {**acc_store, **r["store"]})
 
         yield from rec(0, [], {})
@@ -533,6 +550,8 @@ class DFSMergeIterator:
         # Handle single-block case
         if self.num_levels == 1:
             for result in self.block_result_lists[0]:
+                if _timeout_requested(self.manager):
+                    return
                 yield result
             return
         
@@ -540,6 +559,8 @@ class DFSMergeIterator:
         self._push_level(0, [], {}, set())
         
         while self.stack:
+            if _timeout_requested(self.manager):
+                return
             frame = self.stack[-1]
             
             # Try to get next result at current level
@@ -780,9 +801,10 @@ class DFSCrossModuleIterator:
         self._push_level(0, [], {}, set(), current_combo)
         
         while self.stack:
+            if _timeout_requested(self.manager):
+                return
             frame = self.stack[-1]
             module_name, cycle = self.levels[frame.level]
-            
             try:
                 result = next(frame.iterator)
                 frame.current_result = result

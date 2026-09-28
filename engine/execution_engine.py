@@ -606,6 +606,8 @@ class ExecutionEngine:
             # Only manager=None is supported: we build modules_dict, cfgs_by_module, etc. here.
             raise ValueError("execute_sv requires manager=None; the engine creates the manager internally.")
         manager = ExecutionManager()
+        manager.engine = self
+        self.timeout = False
         if hasattr(self, "cache"):
             manager.cache = self.cache
         manager.sv = True
