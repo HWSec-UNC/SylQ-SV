@@ -891,9 +891,10 @@ class ExecutionEngine:
             combined_per_module[module_name] = []
             for cycle_results in per_cycle_results:
                 merged = cycle_results.get(module_name, [])
-                # Materialize lazy iterators so we can combine them
+                # Materialize lazy iterators; iter() first so list() does not use
+                # LazyProduct.__len__ (sys.maxsize when unknown) as a size hint
                 if hasattr(merged, '__iter__') and not isinstance(merged, list):
-                    merged = list(merged)
+                    merged = list(iter(merged))
                 combined_per_module[module_name].extend(merged)
 
         valid_assertions = [a for a in manager.assertions
