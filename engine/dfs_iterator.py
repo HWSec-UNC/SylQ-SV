@@ -18,7 +18,7 @@ For blocks A, B, C (A is root, C is leaf), each with paths a1, a2, ..., b1, b2, 
 import os
 import sys
 import time
-from typing import List, Dict, Iterator, Optional, Any, Callable, Tuple
+from typing import List, Dict, Iterable, Iterator, Optional, Any, Callable, Tuple
 from z3 import Solver, ExprRef, sat, unsat
 from z3 import z3util
 
@@ -636,7 +636,7 @@ class DFSCrossModuleIterator:
     
     def __init__(
         self,
-        per_module_results: Dict[str, List[List[dict]]],
+        per_module_results: Dict[str, List[Iterable[dict]]],
         num_cycles: int,
         manager: Any = None,
         enable_early_pruning: bool = True,
@@ -648,7 +648,7 @@ class DFSCrossModuleIterator:
         
         Args:
             per_module_results: Dict mapping module_name -> per-cycle list of
-                merged results (index = cycle).
+                iterable merged results (index = cycle).
             num_cycles: Number of clock cycles to simulate.
             manager: ExecutionManager for cache access.
             enable_early_pruning: If True, prune when partial combination is UNSAT.

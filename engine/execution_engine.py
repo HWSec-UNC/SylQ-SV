@@ -884,16 +884,12 @@ class ExecutionEngine:
                         )
 
 
-        # One result list per (module, cycle).
+        # One result iterable per (module, cycle).
         per_module_per_cycle = {}
         for module_name in keys:
             per_module_per_cycle[module_name] = []
             for cycle_results in per_cycle_results:
                 merged = cycle_results.get(module_name, [])
-                # Materialize lazy iterators; iter() first so list() does not use
-                # LazyProduct.__len__ (sys.maxsize when unknown) as a size hint
-                if hasattr(merged, '__iter__') and not isinstance(merged, list):
-                    merged = list(iter(merged))
                 per_module_per_cycle[module_name].append(merged)
 
         valid_assertions = [a for a in manager.assertions
