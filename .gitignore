@@ -10,3 +10,5 @@ designs/*
 venv
 
 slang
+.venv
+filelist.F
