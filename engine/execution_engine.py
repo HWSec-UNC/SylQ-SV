@@ -884,18 +884,17 @@ class ExecutionEngine:
                         )
 
 
-        # NEW — flatten all cycles into one combined per-module result list
-        # Each module's results are the union across all cycles
-        combined_per_module = {}
+        # One result list per (module, cycle).
+        per_module_per_cycle = {}
         for module_name in keys:
-            combined_per_module[module_name] = []
+            per_module_per_cycle[module_name] = []
             for cycle_results in per_cycle_results:
                 merged = cycle_results.get(module_name, [])
                 # Materialize lazy iterators; iter() first so list() does not use
                 # LazyProduct.__len__ (sys.maxsize when unknown) as a size hint
                 if hasattr(merged, '__iter__') and not isinstance(merged, list):
                     merged = list(iter(merged))
-                combined_per_module[module_name].extend(merged)
+                per_module_per_cycle[module_name].append(merged)
 
         valid_assertions = [a for a in manager.assertions
                             if a.get("z3_expr") is not None]
@@ -904,12 +903,12 @@ class ExecutionEngine:
         else:
             logger.info("  Mode: no assertions — enumerating all feasible global path combinations "
                   "(path_count and DFS stats updated)")
-            logger.info(f"  Per-module merged results: {len(combined_per_module)} module(s)")
+            logger.info(f"  Per-module merged results: {len(per_module_per_cycle)} module(s)")
             if max_cross_module_paths is not None:
                 logger.info(f"  Stopping after {max_cross_module_paths:,} global path combination(s).")
         logger.info("Phase: cross-module path iteration (DFS) — %s cycle(s)", num_cycles)
         dfs_xmod = DFSCrossModuleIterator(
-            per_module_results=combined_per_module,
+            per_module_results=per_module_per_cycle,
             num_cycles=int(num_cycles),
             manager=manager,
             enable_early_pruning=True,

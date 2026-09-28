@@ -636,7 +636,7 @@ class DFSCrossModuleIterator:
     
     def __init__(
         self,
-        per_module_results: Dict[str, List[dict]],
+        per_module_results: Dict[str, List[List[dict]]],
         num_cycles: int,
         manager: Any = None,
         enable_early_pruning: bool = True,
@@ -647,7 +647,8 @@ class DFSCrossModuleIterator:
         """Initialize the cross-module DFS iterator.
         
         Args:
-            per_module_results: Dict mapping module_name -> list of merged results.
+            per_module_results: Dict mapping module_name -> per-cycle list of
+                merged results (index = cycle).
             num_cycles: Number of clock cycles to simulate.
             manager: ExecutionManager for cache access.
             enable_early_pruning: If True, prune when partial combination is UNSAT.
@@ -868,10 +869,9 @@ class DFSCrossModuleIterator:
         """Push a new level onto the DFS stack."""
         module_name, cycle = self.levels[level]
         partial_modules = {self.levels[i][0] for i in range(level)}
-        
         frame = DFSFrame(
             level=level,
-            iterator=iter(self.per_module_results[module_name]),
+            iterator=iter(self.per_module_results[module_name][cycle]),
             current_result=None,
             partial_pc=partial_pc,
             partial_store=partial_store,
@@ -889,5 +889,3 @@ class DFSCrossModuleIterator:
             "combos_pruned": self.combos_pruned,
             "cache_hits": self.cache_hits,
         }
-
-
