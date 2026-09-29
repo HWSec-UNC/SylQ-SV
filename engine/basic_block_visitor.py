@@ -1,5 +1,6 @@
 import pyslang.ast as ps_ast
-from helpers.visitor_helpers import handles, build_lookup_table
+
+from helpers.visitor_helpers import build_lookup_table, handles
 
 
 def _expr_to_label(expr):
@@ -268,7 +269,7 @@ class BasicBlockVisitor:
 
     def _emit_step(self, node):
         if not node.steps:
-            return None
+            return
 
         for step_expr in node.steps:
             idx = self._add_node(step_expr)

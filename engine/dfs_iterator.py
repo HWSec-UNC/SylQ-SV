@@ -18,18 +18,20 @@ For blocks A, B, C (A is root, C is leaf), each with paths a1, a2, ..., b1, b2, 
 import os
 import sys
 import time
-from typing import List, Dict, Iterable, Iterator, Optional, Any, Callable, Tuple
-from z3 import Solver, ExprRef, sat, unsat
-from z3 import z3util
+from collections.abc import Callable, Iterable, Iterator
+from typing import Any
+
+from z3 import ExprRef, Solver, sat, unsat, z3util
 
 try:
     from z3 import unknown as z3_unknown
 except Exception:  # pragma: no cover
     z3_unknown = None
-from dataclasses import dataclass, field
 from collections import OrderedDict, defaultdict
+from dataclasses import dataclass, field
 from functools import reduce
 from operator import mul
+
 from logger import logger
 
 from .feasibility_independence import (
@@ -45,11 +47,11 @@ _SAT_UNKNOWN_LOGGED = False
 
 
 def sat_check_full_pc(
-    constraints: List[ExprRef],
+    constraints: list[ExprRef],
     solver_timeout_ms: int = 10000,
     manager: Any = None,
     *,
-    z3_kind: Optional[str] = None,
+    z3_kind: str | None = None,
 ) -> bool:
     """Return True iff Z3 reports *sat* on the full constraint list.
 
@@ -125,9 +127,9 @@ class DFSFrame:
     """
     level: int                          # Which block/module level (0 = first block)
     iterator: Iterator                  # Iterator over results at this level
-    current_result: Optional[dict]      # Current result being processed
-    partial_pc: List[ExprRef]           # Accumulated path conditions up to this level
-    partial_store: Dict[str, Any]       # Accumulated store up to this level
+    current_result: dict | None      # Current result being processed
+    partial_pc: list[ExprRef]           # Accumulated path conditions up to this level
+    partial_store: dict[str, Any]       # Accumulated store up to this level
     partial_vars: set                   # Set of variable names in partial_pc
     is_feasible: bool = True            # Whether the partial merge is still SAT
     # Cross-module DFS only: RTL modules already present in partial_pc (for structural coupling).
@@ -141,7 +143,7 @@ class LRUCache:
         self.maxsize = maxsize
         self.cache: OrderedDict = OrderedDict()
     
-    def get(self, key: str) -> Optional[str]:
+    def get(self, key: str) -> str | None:
         if key in self.cache:
             self.cache.move_to_end(key)
             return self.cache[key]
@@ -168,7 +170,7 @@ def _vars_in_pcs_static(pc_list: list) -> set:
     return out
 
 
-def partition_blocks(block_result_lists: List[List[dict]]) -> List[List[int]]:
+def partition_blocks(block_result_lists: list[list[dict]]) -> list[list[int]]:
     """Partition blocks into connected components based on shared symbolic variables.
     
     Two blocks are in the same component if any of their path results share
@@ -181,7 +183,7 @@ def partition_blocks(block_result_lists: List[List[dict]]) -> List[List[int]]:
         return []
     
     # Compute the set of variables used by each block (across all its results)
-    block_vars: List[set] = []
+    block_vars: list[set] = []
     for block_results in block_result_lists:
         vars_in_block: set = set()
         for r in block_results:
@@ -215,7 +217,7 @@ def partition_blocks(block_result_lists: List[List[dict]]) -> List[List[int]]:
                 union(i, j)
     
     # Group block indices by component
-    groups: Dict[int, List[int]] = defaultdict(list)
+    groups: dict[int, list[int]] = defaultdict(list)
     for i in range(n):
         groups[find(i)].append(i)
     
@@ -232,7 +234,7 @@ class ReplayableMergeResults:
 
     def __init__(
         self,
-        block_result_lists: List[List[dict]],
+        block_result_lists: list[list[dict]],
         module_name: str = "",
         manager: Any = None,
     ):
@@ -263,7 +265,7 @@ class LazyProduct:
     
     def __init__(
         self,
-        component_results: List,
+        component_results: list,
         manager: Any = None,
         solver_timeout_ms: int = 10000,
     ):
@@ -277,7 +279,7 @@ class LazyProduct:
         self.component_results = component_results
         self.manager = manager
         self.solver_timeout_ms = solver_timeout_ms
-        self._len: Optional[int] = None
+        self._len: int | None = None
         self._try_compute_len()
 
     def _try_compute_len(self) -> None:
@@ -285,7 +287,7 @@ class LazyProduct:
         if not self.component_results:
             self._len = 1
             return
-        sizes: List[int] = []
+        sizes: list[int] = []
         for g in self.component_results:
             if isinstance(g, ReplayableMergeResults):
                 self._len = None
@@ -298,7 +300,7 @@ class LazyProduct:
         self._len = reduce(mul, sizes, 1)
     
     @property
-    def logical_size(self) -> Optional[int]:
+    def logical_size(self) -> int | None:
         """Total Cartesian-product size if known; None if any axis is a lazy merge."""
         if self._len is None and self.component_results:
             self._try_compute_len()
@@ -358,9 +360,9 @@ class LazyProduct:
         return len(self.component_results)
     
     @property
-    def component_sizes(self) -> List[str]:
+    def component_sizes(self) -> list[str]:
         """Human-readable size per component; lazy merge axes show as 'lazy'."""
-        out: List[str] = []
+        out: list[str] = []
         for g in self.component_results:
             if isinstance(g, ReplayableMergeResults):
                 out.append("lazy")
@@ -400,10 +402,10 @@ class DFSMergeIterator:
     
     def __init__(
         self,
-        block_result_lists: List[List[dict]],
+        block_result_lists: list[list[dict]],
         module_name: str = "",
         manager: Any = None,
-        check_sat_callback: Optional[Callable] = None,
+        check_sat_callback: Callable | None = None,
         enable_early_pruning: bool = True,
         enable_caching: bool = True,
         solver_timeout: int = 10000,
@@ -429,7 +431,7 @@ class DFSMergeIterator:
         self.solver_timeout = solver_timeout
         
         self.num_levels = len(block_result_lists)
-        self.stack: List[DFSFrame] = []
+        self.stack: list[DFSFrame] = []
         
         # Local cache for partial merge results (supplements Redis cache)
         self._local_cache = LRUCache(maxsize=10000)
@@ -439,7 +441,7 @@ class DFSMergeIterator:
         self.combos_pruned = 0
         self.cache_hits = 0
         
-    def _vars_in_pcs(self, pc_list: List[ExprRef]) -> set:
+    def _vars_in_pcs(self, pc_list: list[ExprRef]) -> set:
         """Extract variable names from a list of Z3 constraints."""
         out = set()
         for c in pc_list:
@@ -450,7 +452,7 @@ class DFSMergeIterator:
                 pass
         return out
     
-    def _default_sat_check(self, constraints: List[ExprRef]) -> bool:
+    def _default_sat_check(self, constraints: list[ExprRef]) -> bool:
         """Full-PC SAT; *unknown* is not satisfiable for feasibility purposes."""
         if not constraints:
             return True
@@ -465,7 +467,7 @@ class DFSMergeIterator:
                 f"{len(constraints)} constraint(s), result={'sat' if out else 'unsat/unknown'}")
         return out
 
-    def _get_cache_key(self, constraints: List[ExprRef]) -> str:
+    def _get_cache_key(self, constraints: list[ExprRef]) -> str:
         """Generate a cache key for a set of constraints."""
         try:
             from .query_normalization import normalize_query_list
@@ -473,7 +475,7 @@ class DFSMergeIterator:
         except Exception:
             return "dfs_merge:" + str(sorted(str(c) for c in constraints))
     
-    def _check_cached(self, cache_key: str) -> Optional[bool]:
+    def _check_cached(self, cache_key: str) -> bool | None:
         """Check if result is in cache. Returns True/False for SAT/UNSAT, None if not cached."""
         # Check local cache first
         local_result = self._local_cache.get(cache_key)
@@ -507,10 +509,10 @@ class DFSMergeIterator:
     
     def _check_partial_feasibility(
         self,
-        partial_pc: List[ExprRef],
+        partial_pc: list[ExprRef],
         partial_vars: set,
-        new_pc: List[ExprRef],
-    ) -> Tuple[bool, List[ExprRef], set]:
+        new_pc: list[ExprRef],
+    ) -> tuple[bool, list[ExprRef], set]:
         """Merge feasibility: full conjunction SAT on *combined_pc* when vars overlap.
 
         If variable sets are disjoint, satisfiability of the conjunction follows from
@@ -602,8 +604,8 @@ class DFSMergeIterator:
     def _push_level(
         self,
         level: int,
-        partial_pc: List[ExprRef],
-        partial_store: Dict[str, Any],
+        partial_pc: list[ExprRef],
+        partial_store: dict[str, Any],
         partial_vars: set,
     ) -> None:
         """Push a new level onto the DFS stack."""
@@ -618,7 +620,7 @@ class DFSMergeIterator:
         )
         self.stack.append(frame)
     
-    def get_stats(self) -> Dict[str, int]:
+    def get_stats(self) -> dict[str, int]:
         """Return iteration statistics."""
         return {
             "combos_checked": self.combos_checked,
@@ -636,7 +638,7 @@ class DFSCrossModuleIterator:
     
     def __init__(
         self,
-        per_module_results: Dict[str, List[Iterable[dict]]],
+        per_module_results: dict[str, list[Iterable[dict]]],
         num_cycles: int,
         manager: Any = None,
         enable_early_pruning: bool = True,
@@ -669,13 +671,13 @@ class DFSCrossModuleIterator:
         
         # Build the list of (module, cycle) combinations to traverse
         # Each level in the DFS is one (module, cycle) pair
-        self.levels: List[Tuple[str, int]] = []
+        self.levels: list[tuple[str, int]] = []
         for module_name in self.module_names:
             for cycle in range(num_cycles):
                 self.levels.append((module_name, cycle))
         
         self.num_levels = len(self.levels)
-        self.stack: List[DFSFrame] = []
+        self.stack: list[DFSFrame] = []
         
         self._local_cache = LRUCache(maxsize=10000)
         
@@ -685,7 +687,7 @@ class DFSCrossModuleIterator:
         self.combos_pruned = 0
         self.cache_hits = 0
     
-    def _vars_in_pcs(self, pc_list: List[ExprRef]) -> set:
+    def _vars_in_pcs(self, pc_list: list[ExprRef]) -> set:
         """Extract variable names from a list of Z3 constraints."""
         out = set()
         for c in pc_list:
@@ -696,13 +698,13 @@ class DFSCrossModuleIterator:
                 pass
         return out
     
-    def _sat_check(self, constraints: List[ExprRef]) -> bool:
+    def _sat_check(self, constraints: list[ExprRef]) -> bool:
         """Full-conjunction SAT; unknown counts as not feasible."""
         return sat_check_full_pc(
             constraints, self.solver_timeout, self.manager, z3_kind="cross_module"
         )
     
-    def _get_cache_key(self, constraints: List[ExprRef]) -> str:
+    def _get_cache_key(self, constraints: list[ExprRef]) -> str:
         """Generate a cache key for a set of constraints."""
         try:
             from .query_normalization import normalize_query_list
@@ -710,7 +712,7 @@ class DFSCrossModuleIterator:
         except Exception:
             return "dfs_xmod:" + str(sorted(str(c) for c in constraints))
     
-    def _check_cached(self, cache_key: str) -> Optional[bool]:
+    def _check_cached(self, cache_key: str) -> bool | None:
         """Check if result is in cache."""
         local_result = self._local_cache.get(cache_key)
         if local_result is not None:
@@ -742,12 +744,12 @@ class DFSCrossModuleIterator:
     
     def _check_partial_feasibility(
         self,
-        partial_pc: List[ExprRef],
+        partial_pc: list[ExprRef],
         partial_vars: set,
-        new_pc: List[ExprRef],
+        new_pc: list[ExprRef],
         partial_modules: set,
         next_module: str,
-    ) -> Tuple[bool, List[ExprRef], set]:
+    ) -> tuple[bool, list[ExprRef], set]:
         """Cross-module partial merge: full *combined_pc* SAT when variable sets overlap."""
         new_vars = self._vars_in_pcs(new_pc)
         combined_pc = partial_pc + new_pc
@@ -782,7 +784,7 @@ class DFSCrossModuleIterator:
 
         return (is_sat, combined_pc, combined_vars)
     
-    def __iter__(self) -> Iterator[Tuple[Dict[str, List[dict]], List[ExprRef], Dict[str, Any]]]:
+    def __iter__(self) -> Iterator[tuple[dict[str, list[dict]], list[ExprRef], dict[str, Any]]]:
         """Iterate over all feasible cross-module combinations.
         
         Yields:
@@ -796,7 +798,7 @@ class DFSCrossModuleIterator:
             return
         
         # Track the current combo being built: module_name -> [cycle_results]
-        current_combo: Dict[str, List[dict]] = {m: [] for m in self.module_names}
+        current_combo: dict[str, list[dict]] = {m: [] for m in self.module_names}
         
         # Initialize stack with first level
         self._push_level(0, [], {}, set(), current_combo)
@@ -861,10 +863,10 @@ class DFSCrossModuleIterator:
     def _push_level(
         self,
         level: int,
-        partial_pc: List[ExprRef],
-        partial_store: Dict[str, Any],
+        partial_pc: list[ExprRef],
+        partial_store: dict[str, Any],
         partial_vars: set,
-        partial_combo: Dict[str, List[dict]],
+        partial_combo: dict[str, list[dict]],
     ) -> None:
         """Push a new level onto the DFS stack."""
         module_name, cycle = self.levels[level]
@@ -882,7 +884,7 @@ class DFSCrossModuleIterator:
         frame.partial_combo = partial_combo  # type: ignore
         self.stack.append(frame)
     
-    def get_stats(self) -> Dict[str, int]:
+    def get_stats(self) -> dict[str, int]:
         """Return iteration statistics."""
         return {
             "combos_checked": self.combos_checked,

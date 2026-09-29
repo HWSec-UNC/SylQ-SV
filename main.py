@@ -1,18 +1,17 @@
 """This file is the entrypoint of the execution."""
-from __future__ import absolute_import
-from __future__ import print_function
-import sys
-import os
-from optparse import OptionParser
-import time
-import logging
 import gc
-from engine.execution_engine import ExecutionEngine
-import pyslang.driver as ps_driver
-from helpers.slang_helpers import SlangSymbolVisitor, SymbolicDFS
-import redis
+import logging
+import os
+import sys
 import threading
 import time
+from optparse import OptionParser
+
+import pyslang.driver as ps_driver
+import redis
+
+from engine.execution_engine import ExecutionEngine
+from helpers.slang_helpers import SlangSymbolVisitor, SymbolicDFS
 from logger import logger
 
 gc.collect()
@@ -38,7 +37,7 @@ def timeout_exit():
     if _engine_ref and hasattr(_engine_ref, '_last_manager'):
         # Mark the engine as timed out so long-running loops can exit cooperatively.
         try:
-            setattr(_engine_ref, "timeout", True)
+            _engine_ref.timeout = True
         except Exception:
             pass
         mgr = _engine_ref._last_manager
@@ -158,30 +157,28 @@ def main():
 
     for f in filelist:
         if not os.path.exists(f):
-            raise IOError("file not found: " + f)
+            raise OSError("file not found: " + f)
 
     # Create a .F file listing all source files (pyslang expects command files, not source files directly).
     # If the single argument is already a .F/.f file, use it as the file list; otherwise write filelist.F.
     # Include paths (-I) are written as +incdir+<path> lines.
     if len(filelist) == 1 and (filelist[0].endswith('.F') or filelist[0].endswith('.f')):
         if not os.path.exists(filelist[0]):
-            raise IOError("file list not found: " + filelist[0])
+            raise OSError("file list not found: " + filelist[0])
         # If user-provided .F file and we have includes, prepend them to a new file
         if options.include:
             with open(filelist[0], 'r') as orig:
                 orig_content = orig.read()
             flist_path = "filelist.F"
             with open(flist_path, "w") as flist:
-                for inc in options.include:
-                    flist.write(f"+incdir+{inc}\n")
+                flist.writelines(f"+incdir+{inc}\n" for inc in options.include)
                 flist.write(orig_content)
             filelist = [flist_path]
     elif len(filelist) >= 1:
         flist_path = "filelist.F"
         with open(flist_path, "w") as flist:
             if options.include:
-                for inc in options.include:
-                    flist.write(f"+incdir+{inc}\n")
+                flist.writelines(f"+incdir+{inc}\n" for inc in options.include)
             for f in filelist:
                 flist.write(f + "\n")
         filelist = [flist_path]
@@ -237,9 +234,7 @@ def main():
             )
             symbol_visitor.visit(top_instances)
             logger.debug(
-                "  AST scan (SlangSymbolVisitor): branch_points={} paths={}".format(
-                    symbol_visitor.branch_points, symbol_visitor.paths
-                )
+                f"  AST scan (SlangSymbolVisitor): branch_points={symbol_visitor.branch_points} paths={symbol_visitor.paths}"
             )
 
         end = time.process_time()

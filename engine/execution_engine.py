@@ -1,9 +1,16 @@
 # Main execution engine that orchestrates symbolic execution of SystemVerilog designs
 
-from z3 import Solver, ExprRef
-from z3 import z3util
-from .execution_manager import ExecutionManager
-from .symbolic_state import SymbolicState
+import gc
+import time
+
+import pyslang.ast as ps_ast
+import pyslang.syntax as ps_stx
+from z3 import ExprRef, Solver, z3util
+
+from helpers.slang_helpers import init_state
+from helpers.utils import to_binary
+from logger import logger
+
 from .cfg import CFG
 from .combinational import build_comb_metadata, evaluate_dirty_comb
 from .dfs_iterator import (
@@ -12,16 +19,9 @@ from .dfs_iterator import (
     ReplayableMergeResults,
     partition_blocks,
 )
-from typing import Optional, List
-import os
-import time
-import gc
-from math import prod
-from helpers.utils import to_binary
-import pyslang.syntax as ps_stx
-import pyslang.ast as ps_ast
-from helpers.slang_helpers import get_module_name, init_state
-from logger import logger
+from .execution_manager import ExecutionManager
+from .symbolic_state import SymbolicState
+
 # Tuple of PySlang AST node types that represent conditional/loop statements
 CONDITIONALS = (
     ps_stx.ConditionalStatementSyntax,
@@ -121,20 +121,20 @@ class ExecutionEngine:
                     manager.seen_mod[child][(to_binary(i))] = {}
 
     def explore_block(self, visitor, manager: ExecutionManager, state_template: SymbolicState,
-                      module_name: str, cfg: CFG, modules_dict: dict) -> List[dict]:
+                      module_name: str, cfg: CFG, modules_dict: dict) -> list[dict]:
         """Explore all paths through a single always block (Paper §3.3). Returns a list of
         {'pc': list of z3 constraints, 'store': {signal: expr}} per feasible path."""
         prev_curr_module = manager.curr_module
         manager.curr_module = module_name
         num_paths = cfg.get_path_count()
-        logger.debug("explore_block: {} ({} paths)".format(module_name, num_paths))
+        logger.debug(f"explore_block: {module_name} ({num_paths} paths)")
         results = []
         try:
             for path_idx, path in enumerate(cfg.get_paths()):
                 if self.debug and (
                     path_idx == 0 or (path_idx + 1) % 100 == 0 or path_idx == num_paths - 1
                 ):
-                    logger.debug("  path {}/{}".format(path_idx + 1, num_paths))
+                    logger.debug(f"  path {path_idx + 1}/{num_paths}")
                 manager.ignore = False
                 manager.abandon = False
                 path_state = state_template.fresh_for_block(module_name,
@@ -211,7 +211,7 @@ class ExecutionEngine:
     @staticmethod
     def _to_bool(z3_expr):
         """Coerce a Z3 expression to BoolRef. BitVec values become (val != 0)."""
-        from z3 import BoolRef, BitVecRef, BitVecVal, ArithRef, IntVal
+        from z3 import ArithRef, BitVecRef, BitVecVal, BoolRef, IntVal
         if isinstance(z3_expr, BoolRef):
             return z3_expr
         if isinstance(z3_expr, BitVecRef):
@@ -223,9 +223,13 @@ class ExecutionEngine:
     def _assert_edge_condition(self, edge_data, cfg, source_bb_idx, path_state, manager):
         """Add a Z3 constraint to path_state.pc based on a CFG edge condition."""
         import z3
-        from z3 import Not, Or, And
-        from helpers.rvalue_to_z3 import semantic_expr_to_z3, case_statement_arm_matches_z3
+        from z3 import And, Not, Or
+
         from engine.basic_block_visitor import CaseLabel, DefaultLabel
+        from helpers.rvalue_to_z3 import (
+            case_statement_arm_matches_z3,
+            semantic_expr_to_z3,
+        )
 
         cond = edge_data.get('condition')
         if cond is None:
@@ -260,12 +264,12 @@ class ExecutionEngine:
         if cond_z3 is None:
             return
 
-        from z3 import BoolRef, BitVecRef, ArithRef
+        from z3 import ArithRef, BitVecRef, BoolRef
         if not isinstance(cond_z3, (BoolRef, BitVecRef, ArithRef)):
             return
 
         path_state.assertion_counter += 1
-        tag = "cfg_p{}".format(path_state.assertion_counter)
+        tag = f"cfg_p{path_state.assertion_counter}"
 
         # Temp debug: map cfg_pN -> edge/source/condition for one module
         if manager.curr_module == "or1200_dpram_256x32":
@@ -324,7 +328,6 @@ class ExecutionEngine:
                                 neg_z3s.append(c != i)
                                 continue
                         neg_z3s.append(cond_z3 != item_z3)
-                    pass
                 if neg_z3s:
                     path_state.pc.assert_and_track(And(*neg_z3s), tag)
         except Exception:
@@ -426,19 +429,19 @@ class ExecutionEngine:
             return
 
         if hasattr(ast, 'statement'):
-            self._collect_assertions(getattr(ast, 'statement'), module_name, assertions_list)
+            self._collect_assertions(ast.statement, module_name, assertions_list)
         if hasattr(ast, 'items'):
-            items = getattr(ast, 'items')
+            items = ast.items
             if hasattr(items, '__iter__'):
                 for item in items:
                     self._collect_assertions(item, module_name, assertions_list)
         if hasattr(ast, 'members'):
-            members = getattr(ast, 'members')
+            members = ast.members
             if hasattr(members, '__iter__') and not isinstance(ast, ps_stx.ModuleDeclarationSyntax):
                 for mem in members:
                     self._collect_assertions(mem, module_name, assertions_list)
         if hasattr(ast, 'body'):
-            self._collect_assertions(getattr(ast, 'body'), module_name, assertions_list)
+            self._collect_assertions(ast.body, module_name, assertions_list)
 
     def _collect_procedural_assertions(self, always_blocks, module_name, assertions_list):
         """Walk the semantic statement trees of always blocks to find immediate assertions.
@@ -541,7 +544,7 @@ class ExecutionEngine:
                 pass
         return out
 
-    def merge_block_results(self, block_result_lists: List[list], module_name: str = "",
+    def merge_block_results(self, block_result_lists: list[list], module_name: str = "",
                             manager=None):
         """Piecewise composition merge step (Paper §3.3, §4.3).
         
@@ -560,7 +563,7 @@ class ExecutionEngine:
         groups = partition_blocks(block_result_lists)
         n_groups = len(groups)
 
-        component_results: List = []
+        component_results: list = []
         for group_idx, block_indices in enumerate(groups):
             group_block_lists = [block_result_lists[i] for i in block_indices]
 
@@ -588,10 +591,10 @@ class ExecutionEngine:
         self,
         visitor,
         modules,
-        manager: Optional[ExecutionManager],
+        manager: ExecutionManager | None,
         num_cycles: int,
         *,
-        max_cross_module_paths: Optional[int] = None,
+        max_cross_module_paths: int | None = None,
     ) -> None:
         """Main entry point for PySlang execution
         Drives symbolic execution for SystemVerilog designs."""
@@ -912,7 +915,7 @@ class ExecutionEngine:
             structural_module_graph=getattr(manager, "structural_module_graph", None),
         )
 
-        cross_stop: Optional[str] = None
+        cross_stop: str | None = None
         for path_combo, all_pcs, all_stores in dfs_xmod:
             if getattr(self, "timeout", False):
                 cross_stop = "timeout"
@@ -1050,7 +1053,7 @@ class ExecutionEngine:
                 z3_s = str(assertion_z3)
                 if len(z3_s) > 400:
                     z3_s = z3_s[:400] + " ... [truncated]"
-                logger.warning(f"\n=== ASSERTION VIOLATION FOUND ===")
+                logger.warning("\n=== ASSERTION VIOLATION FOUND ===")
                 logger.warning(
                     f"  Assertion: #{a_idx + 1} of {n_assertions} (index in collected assertion list)",
                 )
@@ -1064,7 +1067,7 @@ class ExecutionEngine:
                     f"assertions={manager.assertion_solver_time:.4f}s "
                     f"(total {manager.solver_time + manager.assertion_solver_time:.4f}s)",
                 )
-                logger.warning(f"=================================\n")
+                logger.warning("=================================\n")
                 manager.assertion_violation = True
                 return True
             s.pop()

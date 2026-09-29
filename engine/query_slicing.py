@@ -10,11 +10,11 @@ need to be considered.  This module provides:
 """
 
 from __future__ import annotations
-from typing import Dict, Set, List, Any, Optional
+
+from typing import Any
 
 try:
-    from z3 import ExprRef
-    from z3 import z3util
+    from z3 import ExprRef, z3util
 except ImportError:
     ExprRef = None
     z3util = None
@@ -32,8 +32,8 @@ class QuickUnion:
     """
 
     def __init__(self) -> None:
-        self.parent: Dict[Any, Any] = {}
-        self.size: Dict[Any, int] = {}
+        self.parent: dict[Any, Any] = {}
+        self.size: dict[Any, int] = {}
 
     # -- core operations ---------------------------------------------------
 
@@ -67,14 +67,14 @@ class QuickUnion:
     def connected(self, x: Any, y: Any) -> bool:
         return self.find(x) == self.find(y)
 
-    def component(self, x: Any) -> Set[Any]:
+    def component(self, x: Any) -> set[Any]:
         """Return all elements in the same component as *x*."""
         root = self.find(x)
         return {k for k in self.parent if self.find(k) == root}
 
     # -- helpers for symbolic variable tracking ----------------------------
 
-    def union_vars(self, var_names: List[str]) -> None:
+    def union_vars(self, var_names: list[str]) -> None:
         """Union all variables in *var_names* together (they appear in the
         same constraint/branch condition)."""
         if len(var_names) < 2:
@@ -101,7 +101,7 @@ class QuickUnion:
 # Query slicing
 # ---------------------------------------------------------------------------
 
-def get_vars_from_expr(expr) -> Set[str]:
+def get_vars_from_expr(expr) -> set[str]:
     """Return the set of symbolic variable name strings in a Z3 expression."""
     if z3util is None:
         return set()
@@ -114,7 +114,7 @@ def get_vars_from_expr(expr) -> Set[str]:
 def slice_query(
     qu: QuickUnion,
     all_constraints: list,
-    branch_vars: Set[str],
+    branch_vars: set[str],
 ) -> list:
     """Return the subset of *all_constraints* whose variables overlap with the
     connected component(s) of *branch_vars* in the Quick-Union *qu*.

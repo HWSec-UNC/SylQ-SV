@@ -1,14 +1,16 @@
 """A library of helper functions for working with the PySlang AST."""
 import pyslang.ast as ps_ast
 import pyslang.syntax as ps_stx
-from helpers.utils import init_symbol
+from z3 import BitVecRef, BitVecVal, BoolVal, ExprRef, Not, is_bool
+
 from engine.execution_manager import ExecutionManager
-from engine.symbolic_state import SymbolicState
-from helpers.rvalue_to_z3 import solve_pc, case_statement_arm_matches_z3
-from z3 import Not, is_bool, BoolVal, ExprRef, BitVecRef, BitVecVal
-from engine.query_slicing import slice_query, get_vars_from_expr
 from engine.query_normalization import normalize_query
+from engine.query_slicing import get_vars_from_expr, slice_query
+from engine.symbolic_state import SymbolicState
+from helpers.rvalue_to_z3 import case_statement_arm_matches_z3, solve_pc
+from helpers.utils import init_symbol
 from logger import logger
+
 
 def _cache_key(manager, cond_z3, negate=False):
     """Compute the cache key for a branch condition using the
@@ -229,7 +231,7 @@ class SlangSymbolVisitor:
         if not isinstance(symbol, ps_ast.Symbol):
             # Not every AST node in Slang is a ps.Symbol, so therefore I added a traversal here which traveres through their .members attribute because they might contian Statements there such as Compilation root, Definition objects, etc.
             if hasattr(symbol, "members"):
-                for m in getattr(symbol, "members"):
+                for m in symbol.members:
                     self.visit(m)
             return
         
@@ -383,7 +385,6 @@ class SymbolicDFS:
         ContinuousAssign / ExpressionStatement nodes encountered
         during base_store initialization.
         """
-        pass
 
     def visit_expr(self, m: ExecutionManager, s: SymbolicState, expr):
         """Visits expressions"""
@@ -526,11 +527,7 @@ class SymbolicDFS:
         elif kind in [ps_ast.ExpressionKind.IntegerLiteral, ps_ast.ExpressionKind.RealLiteral,
                     ps_ast.ExpressionKind.TimeLiteral, ps_ast.ExpressionKind.NullLiteral,
                     ps_ast.ExpressionKind.StringLiteral, ps_ast.ExpressionKind.UnbasedUnsizedIntegerLiteral,
-                    ps_ast.UnboundedLiteral]:
-            pass
-
-        # Ignore misc. nodes in syntax tree 
-        elif kind in [ps_stx.TokenKind.IntegerLiteral, ps_stx.SyntaxKind.IntegerVectorExpression, 
+                    ps_ast.UnboundedLiteral] or kind in [ps_stx.TokenKind.IntegerLiteral, ps_stx.SyntaxKind.IntegerVectorExpression, 
                       ps_stx.SyntaxKind.ConcatenationExpression, ps_stx.SyntaxKind.IdentifierName,
                       ps_stx.SyntaxKind.IdentifierSelectName, ps_stx.TokenKind.Comma, ps_stx.SyntaxKind.IntegerLiteralExpression]:
             pass
@@ -649,7 +646,7 @@ class SymbolicDFS:
         # Progress indicator: every 10k statements print one line.
         m.visit_count = getattr(m, "visit_count", 0) + 1
         if getattr(m, "debug", False) and m.visit_count % 10000 == 0:
-            logger.debug("... {} statements visited".format(m.visit_count))
+            logger.debug(f"... {m.visit_count} statements visited")
 
         cls_name = stmt.__class__.__name__
         # Handle case/binary by class name first - never read m.ignore or stmt.kind for these.
@@ -870,10 +867,7 @@ class SymbolicDFS:
             if hasattr(stmt, 'elseBody'):
                 self.visit_stmt(m, s, stmt.elseBody, modules, direction)
 
-        elif kind == ps_ast.StatementKind.Return and hasattr(stmt, "expr"):
-            self.visit_expr(m, s, stmt.expr)
-        
-        elif kind == ps_ast.StatementKind.ExpressionStatement:
+        elif kind == ps_ast.StatementKind.Return and hasattr(stmt, "expr") or kind == ps_ast.StatementKind.ExpressionStatement:
             self.visit_expr(m, s, stmt.expr)
 
 

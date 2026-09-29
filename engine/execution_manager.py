@@ -3,11 +3,11 @@ a lot of this information will probably be useful when working in a specific sea
 # Central coordinator that tracks all execution metadata, paths explored, modules processed, and optimization state.
 
 from __future__ import annotations
-from .symbolic_state import SymbolicState
-from helpers.utils import init_symbol
-from typing import Dict, Optional, Set
+
 # import pkg_resources
 import pyslang.syntax as ps_stx
+
+from .symbolic_state import SymbolicState
 
 # Using this as a reference for conditionals:
 # https://sv-lang.com/structslang_1_1syntax_1_1_statement_syntax.html
@@ -80,7 +80,7 @@ class ExecutionManager:
     assertion_solver_time: float = 0
     # Optional undirected RTL adjacency (module -> neighbor modules). If None, cross-module
     # disjoint-skip is conservative (no skip across distinct modules); see feasibility_independence.
-    structural_module_graph: Optional[Dict[str, Set[str]]] = None
+    structural_module_graph: dict[str, set[str]] | None = None
     # Feasibility accounting (merge / LazyProduct / cross-module); see sat_check_full_pc & dfs_iterator
     # feasibility_z3_checks = merge + lazy_product + cross_module (joint full-PC SAT calls)
     feasibility_z3_checks: int = 0
@@ -98,12 +98,12 @@ class ExecutionManager:
     branch_count = 0
     # Set when cross-module DFS is skipped (no assertions): product of per-module
     # merged path counts, when computable (not LazyProduct with unknown size).
-    estimated_global_combinations: Optional[int] = None
+    estimated_global_combinations: int | None = None
     # True when no assertions and at least one module merge is lazy / unknown size,
     # so the full cross-module product cannot be multiplied without iterating.
     feasible_paths_unknown: bool = False
     # CLI: --max-cross-module-paths
-    max_cross_module_paths: Optional[int] = None
+    max_cross_module_paths: int | None = None
     # Why cross-module DFS ended: "", "complete", "max_paths", "timeout", "violation"
     cross_module_stopped_reason: str = ""
     # Quick-Union for query slicing (Paper §4.2.2)
@@ -113,9 +113,9 @@ class ExecutionManager:
     # Continuous-assign metadata (paper §4.4). Populated by ExecutionEngine.execute_sv.
     # module_name → list[ContinuousAssign], {idx→lhs_signal}, {rhs_signal→[idx,…]}.
     # TODO: Param check
-    comb_assigns: Dict[str, list] = {}
-    comb_lhs: Dict[str, Dict[int, str]] = {}
-    comb_deps: Dict[str, Dict[str, list]] = {}
+    comb_assigns: dict[str, list] = {}
+    comb_lhs: dict[str, dict[int, str]] = {}
+    comb_deps: dict[str, dict[str, list]] = {}
 
     def feasibility_stats_line(self) -> str:
         """One-line summary of feasibility checks (Z3, disjoint skips, pruned paths)."""
@@ -156,7 +156,7 @@ class ExecutionManager:
         #self.get_assertions(m, module.members)
         m.init_run_flag = False
 
-    def count_conditionals(self, m: "ExecutionManager", items):
+    def count_conditionals(self, m: ExecutionManager, items):
         """Recursively count all conditional statements in the AST (pyslang version)"""
         stmts = items
         if isinstance(items, ps_stx.BlockStatementSyntax):
@@ -179,27 +179,13 @@ class ExecutionManager:
                     # Case items may have .statements or .statement attribute
                     case_body = getattr(case, 'statements', getattr(case, 'statement', None))
                     self.count_conditionals(m, case_body)
-            elif isinstance(items, ps_stx.ForLoopStatementSyntax):
-                m.num_paths += 1
-                self.count_conditionals(m, items.body)
-            elif hasattr(ps_stx, "ForeachLoopStatementSyntax") and isinstance(items, ps_stx.ForeachLoopStatementSyntax):
-                m.num_paths += 1
-                self.count_conditionals(m, items.body)
-            elif hasattr(ps_stx, "WhileLoopStatementSyntax") and isinstance(items, ps_stx.WhileLoopStatementSyntax):
-                m.num_paths += 1
-                self.count_conditionals(m, items.body)
-            elif hasattr(ps_stx, "DoWhileLoopStatementSyntax") and isinstance(items, ps_stx.DoWhileLoopStatementSyntax):
-                m.num_paths += 1
-                self.count_conditionals(m, items.body)
-            elif hasattr(ps_stx, "RepeatLoopStatementSyntax") and isinstance(items, ps_stx.RepeatLoopStatementSyntax):
+            elif isinstance(items, ps_stx.ForLoopStatementSyntax) or hasattr(ps_stx, "ForeachLoopStatementSyntax") and isinstance(items, ps_stx.ForeachLoopStatementSyntax) or hasattr(ps_stx, "WhileLoopStatementSyntax") and isinstance(items, ps_stx.WhileLoopStatementSyntax) or hasattr(ps_stx, "DoWhileLoopStatementSyntax") and isinstance(items, ps_stx.DoWhileLoopStatementSyntax) or hasattr(ps_stx, "RepeatLoopStatementSyntax") and isinstance(items, ps_stx.RepeatLoopStatementSyntax):
                 m.num_paths += 1
                 self.count_conditionals(m, items.body)
             elif isinstance(items, ps_stx.BlockStatementSyntax):
                 # PySlang uses .items, not .statements for BlockStatementSyntax
                 self.count_conditionals(m, items.items)
-            elif hasattr(ps_stx, "AlwaysConstructSyntax") and isinstance(items, ps_stx.AlwaysConstructSyntax):
-                self.count_conditionals(m, items.statement)
-            elif hasattr(ps_stx, "InitialConstructSyntax") and isinstance(items, ps_stx.InitialConstructSyntax):
+            elif hasattr(ps_stx, "AlwaysConstructSyntax") and isinstance(items, ps_stx.AlwaysConstructSyntax) or hasattr(ps_stx, "InitialConstructSyntax") and isinstance(items, ps_stx.InitialConstructSyntax):
                 self.count_conditionals(m, items.statement)
             elif hasattr(ps_stx, "CaseItemSyntax") and isinstance(items, ps_stx.CaseItemSyntax):
                 # CaseItemSyntax may have .statements or .statement attribute
@@ -224,10 +210,8 @@ class ExecutionManager:
                             return self.count_conditionals_2(m, items.items) + 1
                 if isinstance(item, ps_stx.BlockStatementSyntax):
                     return self.count_conditionals_2(m, item.statements)
-                elif hasattr(ps_stx, "AlwaysConstructSyntax") and isinstance(item, ps_stx.AlwaysConstructSyntax):
+                elif hasattr(ps_stx, "AlwaysConstructSyntax") and isinstance(item, ps_stx.AlwaysConstructSyntax) or hasattr(ps_stx, "InitialConstructSyntax") and isinstance(item, ps_stx.InitialConstructSyntax):
                     return self.count_conditionals_2(m, item.statement)             
-                elif hasattr(ps_stx, "InitialConstructSyntax") and isinstance(item, ps_stx.InitialConstructSyntax):
-                    return self.count_conditionals_2(m, item.statement)
         elif items is not None:
             if isinstance(items, ps_stx.ConditionalStatementSyntax):
                 return  ( self.count_conditionals_2(m, items.ifTrue) + 

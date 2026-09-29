@@ -8,8 +8,10 @@ the dirty set to a fixed point, writing each assign's LHS and dirtying any
 further comb assigns that depend on it.
 """
 import pyslang.ast as ps_ast
-from helpers.rvalue_to_z3 import semantic_expr_to_z3
 import z3
+
+from helpers.rvalue_to_z3 import semantic_expr_to_z3
+
 # TODO: Param look at this file
 
 def _collect_rhs_signals(expr, out):

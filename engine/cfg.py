@@ -1,12 +1,17 @@
 """Converts PySlang AST (representing SystemVerilog) into executable CFG structure that enables path exploration"""
-from operator import indexOf
 import os
-import networkx as nx
+from operator import indexOf
+
 import matplotlib.pyplot as plt
+import networkx as nx
 import pyslang.ast as ps_ast
-from .basic_block_visitor import BasicBlockVisitor
-from helpers.visitor_helpers import handles, build_lookup_table
+
+from helpers.visitor_helpers import build_lookup_table, handles
 from logger import logger
+
+from .basic_block_visitor import BasicBlockVisitor
+
+
 class CFG:
     """Represents the control flow graph of a module/always block"""
     def __init__(self):

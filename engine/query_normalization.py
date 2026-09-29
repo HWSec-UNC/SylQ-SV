@@ -20,17 +20,31 @@ Usage:
 """
 
 from __future__ import annotations
-from typing import Dict, List, Optional, Set
 
 try:
     from z3 import (
-        ExprRef, BoolRef, BitVecRef, ArithRef,
-        simplify, substitute, is_bool, is_const,
-        BitVec, BitVecSort, BoolVal, BitVecVal,
-        And, Or, Not, is_and, is_or, is_not,
-        is_true, is_false,
+        And,
+        ArithRef,
+        BitVec,
+        BitVecRef,
+        BitVecSort,
+        BitVecVal,
+        BoolRef,
+        BoolVal,
+        ExprRef,
+        Not,
+        Or,
+        is_and,
+        is_bool,
+        is_const,
+        is_false,
+        is_not,
+        is_or,
+        is_true,
+        simplify,
+        substitute,
+        z3util,
     )
-    from z3 import z3util
     Z3_AVAILABLE = True
 except ImportError:
     Z3_AVAILABLE = False
@@ -110,13 +124,13 @@ def _lexicographic_normalize(expr: ExprRef) -> ExprRef:
 # Phase 3: Variable renaming
 # ---------------------------------------------------------------------------
 
-def _collect_vars_ordered(expr: ExprRef) -> List[str]:
+def _collect_vars_ordered(expr: ExprRef) -> list[str]:
     """Collect symbolic variable names from *expr* in left-to-right (DFS) order,
     preserving first-occurrence order."""
     if not Z3_AVAILABLE:
         return []
-    seen: Set[str] = set()
-    ordered: List[str] = []
+    seen: set[str] = set()
+    ordered: list[str] = []
 
     def _walk(e):
         try:
@@ -151,7 +165,7 @@ def _is_literal(name: str) -> bool:
     return False
 
 
-def _rename_variables(expr: ExprRef, rename_map: Optional[Dict[str, ExprRef]] = None) -> tuple:
+def _rename_variables(expr: ExprRef, rename_map: dict[str, ExprRef] | None = None) -> tuple:
     """Rename all symbolic variables in *expr* to T1, T2, ... in order of
     first occurrence (left-to-right DFS).
 
@@ -212,7 +226,7 @@ def _rename_variables(expr: ExprRef, rename_map: Optional[Dict[str, ExprRef]] = 
 # Public API
 # ---------------------------------------------------------------------------
 
-def normalize_constraint(expr: ExprRef, rename_map: Optional[Dict] = None) -> tuple:
+def normalize_constraint(expr: ExprRef, rename_map: dict | None = None) -> tuple:
     """Apply all three normalization phases to a single Z3 constraint.
 
     Returns (normalized_expr, rename_map) where rename_map is updated
@@ -250,7 +264,7 @@ def normalize_query_list(constraints: list) -> str:
     if not Z3_AVAILABLE or not constraints:
         return str(constraints)
 
-    rename_map: Dict = {}
+    rename_map: dict = {}
     normalized_parts = []
     for c in constraints:
         nc, rename_map = normalize_constraint(c, rename_map)

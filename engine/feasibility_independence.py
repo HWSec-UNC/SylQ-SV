@@ -25,10 +25,9 @@ Environment:
 from __future__ import annotations
 
 import os
-from typing import AbstractSet, Dict, List, Optional, Set
+from typing import AbstractSet
 
-from z3 import ExprRef, Z3_OP_SELECT, Z3_OP_STORE, Z3_OP_UNINTERPRETED, is_app
-from z3 import z3util
+from z3 import Z3_OP_SELECT, Z3_OP_STORE, Z3_OP_UNINTERPRETED, ExprRef, is_app, z3util
 
 _LEGACY = os.environ.get("SYLQ_FEASIBILITY_LEGACY_DISJOINT", "").strip().lower() in (
     "1",
@@ -51,7 +50,7 @@ def normalize_feasibility_var_name(raw: str) -> str:
     return ".".join(parts)
 
 
-def canonical_var_set(names: AbstractSet[str]) -> Set[str]:
+def canonical_var_set(names: AbstractSet[str]) -> set[str]:
     return {normalize_feasibility_var_name(n) for n in names}
 
 
@@ -59,10 +58,10 @@ def canonical_name_sets_disjoint(v1: AbstractSet[str], v2: AbstractSet[str]) -> 
     return not (canonical_var_set(v1) & canonical_var_set(v2))
 
 
-def _collect_ast_structure_keys(constraints: List[ExprRef]) -> Set[str]:
+def _collect_ast_structure_keys(constraints: list[ExprRef]) -> set[str]:
     """Keys for array/UF structure that can couple PCs without shared atom names."""
-    out: Set[str] = set()
-    seen: Set[int] = set()
+    out: set[str] = set()
+    seen: set[int] = set()
 
     def visit(e: ExprRef) -> None:
         eid = id(e)
@@ -76,11 +75,11 @@ def _collect_ast_structure_keys(constraints: List[ExprRef]) -> Set[str]:
         if k == Z3_OP_SELECT or k == Z3_OP_STORE:
             try:
                 root = e.arg(0)
-                out.add(f"arr:{str(root)}")
+                out.add(f"arr:{root!s}")
             except Exception:
-                out.add(f"arr:{str(e)}")
+                out.add(f"arr:{e!s}")
         elif k == Z3_OP_UNINTERPRETED:
-            out.add(f"uf:{str(decl)}")
+            out.add(f"uf:{decl!s}")
         for i in range(e.num_args()):
             try:
                 visit(e.arg(i))
@@ -95,16 +94,16 @@ def _collect_ast_structure_keys(constraints: List[ExprRef]) -> Set[str]:
     return out
 
 
-def ast_structure_intersects(pc1: List[ExprRef], pc2: List[ExprRef]) -> bool:
+def ast_structure_intersects(pc1: list[ExprRef], pc2: list[ExprRef]) -> bool:
     """True if PCs share array/UF structure that could create hidden coupling."""
     if not pc1 or not pc2:
         return False
     return bool(_collect_ast_structure_keys(pc1) & _collect_ast_structure_keys(pc2))
 
 
-def vars_from_constraints(constraints: List[ExprRef]) -> Set[str]:
+def vars_from_constraints(constraints: list[ExprRef]) -> set[str]:
     """Variable names from Z3 constraints (same basis as dfs_iterator)."""
-    out: Set[str] = set()
+    out: set[str] = set()
     for c in constraints:
         try:
             for v in z3util.get_vars(c):
@@ -117,7 +116,7 @@ def vars_from_constraints(constraints: List[ExprRef]) -> Set[str]:
 def cross_module_structurally_independent(
     partial_modules: AbstractSet[str],
     next_module: str,
-    module_graph: Optional[Dict[str, Set[str]]],
+    module_graph: dict[str, set[str]] | None,
 ) -> bool:
     """Whether cross-module combine may skip Z3 for *structural* RTL reasons alone.
 
@@ -156,8 +155,8 @@ def cross_module_structurally_independent(
 def may_disjoint_skip_merge(
     partial_vars: AbstractSet[str],
     new_vars: AbstractSet[str],
-    partial_pc: List[ExprRef],
-    new_pc: List[ExprRef],
+    partial_pc: list[ExprRef],
+    new_pc: list[ExprRef],
 ) -> bool:
     """Sound predicate for intra-module (block) merge: OK to skip joint Z3."""
     if _LEGACY:
@@ -172,11 +171,11 @@ def may_disjoint_skip_merge(
 def may_disjoint_skip_cross_module(
     partial_vars: AbstractSet[str],
     new_vars: AbstractSet[str],
-    partial_pc: List[ExprRef],
-    new_pc: List[ExprRef],
+    partial_pc: list[ExprRef],
+    new_pc: list[ExprRef],
     partial_modules: AbstractSet[str],
     next_module: str,
-    module_graph: Optional[Dict[str, Set[str]]],
+    module_graph: dict[str, set[str]] | None,
 ) -> bool:
     """Sound predicate for cross-module partial combine: OK to skip joint Z3."""
     if _LEGACY:

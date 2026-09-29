@@ -1,10 +1,9 @@
 """Helpers for working with Z3: semantic expression conversion and solving."""
 
-import z3
-from typing import Optional, Tuple
-from z3 import Solver, BitVec, BitVecRef, If, BitVecVal, And, Or, Not, ULT, UGT, BoolRef
-import pyslang.ast as ps_ast
 
+import pyslang.ast as ps_ast
+import z3
+from z3 import UGT, ULT, And, BitVec, BitVecRef, BitVecVal, BoolRef, If, Not, Or, Solver
 
 SOLVE_PC_TIMEOUT_MS = 10000
 
@@ -48,7 +47,7 @@ def _parse_svint(sv) -> int:
     return int(clean, base) if clean else 0
 
 
-def _hex_char_value(ch: str) -> Optional[int]:
+def _hex_char_value(ch: str) -> int | None:
     if ch in "0123456789":
         return int(ch)
     if ch in "aA":
@@ -66,7 +65,7 @@ def _hex_char_value(ch: str) -> Optional[int]:
     return None
 
 
-def _wildcard_literal_mask_and_pat(sv, casex: bool) -> Optional[Tuple[int, int, int]]:
+def _wildcard_literal_mask_and_pat(sv, casex: bool) -> tuple[int, int, int] | None:
     """Parse ``casez``/``casex`` pattern literals for masked Z3 equality.
 
     Supports sized **binary**, **hex**, and **oct** literals. **Decimal** (``d``)
@@ -105,7 +104,7 @@ def _wildcard_literal_mask_and_pat(sv, casex: bool) -> Optional[Tuple[int, int, 
     return None
 
 
-def _wildcard_mask_binary(digits: str, head: str, casex: bool) -> Optional[Tuple[int, int, int]]:
+def _wildcard_mask_binary(digits: str, head: str, casex: bool) -> tuple[int, int, int] | None:
     if not head:
         width = len(digits)
     else:
@@ -128,16 +127,14 @@ def _wildcard_mask_binary(digits: str, head: str, casex: bool) -> Optional[Tuple
         care |= 1 << bit_idx
         if ch == "1":
             pat |= 1 << bit_idx
-        elif ch == "0":
-            pass
-        elif not casex and ch in "xX":
+        elif ch == "0" or not casex and ch in "xX":
             pass
         else:
             return None
     return care, pat, width
 
 
-def _wildcard_mask_hex(digits: str, head: str, casex: bool) -> Optional[Tuple[int, int, int]]:
+def _wildcard_mask_hex(digits: str, head: str, casex: bool) -> tuple[int, int, int] | None:
     if not head:
         width = len(digits) * 4
     else:
@@ -175,7 +172,7 @@ def _wildcard_mask_hex(digits: str, head: str, casex: bool) -> Optional[Tuple[in
     return care, pat, width
 
 
-def _wildcard_mask_oct(digits: str, head: str, casex: bool) -> Optional[Tuple[int, int, int]]:
+def _wildcard_mask_oct(digits: str, head: str, casex: bool) -> tuple[int, int, int] | None:
     if not head:
         width = len(digits) * 3
     else:
@@ -214,7 +211,7 @@ def _wildcard_mask_oct(digits: str, head: str, casex: bool) -> Optional[Tuple[in
 
 
 # Backwards-compatible name used in tests
-def _binary_literal_mask_and_pat(sv, casex: bool) -> Optional[Tuple[int, int, int]]:
+def _binary_literal_mask_and_pat(sv, casex: bool) -> tuple[int, int, int] | None:
     """Deprecated alias; use :func:`_wildcard_literal_mask_and_pat`."""
     return _wildcard_literal_mask_and_pat(sv, casex)
 
@@ -440,8 +437,7 @@ def semantic_expr_to_z3(expr, store: dict, module: str, width_hint: int = 32):
         if isinstance(base, BitVecRef):
             if hi >= base.size():
                 hi = base.size() - 1
-            if lo < 0:
-                lo = 0
+            lo = max(lo, 0)
             return z3.Extract(hi, lo, base)
         return None
 
