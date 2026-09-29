@@ -331,15 +331,18 @@ class LazyProduct:
             if _timeout_requested(self.manager):
                 return
             if i == len(self.component_results):
-                if self.manager is not None and acc_pc:
-                    if not sat_check_full_pc(
+                if (
+                    self.manager is not None
+                    and acc_pc
+                    and not sat_check_full_pc(
                         acc_pc,
                         self.solver_timeout_ms,
                         self.manager,
                         z3_kind="lazy_product",
-                    ):
-                        self.manager.feasibility_pruned_lazy_product += 1
-                        return
+                    )
+                ):
+                    self.manager.feasibility_pruned_lazy_product += 1
+                    return
                 yield {"pc": acc_pc, "store": dict(acc_store)}
                 return
             for r in self.component_results[i]:

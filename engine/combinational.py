@@ -122,9 +122,8 @@ def evaluate_dirty_comb(state, module_name, manager):
             continue
 
         old = store.get(lhs)
-        if isinstance(old, z3.ExprRef) and isinstance(new_val, z3.ExprRef):
-            if old.eq(new_val):
-                continue 
+        if isinstance(old, z3.ExprRef) and isinstance(new_val, z3.ExprRef) and old.eq(new_val):
+            continue
 
         store[lhs] = new_val
         for dep_idx in deps_by_signal.get(lhs, ()):

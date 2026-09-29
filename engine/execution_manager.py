@@ -202,12 +202,13 @@ class ExecutionManager:
 
         if hasattr(stmts, '__iter__'):
             for item in stmts:
-                if isinstance(item, CONDITIONALS):
-                    if isinstance(item, (ps_stx.ConditionalStatementSyntax, ps_stx.CaseStatementSyntax)):
-                        if isinstance(item, ps_stx.ConditionalStatementSyntax):
-                            return self.count_conditionals_2(m, item.ifTrue) + self.count_conditionals_2(m, item.ifFalse)  + 1
-                        if isinstance(items, ps_stx.CaseStatementSyntax):
-                            return self.count_conditionals_2(m, items.items) + 1
+                if isinstance(item, CONDITIONALS) and isinstance(
+                    item, (ps_stx.ConditionalStatementSyntax, ps_stx.CaseStatementSyntax)
+                ):
+                    if isinstance(item, ps_stx.ConditionalStatementSyntax):
+                        return self.count_conditionals_2(m, item.ifTrue) + self.count_conditionals_2(m, item.ifFalse)  + 1
+                    if isinstance(items, ps_stx.CaseStatementSyntax):
+                        return self.count_conditionals_2(m, items.items) + 1
                 if isinstance(item, ps_stx.BlockStatementSyntax):
                     return self.count_conditionals_2(m, item.statements)
                 elif hasattr(ps_stx, "AlwaysConstructSyntax") and isinstance(item, ps_stx.AlwaysConstructSyntax) or hasattr(ps_stx, "InitialConstructSyntax") and isinstance(item, ps_stx.InitialConstructSyntax):

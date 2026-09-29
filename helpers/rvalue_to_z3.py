@@ -398,13 +398,12 @@ def semantic_expr_to_z3(expr, store: dict, module: str, width_hint: int = 32):
             lhs = If(lhs, BitVecVal(1, w), BitVecVal(0, w))
         if isinstance(rhs, BoolRef):
             rhs = If(rhs, BitVecVal(1, w), BitVecVal(0, w))
-        if isinstance(lhs, BitVecRef) and isinstance(rhs, BitVecRef):
-            if lhs.size() != rhs.size():
-                target = max(lhs.size(), rhs.size())
-                if lhs.size() < target:
-                    lhs = z3.ZeroExt(target - lhs.size(), lhs)
-                if rhs.size() < target:
-                    rhs = z3.ZeroExt(target - rhs.size(), rhs)
+        if isinstance(lhs, BitVecRef) and isinstance(rhs, BitVecRef) and lhs.size() != rhs.size():
+            target = max(lhs.size(), rhs.size())
+            if lhs.size() < target:
+                lhs = z3.ZeroExt(target - lhs.size(), lhs)
+            if rhs.size() < target:
+                rhs = z3.ZeroExt(target - rhs.size(), rhs)
         fn = _BINOP_MAP.get(op)
         if fn is not None:
             return fn(lhs, rhs)

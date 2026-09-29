@@ -294,13 +294,16 @@ class ExecutionEngine:
                             continue
                     item_z3 = semantic_expr_to_z3(item_expr, store, module)
                     if item_z3 is not None and isinstance(item_z3, (BoolRef, BitVecRef, ArithRef)):
-                        if isinstance(cond_z3, BitVecRef) and isinstance(item_z3, BitVecRef):
-                            if cond_z3.size() != item_z3.size():
-                                tgt = max(cond_z3.size(), item_z3.size())
-                                c = cond_z3 if cond_z3.size() == tgt else z3.ZeroExt(tgt - cond_z3.size(), cond_z3)
-                                i = item_z3 if item_z3.size() == tgt else z3.ZeroExt(tgt - item_z3.size(), item_z3)
-                                item_z3s.append(c == i)
-                                continue
+                        if (
+                            isinstance(cond_z3, BitVecRef)
+                            and isinstance(item_z3, BitVecRef)
+                            and cond_z3.size() != item_z3.size()
+                        ):
+                            tgt = max(cond_z3.size(), item_z3.size())
+                            c = cond_z3 if cond_z3.size() == tgt else z3.ZeroExt(tgt - cond_z3.size(), cond_z3)
+                            i = item_z3 if item_z3.size() == tgt else z3.ZeroExt(tgt - item_z3.size(), item_z3)
+                            item_z3s.append(c == i)
+                            continue
                         item_z3s.append(cond_z3 == item_z3)
                 if item_z3s:
                     constraint = item_z3s[0] if len(item_z3s) == 1 else Or(*item_z3s)
@@ -318,13 +321,16 @@ class ExecutionEngine:
                             continue
                     item_z3 = semantic_expr_to_z3(item_expr, store, module)
                     if item_z3 is not None and isinstance(item_z3, (BoolRef, BitVecRef, ArithRef)):
-                        if isinstance(cond_z3, BitVecRef) and isinstance(item_z3, BitVecRef):
-                            if cond_z3.size() != item_z3.size():
-                                tgt = max(cond_z3.size(), item_z3.size())
-                                c = cond_z3 if cond_z3.size() == tgt else z3.ZeroExt(tgt - cond_z3.size(), cond_z3)
-                                i = item_z3 if item_z3.size() == tgt else z3.ZeroExt(tgt - item_z3.size(), item_z3)
-                                neg_z3s.append(c != i)
-                                continue
+                        if (
+                            isinstance(cond_z3, BitVecRef)
+                            and isinstance(item_z3, BitVecRef)
+                            and cond_z3.size() != item_z3.size()
+                        ):
+                            tgt = max(cond_z3.size(), item_z3.size())
+                            c = cond_z3 if cond_z3.size() == tgt else z3.ZeroExt(tgt - cond_z3.size(), cond_z3)
+                            i = item_z3 if item_z3.size() == tgt else z3.ZeroExt(tgt - item_z3.size(), item_z3)
+                            neg_z3s.append(c != i)
+                            continue
                         neg_z3s.append(cond_z3 != item_z3)
                 if neg_z3s:
                     path_state.pc.assert_and_track(And(*neg_z3s), tag)
