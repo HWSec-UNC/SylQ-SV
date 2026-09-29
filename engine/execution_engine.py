@@ -61,7 +61,7 @@ class ExecutionEngine:
         """Solves path condition using Z3"""
         result = str(s.check())
         if str(result) == "sat":
-            model = s.model()
+            _model = s.model()
             return True
         else:
             return False
@@ -81,9 +81,7 @@ class ExecutionEngine:
         for path in seen[m.curr_module]:
             if path[bit_index] == '1':
                 count += 1
-        if count >  2 * nested_ifs:
-            return True
-        return False
+        return count > 2 * nested_ifs
 
     def collect_all_instances(self, instance: ps_ast.Symbol, out: list) -> None:
         """Recursively collect this Instance symbol and all nested sub-instances depth-first."""

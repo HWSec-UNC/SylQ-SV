@@ -278,9 +278,9 @@ class SlangSymbolVisitor:
         elif symbol.kind == ps_ast.SymbolKind.Instance:
             # instance.name is a common attribute
             try:
-                instance_name = getattr(symbol, "name", None)
+                _instance_name = getattr(symbol, "name", None)
             except Exception:
-                instance_name = None
+                _instance_name = None
             self._recurse_if_present(symbol, "instanceBody", "parentInstance", "members", "children")
             return
         

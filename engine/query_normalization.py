@@ -160,9 +160,7 @@ def _is_literal(name: str) -> bool:
     except ValueError:
         pass
     # Hex-like
-    if name.startswith('#') or name.startswith('0x'):
-        return True
-    return False
+    return bool(name.startswith(('#', '0x')))
 
 
 def _rename_variables(expr: ExprRef, rename_map: dict[str, ExprRef] | None = None) -> tuple:

@@ -163,9 +163,7 @@ def may_disjoint_skip_merge(
         return not (set(partial_vars) & set(new_vars))
     if not canonical_name_sets_disjoint(partial_vars, new_vars):
         return False
-    if ast_structure_intersects(partial_pc, new_pc):
-        return False
-    return True
+    return not ast_structure_intersects(partial_pc, new_pc)
 
 
 def may_disjoint_skip_cross_module(
@@ -186,6 +184,4 @@ def may_disjoint_skip_cross_module(
         return False
     if not canonical_name_sets_disjoint(partial_vars, new_vars):
         return False
-    if ast_structure_intersects(partial_pc, new_pc):
-        return False
-    return True
+    return not ast_structure_intersects(partial_pc, new_pc)

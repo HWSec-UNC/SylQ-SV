@@ -807,7 +807,7 @@ class DFSCrossModuleIterator:
             if _timeout_requested(self.manager):
                 return
             frame = self.stack[-1]
-            module_name, cycle = self.levels[frame.level]
+            module_name, _cycle = self.levels[frame.level]
             try:
                 result = next(frame.iterator)
                 frame.current_result = result
@@ -815,7 +815,7 @@ class DFSCrossModuleIterator:
                 self.stack.pop()
                 # Backtrack: remove last added cycle result
                 if frame.level > 0:
-                    prev_module, prev_cycle = self.levels[frame.level - 1]
+                    _prev_module, _prev_cycle = self.levels[frame.level - 1]
                     # Restore combo state (handled by stack frames)
                 continue
             

@@ -137,7 +137,7 @@ class ExecutionManager:
                 continue
             else:
                 for key2, var in val.items():
-                    if var in store.values() and (key2 in self.reg_decls or key2.startswith("clk") or key2.startswith("rst")):
+                    if var in store.values() and (key2 in self.reg_decls or key2.startswith(("clk", "rst"))):
                         prev_symbol = state.store[key][key2]
                         new_symbol = store[key][key2]
                         state.store[key][key2].replace(prev_symbol, new_symbol)
@@ -203,7 +203,7 @@ class ExecutionManager:
         if hasattr(stmts, '__iter__'):
             for item in stmts:
                 if isinstance(item, CONDITIONALS):
-                    if isinstance(item, ps_stx.ConditionalStatementSyntax) or isinstance(item, ps_stx.CaseStatementSyntax):
+                    if isinstance(item, (ps_stx.ConditionalStatementSyntax, ps_stx.CaseStatementSyntax)):
                         if isinstance(item, ps_stx.ConditionalStatementSyntax):
                             return self.count_conditionals_2(m, item.ifTrue) + self.count_conditionals_2(m, item.ifFalse)  + 1
                         if isinstance(items, ps_stx.CaseStatementSyntax):
@@ -235,6 +235,4 @@ class ExecutionManager:
         for path in seen[m.curr_module]:
             if path[bit_index] == '1':
                 count += 1
-        if count >  2 * nested_ifs:
-            return True
-        return False
+        return count > 2 * nested_ifs

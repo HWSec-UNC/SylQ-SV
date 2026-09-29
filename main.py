@@ -211,7 +211,7 @@ def main():
                     all_names = [t.name for t in top_instances]
                     logger.error(f"ERROR: --top '{options.topmodule}' not found in topInstances: {all_names}",
                           file=sys.stderr)
-                    exit(1)
+                    sys.exit(1)
                 top_instances = filtered
                 logger.info(f"--top: filtered to {options.topmodule} "
                       f"(skipping {len(root.topInstances) - 1} other top-level modules)")
@@ -286,7 +286,7 @@ def main():
 
         if timer:
             timer.cancel()
-        exit()
+        sys.exit()
 
 if __name__ == '__main__':
     main()

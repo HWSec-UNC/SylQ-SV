@@ -148,7 +148,7 @@ class CFG:
         if not self.all_nodes:
             return
 
-        sorted_points = sorted(list(self.partition_points))
+        sorted_points = sorted(self.partition_points)
         sorted_points.append(len(self.all_nodes))
 
         self.basic_block_list = []
@@ -193,8 +193,8 @@ class CFG:
     def _find_leaves(self):
         """Find leaves in cfg, to know which nodes need to connect to dummy exit."""
         if self.cfg_edges:
-            starts = set(edge[0] for edge in self.cfg_edges)
-            ends = set(edge[1] for edge in self.cfg_edges)
+            starts = {edge[0] for edge in self.cfg_edges}
+            ends = {edge[1] for edge in self.cfg_edges}
             self.leaves = ends - starts
         elif self.basic_block_list:
             self.leaves = {len(self.basic_block_list) - 1}
