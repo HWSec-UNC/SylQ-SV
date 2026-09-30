@@ -1,4 +1,4 @@
-"""The Symbolic State is comprised of the path condition and the symbolic store. There 
+"""The Symbolic State is comprised of the path condition and the symbolic store. There
 are some other methods here that may be helpful, too."""
 
 import random
@@ -12,8 +12,8 @@ class SymbolicState:
     assertion_counter = 0
     sort = BitVecSort(32)
     clock_cycle: int = 0
-    #TODO need to change to be a nested mapping of module names to dictionaries
-    # can be initalized at the beginning of the run 
+    # TODO need to change to be a nested mapping of module names to dictionaries
+    # can be initalized at the beginning of the run
     store = {}
 
     # set to true when evaluating a conditoin so that
@@ -24,10 +24,10 @@ class SymbolicState:
     def get_symbolic_expr(self, module_name: str, var_name: str) -> str:
         """Just looks up a symbolic expression associated with a specific variable name
         in that particular module."""
-        if '[' in var_name:
+        if "[" in var_name:
             name = var_name.split("[")[0]
             return self.store[module_name][name]
-        elif '.' in var_name:
+        elif "." in var_name:
             real_module_name = var_name.split(".")[0]
             real_var_name = var_name.split(".")[1]
             return self.store[real_module_name][real_var_name]
@@ -106,12 +106,12 @@ class SymbolicState:
         mod_store = self.store.setdefault(module_name, {})
         for k, v in bucket.items():
             mod_store[k] = v
-            # TODO: Param Check 
+            # TODO: Param Check
             if manager is not None:
                 self.mark_dirty(module_name, k, manager)
         bucket.clear()
-    
-    def advance_cycle(self, module_name: str, reg_decls: set) -> 'SymbolicState':
+
+    def advance_cycle(self, module_name: str, reg_decls: set) -> "SymbolicState":
         """Create a new SymbolicState for the next clock cycle.
         Register values (signals in reg_decls) carry forward from this cycle's
         end store. Input signals get fresh symbolic variables.
@@ -137,8 +137,10 @@ class SymbolicState:
                 next_store[signal] = val
             else:
                 # Input wire: give a fresh symbolic variable for the new cycle
-                fresh_name = ''.join(
-                    random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits)
+                fresh_name = "".join(
+                    random.choice(
+                        string.ascii_uppercase + string.ascii_lowercase + string.digits
+                    )
                     for _ in range(16)
                 )
                 next_store[signal] = BitVec(fresh_name, 32)

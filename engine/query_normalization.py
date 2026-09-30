@@ -45,6 +45,7 @@ try:
         substitute,
         z3util,
     )
+
     Z3_AVAILABLE = True
 except ImportError:
     Z3_AVAILABLE = False
@@ -53,6 +54,7 @@ except ImportError:
 # ---------------------------------------------------------------------------
 # Phase 1: Propositional term normalization (concatenation + arithmetic NF)
 # ---------------------------------------------------------------------------
+
 
 def _simplify_expr(expr: ExprRef) -> ExprRef:
     """Apply Z3's built-in simplifier which handles:
@@ -68,13 +70,14 @@ def _simplify_expr(expr: ExprRef) -> ExprRef:
         return expr
     try:
         # Z3's simplify with specific options for better normalization
-        return simplify(expr,
-                        som=True,           # sum-of-monomials for arithmetic
-                        sort_sums=True,     # canonical ordering in sums
-                        pull_cheap_ite=True,
-                        flat=True,          # flatten nested And/Or
-                        elim_and=False,     # keep And nodes (not rewrite to Or+Not)
-                        )
+        return simplify(
+            expr,
+            som=True,  # sum-of-monomials for arithmetic
+            sort_sums=True,  # canonical ordering in sums
+            pull_cheap_ite=True,
+            flat=True,  # flatten nested And/Or
+            elim_and=False,  # keep And nodes (not rewrite to Or+Not)
+        )
     except Exception:
         return expr
 
@@ -82,6 +85,7 @@ def _simplify_expr(expr: ExprRef) -> ExprRef:
 # ---------------------------------------------------------------------------
 # Phase 2: Lexicographic ordering
 # ---------------------------------------------------------------------------
+
 
 def _sort_children(expr: ExprRef) -> ExprRef:
     """If *expr* is a conjunction (And) or disjunction (Or), sort its
@@ -124,6 +128,7 @@ def _lexicographic_normalize(expr: ExprRef) -> ExprRef:
 # Phase 3: Variable renaming
 # ---------------------------------------------------------------------------
 
+
 def _collect_vars_ordered(expr: ExprRef) -> list[str]:
     """Collect symbolic variable names from *expr* in left-to-right (DFS) order,
     preserving first-occurrence order."""
@@ -152,7 +157,7 @@ def _collect_vars_ordered(expr: ExprRef) -> list[str]:
 
 def _is_literal(name: str) -> bool:
     """Check if a name looks like a Z3 numeric/boolean literal."""
-    if name in ('True', 'False'):
+    if name in ("True", "False"):
         return True
     try:
         int(name)
@@ -160,10 +165,12 @@ def _is_literal(name: str) -> bool:
     except ValueError:
         pass
     # Hex-like
-    return bool(name.startswith(('#', '0x')))
+    return bool(name.startswith(("#", "0x")))
 
 
-def _rename_variables(expr: ExprRef, rename_map: dict[str, ExprRef] | None = None) -> tuple:
+def _rename_variables(
+    expr: ExprRef, rename_map: dict[str, ExprRef] | None = None
+) -> tuple:
     """Rename all symbolic variables in *expr* to T1, T2, ... in order of
     first occurrence (left-to-right DFS).
 
@@ -203,6 +210,7 @@ def _rename_variables(expr: ExprRef, rename_map: dict[str, ExprRef] | None = Non
                     else:
                         # Boolean variable
                         from z3 import Bool
+
                         new_var = Bool(new_name)
                     rename_map[vname] = new_var
                     subs_from.append(v)
@@ -223,6 +231,7 @@ def _rename_variables(expr: ExprRef, rename_map: dict[str, ExprRef] | None = Non
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
+
 
 def normalize_constraint(expr: ExprRef, rename_map: dict | None = None) -> tuple:
     """Apply all three normalization phases to a single Z3 constraint.

@@ -29,14 +29,18 @@ CONDITIONALS = (
     ps_stx.ForeachLoopStatementSyntax,
     ps_stx.ForLoopStatementSyntax,
     ps_stx.LoopStatementSyntax,
-    ps_stx.DoWhileStatementSyntax
+    ps_stx.DoWhileStatementSyntax,
 )
+
+
 class ExecutionEngine:
     # Drives the entire symbolic execution process
     module_depth: int = 0  # Tracks current module nesting depth during execution
-    debug: bool = False    # Boolean flag to enable debug output
-    done: bool = False     # Boolean flag indicating if execution is complete
-    timeout: bool = False  # Set to True by main.py timeout handler to request early stop
+    debug: bool = False  # Boolean flag to enable debug output
+    done: bool = False  # Boolean flag indicating if execution is complete
+    timeout: bool = (
+        False  # Set to True by main.py timeout handler to request early stop
+    )
 
     def check_pc_SAT(self, s: Solver, constraint: ExprRef) -> bool:
         """Check if pc is satisfiable before taking path."""
@@ -66,9 +70,11 @@ class ExecutionEngine:
         else:
             return False
 
-    def seen_all_cases(self, m: ExecutionManager, bit_index: int, nested_ifs: int) -> bool:
+    def seen_all_cases(
+        self, m: ExecutionManager, bit_index: int, nested_ifs: int
+    ) -> bool:
         """Checks if we've seen all the cases for this index in the bit string.
-        We know there are no more nested conditionals within the block, just want to check 
+        We know there are no more nested conditionals within the block, just want to check
         that we have seen the path where this bit was turned on but the thing to the left of it
         could vary."""
         # first check if things less than me have been added.
@@ -79,21 +85,19 @@ class ExecutionEngine:
         count = 0
         seen = m.seen
         for path in seen[m.curr_module]:
-            if path[bit_index] == '1':
+            if path[bit_index] == "1":
                 count += 1
         return count > 2 * nested_ifs
 
     def collect_all_instances(self, instance: ps_ast.Symbol, out: list) -> None:
         """Recursively collect this Instance symbol and all nested sub-instances depth-first."""
         out.append(instance)
-        body = getattr(instance, 'body', getattr(instance, 'instanceBody', None))
+        body = getattr(instance, "body", getattr(instance, "instanceBody", None))
         if body is None:
             return
         for member in body:
             if member.kind == ps_ast.SymbolKind.Instance:
                 self.collect_all_instances(member, out)
-
-
 
     def populate_child_paths(self, manager: ExecutionManager) -> None:
         """Populates child path codes based on number of paths."""
@@ -118,8 +122,15 @@ class ExecutionEngine:
                 for i in range(manager.child_num_paths[child]):
                     manager.seen_mod[child][(to_binary(i))] = {}
 
-    def explore_block(self, visitor, manager: ExecutionManager, state_template: SymbolicState,
-                      module_name: str, cfg: CFG, modules_dict: dict) -> list[dict]:
+    def explore_block(
+        self,
+        visitor,
+        manager: ExecutionManager,
+        state_template: SymbolicState,
+        module_name: str,
+        cfg: CFG,
+        modules_dict: dict,
+    ) -> list[dict]:
         """Explore all paths through a single always block (Paper §3.3). Returns a list of
         {'pc': list of z3 constraints, 'store': {signal: expr}} per feasible path."""
         prev_curr_module = manager.curr_module
@@ -130,20 +141,24 @@ class ExecutionEngine:
         try:
             for path_idx, path in enumerate(cfg.get_paths()):
                 if self.debug and (
-                    path_idx == 0 or (path_idx + 1) % 100 == 0 or path_idx == num_paths - 1
+                    path_idx == 0
+                    or (path_idx + 1) % 100 == 0
+                    or path_idx == num_paths - 1
                 ):
                     logger.debug(f"  path {path_idx + 1}/{num_paths}")
                 manager.ignore = False
                 manager.abandon = False
-                path_state = state_template.fresh_for_block(module_name,
-                    state_template.snapshot(module_name))
+                path_state = state_template.fresh_for_block(
+                    module_name, state_template.snapshot(module_name)
+                )
 
                 # base_store already has CA outputs baked in (one-shot pass in
                 # execute_sv). Starts clean — only writes during the path dirty
                 # their dependents, and evaluate_dirty_comb re-runs just those.
 
-                self._execute_cfg_path(visitor, manager, path_state, module_name,
-                                       cfg, path, modules_dict)
+                self._execute_cfg_path(
+                    visitor, manager, path_state, module_name, cfg, path, modules_dict
+                )
 
                 try:
                     constraints = list(path_state.pc.assertions())
@@ -154,17 +169,21 @@ class ExecutionEngine:
                 except Exception:
                     pass
                 if not constraints or str(path_state.pc.check()) == "sat":
-                    results.append({
-                        "pc": constraints,
-                        "store": dict(path_state.store.get(module_name, {}))
-                    })
+                    results.append(
+                        {
+                            "pc": constraints,
+                            "store": dict(path_state.store.get(module_name, {})),
+                        }
+                    )
         finally:
             manager.curr_module = prev_curr_module
-            if hasattr(manager, '_pc_ref'):
+            if hasattr(manager, "_pc_ref"):
                 manager._pc_ref = None
         return results
 
-    def _execute_cfg_path(self, visitor, manager, path_state, module_name, cfg, path, modules_dict):
+    def _execute_cfg_path(
+        self, visitor, manager, path_state, module_name, cfg, path, modules_dict
+    ):
         """Execute a single CFG path: add edge constraints to pc and run assignment statements."""
 
         prev_bb_idx = None
@@ -178,7 +197,8 @@ class ExecutionEngine:
                     edge_data = cfg.graph.get_edge_data(prev_bb_idx, -2)
                     if edge_data:
                         self._assert_edge_condition(
-                            edge_data, cfg, prev_bb_idx, path_state, manager)
+                            edge_data, cfg, prev_bb_idx, path_state, manager
+                        )
                 break
 
             # Add constraint from the incoming edge
@@ -186,7 +206,8 @@ class ExecutionEngine:
                 edge_data = cfg.graph.get_edge_data(prev_bb_idx, bb_idx)
                 if edge_data:
                     self._assert_edge_condition(
-                        edge_data, cfg, prev_bb_idx, path_state, manager)
+                        edge_data, cfg, prev_bb_idx, path_state, manager
+                    )
 
             # Execute statements in this BB (skip bare condition Expression nodes)
             basic_block = cfg.basic_block_list[bb_idx]
@@ -210,6 +231,7 @@ class ExecutionEngine:
     def _to_bool(z3_expr):
         """Coerce a Z3 expression to BoolRef. BitVec values become (val != 0)."""
         from z3 import ArithRef, BitVecRef, BitVecVal, BoolRef, IntVal
+
         if isinstance(z3_expr, BoolRef):
             return z3_expr
         if isinstance(z3_expr, BitVecRef):
@@ -218,7 +240,9 @@ class ExecutionEngine:
             return z3_expr != IntVal(0)
         return z3_expr != 0
 
-    def _assert_edge_condition(self, edge_data, cfg, source_bb_idx, path_state, manager):
+    def _assert_edge_condition(
+        self, edge_data, cfg, source_bb_idx, path_state, manager
+    ):
         """Add a Z3 constraint to path_state.pc based on a CFG edge condition."""
         import z3
         from z3 import And, Not, Or
@@ -229,7 +253,7 @@ class ExecutionEngine:
             semantic_expr_to_z3,
         )
 
-        cond = edge_data.get('condition')
+        cond = edge_data.get("condition")
         if cond is None:
             return
 
@@ -239,7 +263,7 @@ class ExecutionEngine:
         cond_expr_node = None
 
         # Exact guard node carried by CFG edge metadata.
-        guard_node_idx = edge_data.get('guard_node_idx')
+        guard_node_idx = edge_data.get("guard_node_idx")
         if isinstance(guard_node_idx, int) and 0 <= guard_node_idx < len(cfg.all_nodes):
             candidate = cfg.all_nodes[guard_node_idx]
             if isinstance(candidate, ps_ast.Expression):
@@ -263,6 +287,7 @@ class ExecutionEngine:
             return
 
         from z3 import ArithRef, BitVecRef, BoolRef
+
         if not isinstance(cond_z3, (BoolRef, BitVecRef, ArithRef)):
             return
 
@@ -272,14 +297,16 @@ class ExecutionEngine:
         # Temp debug: map cfg_pN -> edge/source/condition for one module
         if manager.curr_module == "or1200_dpram_256x32":
             try:
-                logger.debug(f"[CFG_ASSERT] {tag} src_bb={source_bb_idx} guard_idx={guard_node_idx} cond={cond} cond_z3={cond_z3}")
+                logger.debug(
+                    f"[CFG_ASSERT] {tag} src_bb={source_bb_idx} guard_idx={guard_node_idx} cond={cond} cond_z3={cond_z3}"
+                )
             except Exception:
                 pass
-        
+
         try:
-            if cond == 'true':
+            if cond == "true":
                 path_state.pc.assert_and_track(self._to_bool(cond_z3), tag)
-            elif cond == 'false':
+            elif cond == "false":
                 path_state.pc.assert_and_track(Not(self._to_bool(cond_z3)), tag)
             elif isinstance(cond, CaseLabel):
                 item_z3s = []
@@ -293,15 +320,25 @@ class ExecutionEngine:
                             item_z3s.append(arm)
                             continue
                     item_z3 = semantic_expr_to_z3(item_expr, store, module)
-                    if item_z3 is not None and isinstance(item_z3, (BoolRef, BitVecRef, ArithRef)):
+                    if item_z3 is not None and isinstance(
+                        item_z3, (BoolRef, BitVecRef, ArithRef)
+                    ):
                         if (
                             isinstance(cond_z3, BitVecRef)
                             and isinstance(item_z3, BitVecRef)
                             and cond_z3.size() != item_z3.size()
                         ):
                             tgt = max(cond_z3.size(), item_z3.size())
-                            c = cond_z3 if cond_z3.size() == tgt else z3.ZeroExt(tgt - cond_z3.size(), cond_z3)
-                            i = item_z3 if item_z3.size() == tgt else z3.ZeroExt(tgt - item_z3.size(), item_z3)
+                            c = (
+                                cond_z3
+                                if cond_z3.size() == tgt
+                                else z3.ZeroExt(tgt - cond_z3.size(), cond_z3)
+                            )
+                            i = (
+                                item_z3
+                                if item_z3.size() == tgt
+                                else z3.ZeroExt(tgt - item_z3.size(), item_z3)
+                            )
                             item_z3s.append(c == i)
                             continue
                         item_z3s.append(cond_z3 == item_z3)
@@ -311,7 +348,7 @@ class ExecutionEngine:
             elif isinstance(cond, DefaultLabel):
                 neg_z3s = []
                 case_kind = getattr(cond, "case_kind", "") or ""
-                for item_expr in cond.get('default_from', []):
+                for item_expr in cond.get("default_from", []):
                     if isinstance(cond_z3, BitVecRef):
                         arm = case_statement_arm_matches_z3(
                             cond_z3, item_expr, store, module, case_kind
@@ -320,15 +357,25 @@ class ExecutionEngine:
                             neg_z3s.append(Not(arm))
                             continue
                     item_z3 = semantic_expr_to_z3(item_expr, store, module)
-                    if item_z3 is not None and isinstance(item_z3, (BoolRef, BitVecRef, ArithRef)):
+                    if item_z3 is not None and isinstance(
+                        item_z3, (BoolRef, BitVecRef, ArithRef)
+                    ):
                         if (
                             isinstance(cond_z3, BitVecRef)
                             and isinstance(item_z3, BitVecRef)
                             and cond_z3.size() != item_z3.size()
                         ):
                             tgt = max(cond_z3.size(), item_z3.size())
-                            c = cond_z3 if cond_z3.size() == tgt else z3.ZeroExt(tgt - cond_z3.size(), cond_z3)
-                            i = item_z3 if item_z3.size() == tgt else z3.ZeroExt(tgt - item_z3.size(), item_z3)
+                            c = (
+                                cond_z3
+                                if cond_z3.size() == tgt
+                                else z3.ZeroExt(tgt - cond_z3.size(), cond_z3)
+                            )
+                            i = (
+                                item_z3
+                                if item_z3.size() == tgt
+                                else z3.ZeroExt(tgt - item_z3.size(), item_z3)
+                            )
                             neg_z3s.append(c != i)
                             continue
                         neg_z3s.append(cond_z3 != item_z3)
@@ -352,7 +399,9 @@ class ExecutionEngine:
                 buf = getattr(start, "buffer", None)
                 path = ""
                 if buf is not None:
-                    path = getattr(buf, "name", None) or getattr(buf, "file", None) or ""
+                    path = (
+                        getattr(buf, "name", None) or getattr(buf, "file", None) or ""
+                    )
                     if path is not None and not isinstance(path, str):
                         path = str(path)
                 if line is not None:
@@ -387,12 +436,16 @@ class ExecutionEngine:
                 self._collect_assertions(item, module_name, assertions_list)
             return
 
-        cname = ast.__class__.__name__ if hasattr(ast, '__class__') else ''
+        cname = ast.__class__.__name__ if hasattr(ast, "__class__") else ""
 
         # Check for immediate assertion statements: assert(expr)
-        if cname in ('ImmediateAssertStatementSyntax', 'ImmediateAssertionStatementSyntax',
-                      'ImmediateAssertionMemberSyntax',
-                      'ImmediateAssumeStatementSyntax', 'ImmediateCoverStatementSyntax'):
+        if cname in (
+            "ImmediateAssertStatementSyntax",
+            "ImmediateAssertionStatementSyntax",
+            "ImmediateAssertionMemberSyntax",
+            "ImmediateAssumeStatementSyntax",
+            "ImmediateCoverStatementSyntax",
+        ):
             sr = getattr(ast, "sourceRange", None)
             if callable(getattr(ast, "toString", None)) and sr is None:
                 try:
@@ -400,30 +453,38 @@ class ExecutionEngine:
                 except Exception:
                     sr = None
             source = self._format_source_range(sr)
-            assertions_list.append({
-                'node': ast,
-                'module': module_name,
-                'source': source,
-                'source_range': sr,
-                'kind': 'immediate',
-                'z3_expr': None,  # filled during explore_block or cross-module check
-            })
+            assertions_list.append(
+                {
+                    "node": ast,
+                    "module": module_name,
+                    "source": source,
+                    "source_range": sr,
+                    "kind": "immediate",
+                    "z3_expr": None,  # filled during explore_block or cross-module check
+                }
+            )
             return
 
         # Check for concurrent assertion statements: assert property (...)
-        if cname in ('AssertPropertyStatementSyntax', 'ConcurrentAssertionMemberSyntax',
-                      'AssumePropertyStatementSyntax', 'CoverPropertyStatementSyntax',
-                      'ExpectPropertyStatementSyntax'):
+        if cname in (
+            "AssertPropertyStatementSyntax",
+            "ConcurrentAssertionMemberSyntax",
+            "AssumePropertyStatementSyntax",
+            "CoverPropertyStatementSyntax",
+            "ExpectPropertyStatementSyntax",
+        ):
             sr = getattr(ast, "sourceRange", None)
             source = self._format_source_range(sr)
-            assertions_list.append({
-                'node': ast,
-                'module': module_name,
-                'source': source,
-                'source_range': sr,
-                'kind': 'concurrent',
-                'z3_expr': None,
-            })
+            assertions_list.append(
+                {
+                    "node": ast,
+                    "module": module_name,
+                    "source": source,
+                    "source_range": sr,
+                    "kind": "concurrent",
+                    "z3_expr": None,
+                }
+            )
             return
 
         # Recurse into known container types
@@ -432,22 +493,26 @@ class ExecutionEngine:
                 self._collect_assertions(mem, module_name, assertions_list)
             return
 
-        if hasattr(ast, 'statement'):
+        if hasattr(ast, "statement"):
             self._collect_assertions(ast.statement, module_name, assertions_list)
-        if hasattr(ast, 'items'):
+        if hasattr(ast, "items"):
             items = ast.items
-            if hasattr(items, '__iter__'):
+            if hasattr(items, "__iter__"):
                 for item in items:
                     self._collect_assertions(item, module_name, assertions_list)
-        if hasattr(ast, 'members'):
+        if hasattr(ast, "members"):
             members = ast.members
-            if hasattr(members, '__iter__') and not isinstance(ast, ps_stx.ModuleDeclarationSyntax):
+            if hasattr(members, "__iter__") and not isinstance(
+                ast, ps_stx.ModuleDeclarationSyntax
+            ):
                 for mem in members:
                     self._collect_assertions(mem, module_name, assertions_list)
-        if hasattr(ast, 'body'):
+        if hasattr(ast, "body"):
             self._collect_assertions(ast.body, module_name, assertions_list)
 
-    def _collect_procedural_assertions(self, always_blocks, module_name, assertions_list):
+    def _collect_procedural_assertions(
+        self, always_blocks, module_name, assertions_list
+    ):
         """Walk the semantic statement trees of always blocks to find immediate assertions.
 
         PySlang represents ``assert(expr)`` inside procedural blocks as
@@ -458,39 +523,43 @@ class ExecutionEngine:
         found = []
 
         def _visitor(node):
-            if getattr(node, 'kind', None) == ps_ast.StatementKind.ImmediateAssertion:
-                cond = getattr(node, 'cond', None)
-                source_range = getattr(node, 'sourceRange', None)
+            if getattr(node, "kind", None) == ps_ast.StatementKind.ImmediateAssertion:
+                cond = getattr(node, "cond", None)
+                source_range = getattr(node, "sourceRange", None)
                 source = ExecutionEngine._format_source_range(source_range)
-                found.append({
-                    'node': node,
-                    'module': module_name,
-                    'source': source,
-                    'source_range': source_range,
-                    'kind': 'immediate',
-                    'cond_expr': cond,
-                    'z3_expr': None,
-                })
+                found.append(
+                    {
+                        "node": node,
+                        "module": module_name,
+                        "source": source,
+                        "source_range": source_range,
+                        "kind": "immediate",
+                        "cond_expr": cond,
+                        "z3_expr": None,
+                    }
+                )
 
         for ab in always_blocks:
-            ab_body = getattr(ab, 'body', getattr(ab, 'statement', None))
+            ab_body = getattr(ab, "body", getattr(ab, "statement", None))
             if ab_body is not None:
                 ab_body.visit(_visitor)
 
         assertions_list.extend(found)
 
-    def _eval_assertion_expr(self, assertion_info, visitor, manager, state, modules_dict):
+    def _eval_assertion_expr(
+        self, assertion_info, visitor, manager, state, modules_dict
+    ):
         """Attempt to evaluate the assertion node's condition/expression into a Z3 expression.
 
         Tries multiple attribute names to locate the assertion condition in the
         pyslang AST node, then uses the visitor's expr_to_z3 to convert it.
         Sets assertion_info['z3_expr'] if successful.
         """
-        node = assertion_info['node']
-        expr_node = assertion_info.get('cond_expr')
+        node = assertion_info["node"]
+        expr_node = assertion_info.get("cond_expr")
 
         if expr_node is None:
-            for attr in ('cond', 'expr', 'condition', 'expression'):
+            for attr in ("cond", "expr", "condition", "expression"):
                 if hasattr(node, attr):
                     expr_node = getattr(node, attr)
                     if expr_node is not None:
@@ -498,12 +567,12 @@ class ExecutionEngine:
 
         # For concurrent assertions, try the property spec
         if expr_node is None:
-            for attr in ('propertySpec', 'property', 'spec'):
+            for attr in ("propertySpec", "property", "spec"):
                 if hasattr(node, attr):
                     prop = getattr(node, attr)
                     if prop is not None:
                         # Property spec may have an .expr attribute
-                        for pattr in ('expr', 'expression', 'cond'):
+                        for pattr in ("expr", "expression", "cond"):
                             if hasattr(prop, pattr):
                                 expr_node = getattr(prop, pattr)
                                 if expr_node is not None:
@@ -512,9 +581,9 @@ class ExecutionEngine:
                             break
 
         # For nodes that wrap a statement containing the assertion
-        if expr_node is None and hasattr(node, 'statement'):
+        if expr_node is None and hasattr(node, "statement"):
             stmt = node.statement
-            for attr in ('cond', 'expr', 'condition', 'expression'):
+            for attr in ("cond", "expr", "condition", "expression"):
                 if hasattr(stmt, attr):
                     expr_node = getattr(stmt, attr)
                     if expr_node is not None:
@@ -527,9 +596,10 @@ class ExecutionEngine:
             visitor.visit_expr(manager, state, expr_node)
             z3_expr = visitor.expr_to_z3(manager, state, expr_node)
             if z3_expr is not None:
-                assertion_info['z3_expr'] = z3_expr
+                assertion_info["z3_expr"] = z3_expr
         except Exception as e:
             import logging
+
             logging.warning(
                 "Assertion Z3 eval failed module=%s source=%s: %s",
                 assertion_info.get("module"),
@@ -548,17 +618,18 @@ class ExecutionEngine:
                 pass
         return out
 
-    def merge_block_results(self, block_result_lists: list[list], module_name: str = "",
-                            manager=None):
+    def merge_block_results(
+        self, block_result_lists: list[list], module_name: str = "", manager=None
+    ):
         """Piecewise composition merge step (Paper §3.3, §4.3).
-        
+
         Combines path fragments from always blocks via SMT while preserving completeness.
-        
+
         Pipeline:
         1. Partition blocks into connected components (union-find on shared variables)
         2. Within each component: ReplayableMergeResults streams DFSMergeIterator (not materialized)
         3. Across components: LazyProduct nests iteration (lazy Cartesian product)
-        
+
         Returns a LazyProduct, ReplayableMergeResults, or plain list (all iterable); merge
         is not materialized until consumers iterate (DFS streaming)."""
         if not block_result_lists:
@@ -581,7 +652,7 @@ class ExecutionEngine:
                         manager=manager,
                     )
                 )
-        
+
         if n_groups == 1:
             return component_results[0]
 
@@ -611,7 +682,9 @@ class ExecutionEngine:
 
         if manager is not None:
             # Only manager=None is supported: we build modules_dict, cfgs_by_module, etc. here.
-            raise ValueError("execute_sv requires manager=None; the engine creates the manager internally.")
+            raise ValueError(
+                "execute_sv requires manager=None; the engine creates the manager internally."
+            )
         manager = ExecutionManager()
         manager.engine = self
         self.timeout = False
@@ -624,6 +697,7 @@ class ExecutionEngine:
         self._last_manager = manager
         # Initialize Quick-Union for query slicing (Paper §4.2.2)
         from .query_slicing import QuickUnion
+
         manager.qu_path = QuickUnion()
         manager.qu_merge = QuickUnion()
 
@@ -637,7 +711,7 @@ class ExecutionEngine:
 
         for instance in all_instances:
             instance_name = instance.name
-            body = getattr(instance, 'body', getattr(instance, 'instanceBody', None))
+            body = getattr(instance, "body", getattr(instance, "instanceBody", None))
 
             modules_dict[instance_name] = instance
             manager.names_list.append(instance_name)
@@ -646,12 +720,12 @@ class ExecutionEngine:
 
             probe = CFG()
             probe.get_always_sv(body)
-            always_blocks_by_module[instance_name] = (
-                list(probe.always_blocks) + list(probe.always_comb_blocks)
+            always_blocks_by_module[instance_name] = list(probe.always_blocks) + list(
+                probe.always_comb_blocks
             )
 
             for ab in probe.always_blocks:
-                ab_body = getattr(ab, 'body', getattr(ab, 'statement', None))
+                ab_body = getattr(ab, "body", getattr(ab, "statement", None))
                 c = CFG()
                 c._instance_body = probe._instance_body
                 c.module_name = instance_name
@@ -660,7 +734,7 @@ class ExecutionEngine:
                 cfgs_by_module[instance_name].append(c)
 
             for ab in probe.always_comb_blocks:
-                ab_body = getattr(ab, 'body', getattr(ab, 'statement', None))
+                ab_body = getattr(ab, "body", getattr(ab, "statement", None))
                 c = CFG()
                 c._instance_body = probe._instance_body
                 c.module_name = instance_name
@@ -705,7 +779,9 @@ class ExecutionEngine:
             self.module_depth -= 1
             return
 
-        first_module = modules_dict[manager.names_list[0]] if manager.names_list else None
+        first_module = (
+            modules_dict[manager.names_list[0]] if manager.names_list else None
+        )
 
         # --- Piecewise composition (sole execution mode) ---
         manager.prev_store = state.store
@@ -725,7 +801,10 @@ class ExecutionEngine:
             for c in cfgs_by_module[module_name]:
                 for node in c.decls:
                     visitor.dfs(node)
-                    if hasattr(node, 'name') and node.name not in state.store[module_name]:
+                    if (
+                        hasattr(node, "name")
+                        and node.name not in state.store[module_name]
+                    ):
                         state.store[module_name][node.name] = node.name
                 for node in c.comb:
                     visitor.dfs(node)
@@ -759,21 +838,28 @@ class ExecutionEngine:
         # starts inherit CA outputs baked in. Without this, each path would have
         # to re-evaluate every CA itself (paths × CAs Z3 builds per module).
         from types import SimpleNamespace
+
         for module_name in keys:
             n_ca = len(manager.comb_assigns[module_name])
             if n_ca == 0:
                 continue
             seed = SimpleNamespace(
                 store={module_name: base_store[module_name]},
-                dirty={module_name: (1 << n_ca) - 1}, # Marks all CAs as dirty so they get evaluated
+                dirty={
+                    module_name: (1 << n_ca) - 1
+                },  # Marks all CAs as dirty so they get evaluated
             )
             evaluate_dirty_comb(seed, module_name, manager)
 
         # Count sequential vs combinational CFGs for reporting
-        n_seq = sum(1 for m in keys for c in cfgs_by_module[m] if not c.is_combinational)
+        n_seq = sum(
+            1 for m in keys for c in cfgs_by_module[m] if not c.is_combinational
+        )
         n_comb = sum(1 for m in keys for c in cfgs_by_module[m] if c.is_combinational)
         if n_comb > 0:
-            logger.debug(f"  always_comb optimization: {n_comb} combinational CFGs, {n_seq} sequential CFGs")
+            logger.debug(
+                f"  always_comb optimization: {n_comb} combinational CFGs, {n_seq} sequential CFGs"
+            )
             logger.debug(f"  Look-up table built for {len(comb_lookup)} module(s)")
 
         # --- Phase: Collect SVA assertions from all modules ---
@@ -783,26 +869,34 @@ class ExecutionEngine:
             # 1) Module-level syntax walk (concurrent assertions, SVA properties)
             module_sym = modules_dict.get(module_name, None)
             if module_sym is None:
-                base_name = module_name.rsplit('_', 1)[0] if '_' in module_name else module_name
+                base_name = (
+                    module_name.rsplit("_", 1)[0] if "_" in module_name else module_name
+                )
                 module_sym = modules_dict.get(base_name, None)
             if module_sym is not None:
-                module_ast = getattr(module_sym, 'syntax', module_sym)
+                module_ast = getattr(module_sym, "syntax", module_sym)
                 self._collect_assertions(module_ast, module_name, manager.assertions)
             # 2) Procedural-block walk (immediate assertions inside always blocks)
             ab_list = always_blocks_by_module.get(module_name, [])
             if ab_list:
-                self._collect_procedural_assertions(ab_list, module_name, manager.assertions)
+                self._collect_procedural_assertions(
+                    ab_list, module_name, manager.assertions
+                )
 
         for assertion_info in manager.assertions:
-            amod = assertion_info['module']
+            amod = assertion_info["module"]
             manager.curr_module = amod
-            self._eval_assertion_expr(assertion_info, visitor, manager, state, modules_dict)
+            self._eval_assertion_expr(
+                assertion_info, visitor, manager, state, modules_dict
+            )
         n_total = len(manager.assertions)
-        n_with_z3 = sum(1 for a in manager.assertions if a.get('z3_expr') is not None)
-        n_immediate = sum(1 for a in manager.assertions if a.get('kind') == 'immediate')
+        n_with_z3 = sum(1 for a in manager.assertions if a.get("z3_expr") is not None)
+        n_immediate = sum(1 for a in manager.assertions if a.get("kind") == "immediate")
         n_concurrent = n_total - n_immediate
-        logger.info(f"  Found {n_total} assertion(s) ({n_immediate} immediate, {n_concurrent} concurrent), "
-              f"{n_with_z3} with Z3 expressions")
+        logger.info(
+            f"  Found {n_total} assertion(s) ({n_immediate} immediate, {n_concurrent} concurrent), "
+            f"{n_with_z3} with Z3 expressions"
+        )
 
         logger.info("Phase: explore_block (multi-cycle: %s cycle(s))", num_cycles)
 
@@ -810,7 +904,9 @@ class ExecutionEngine:
         per_cycle_results = []
 
         # The store that carries register state forward between cycles
-        cycle_store = {module_name: dict(base_store[module_name]) for module_name in keys}
+        cycle_store = {
+            module_name: dict(base_store[module_name]) for module_name in keys
+        }
 
         for cycle_idx in range(int(num_cycles)):
             logger.info("--- Cycle %d/%s ---", cycle_idx + 1, num_cycles)
@@ -822,9 +918,13 @@ class ExecutionEngine:
             block_results = {}
             for module_name in keys:
                 # Build the state template for this cycle from the carried-forward store
-                state_template = state.fresh_for_block(module_name, cycle_store[module_name])
+                state_template = state.fresh_for_block(
+                    module_name, cycle_store[module_name]
+                )
                 cfgs = list(cfgs_by_module[module_name])
-                cfgs.sort(key=lambda c: (1 if getattr(c, "is_combinational", False) else 0,))
+                cfgs.sort(
+                    key=lambda c: (1 if getattr(c, "is_combinational", False) else 0,)
+                )
                 block_results[module_name] = [
                     self.explore_block(
                         visitor, manager, state_template, module_name, cfg, modules_dict
@@ -842,7 +942,10 @@ class ExecutionEngine:
                 merged = merged_this_cycle[module_name]
                 logger.debug(
                     "  merge %s (%d/%d): %d blocks",
-                    module_name, idx + 1, len(keys), n_blocks
+                    module_name,
+                    idx + 1,
+                    len(keys),
+                    n_blocks,
                 )
 
             per_cycle_results.append(merged_this_cycle)
@@ -881,15 +984,17 @@ class ExecutionEngine:
 
                         # advance_cycle carries registers forward and gives fresh
                         # BitVec symbols to input signals
-                        next_state = end_state.advance_cycle(module_name, manager.reg_decls)
+                        next_state = end_state.advance_cycle(
+                            module_name, manager.reg_decls
+                        )
                         cycle_store[module_name] = next_state.store[module_name]
                     else:
                         logger.warning(
                             "No feasible paths in cycle %d for module %s; "
                             "carrying forward unchanged store",
-                            cycle_idx + 1, module_name
+                            cycle_idx + 1,
+                            module_name,
                         )
-
 
         # One result iterable per (module, cycle).
         per_module_per_cycle = {}
@@ -899,17 +1004,26 @@ class ExecutionEngine:
                 merged = cycle_results.get(module_name, [])
                 per_module_per_cycle[module_name].append(merged)
 
-        valid_assertions = [a for a in manager.assertions
-                            if a.get("z3_expr") is not None]
+        valid_assertions = [
+            a for a in manager.assertions if a.get("z3_expr") is not None
+        ]
         if valid_assertions:
             logger.info(f"  Checking {len(valid_assertions)} assertion(s)")
         else:
-            logger.info("  Mode: no assertions — enumerating all feasible global path combinations "
-                  "(path_count and DFS stats updated)")
-            logger.info(f"  Per-module merged results: {len(per_module_per_cycle)} module(s)")
+            logger.info(
+                "  Mode: no assertions — enumerating all feasible global path combinations "
+                "(path_count and DFS stats updated)"
+            )
+            logger.info(
+                f"  Per-module merged results: {len(per_module_per_cycle)} module(s)"
+            )
             if max_cross_module_paths is not None:
-                logger.info(f"  Stopping after {max_cross_module_paths:,} global path combination(s).")
-        logger.info("Phase: cross-module path iteration (DFS) — %s cycle(s)", num_cycles)
+                logger.info(
+                    f"  Stopping after {max_cross_module_paths:,} global path combination(s)."
+                )
+        logger.info(
+            "Phase: cross-module path iteration (DFS) — %s cycle(s)", num_cycles
+        )
         dfs_xmod = DFSCrossModuleIterator(
             per_module_results=per_module_per_cycle,
             num_cycles=int(num_cycles),
@@ -945,7 +1059,8 @@ class ExecutionEngine:
 
             if valid_assertions:
                 violation = self._check_assertions_on_path(
-                    manager, visitor, all_pcs, all_stores, modules_dict)
+                    manager, visitor, all_pcs, all_stores, modules_dict
+                )
                 if violation:
                     stats = dfs_xmod.get_stats()
                     manager.cross_module_stopped_reason = "violation"
@@ -958,7 +1073,6 @@ class ExecutionEngine:
                             stats["combos_pruned"],
                             stats["cache_hits"],
                         ),
-
                     )
                     self.module_depth -= 1
                     return
@@ -1003,7 +1117,9 @@ class ExecutionEngine:
         )
         self.module_depth -= 1
 
-    def _check_assertions_on_path(self, manager, visitor, all_pcs, all_stores, modules_dict):
+    def _check_assertions_on_path(
+        self, manager, visitor, all_pcs, all_stores, modules_dict
+    ):
         """Check all collected SVA assertions against a feasible merged path.
 
         For each assertion in manager.assertions, negate the assertion expression
@@ -1029,6 +1145,7 @@ class ExecutionEngine:
                 s.add(c)
             # Negate the assertion: if SAT, the assertion can be violated
             from z3 import Not, is_bool
+
             if not is_bool(assertion_z3):
                 continue
             s.push()
@@ -1064,7 +1181,9 @@ class ExecutionEngine:
                 logger.warning(f"  Module: {module}")
                 logger.warning(f"  Kind: {assertion_info.get('kind', '?')}")
                 logger.warning(f"  Source: {source_pretty}")
-                logger.warning(f"  Property (Z3, must hold; violation uses NOT this): {z3_s}")
+                logger.warning(
+                    f"  Property (Z3, must hold; violation uses NOT this): {z3_s}"
+                )
                 logger.warning(f"  Counterexample: {counterexample}")
                 logger.warning(
                     f"  Solver time: feasibility={manager.solver_time:.4f}s, "
@@ -1076,25 +1195,43 @@ class ExecutionEngine:
                 return True
             s.pop()
         return False
+
     # Never called
     def check_state(self, manager, state):
         """Checks the status of the execution and displays the state."""
-        if self.done and manager.debug and not manager.is_child and not manager.init_run_flag and not manager.ignore and not manager.abandon:
+        if (
+            self.done
+            and manager.debug
+            and not manager.is_child
+            and not manager.init_run_flag
+            and not manager.ignore
+            and not manager.abandon
+        ):
             logger.debug(f"Cycle {manager.cycle} final state:")
             logger.debug(state.store)
-    
+
             logger.debug(f"Cycle {manager.cycle} final path condition:")
             logger.debug(state.pc)
-        elif self.done and not manager.is_child and manager.assertion_violation and not manager.ignore and not manager.abandon:
+        elif (
+            self.done
+            and not manager.is_child
+            and manager.assertion_violation
+            and not manager.ignore
+            and not manager.abandon
+        ):
             logger.debug(f"Cycle {manager.cycle} initial state:")
             logger.debug(manager.initial_store)
 
             logger.debug(f"Cycle {manager.cycle} final state:")
             logger.debug(state.store)
-    
+
             logger.debug(f"Cycle {manager.cycle} final path condition:")
             logger.debug(state.pc)
-        elif manager.debug and not manager.is_child and not manager.init_run_flag and not manager.ignore:
+        elif (
+            manager.debug
+            and not manager.is_child
+            and not manager.init_run_flag
+            and not manager.ignore
+        ):
             logger.debug("Initial state:")
             logger.debug(state.store)
-                

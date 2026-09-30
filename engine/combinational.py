@@ -7,12 +7,14 @@ the bits of the assigns that depend on it. At end of clock edge we iterate
 the dirty set to a fixed point, writing each assign's LHS and dirtying any
 further comb assigns that depend on it.
 """
+
 import pyslang.ast as ps_ast
 import z3
 
 from helpers.rvalue_to_z3 import semantic_expr_to_z3
 
 # TODO: Param look at this file
+
 
 def _collect_rhs_signals(expr, out):
     if expr is None:
@@ -23,8 +25,20 @@ def _collect_rhs_signals(expr, out):
         if sym is not None and getattr(sym, "name", None):
             out.add(sym.name)
         return
-    for attr in ("left", "right", "operand", "predicate", "value", "selector",
-                 "min", "typ", "max", "expression", "operand1", "operand2"):
+    for attr in (
+        "left",
+        "right",
+        "operand",
+        "predicate",
+        "value",
+        "selector",
+        "min",
+        "typ",
+        "max",
+        "expression",
+        "operand1",
+        "operand2",
+    ):
         sub = getattr(expr, attr, None)
         if sub is not None and sub is not expr:
             _collect_rhs_signals(sub, out)
@@ -98,7 +112,7 @@ def evaluate_dirty_comb(state, module_name, manager):
     store = state.store.setdefault(module_name, {})
     while dirty:
         # Fun bitwise tricks.
-        # First isolate the lowest set bit, then subtract one to get the 
+        # First isolate the lowest set bit, then subtract one to get the
         # desired index. Lastly, clear this bit.
         bit = dirty & -dirty
         idx = bit.bit_length() - 1
@@ -122,7 +136,11 @@ def evaluate_dirty_comb(state, module_name, manager):
             continue
 
         old = store.get(lhs)
-        if isinstance(old, z3.ExprRef) and isinstance(new_val, z3.ExprRef) and old.eq(new_val):
+        if (
+            isinstance(old, z3.ExprRef)
+            and isinstance(new_val, z3.ExprRef)
+            and old.eq(new_val)
+        ):
             continue
 
         store[lhs] = new_val

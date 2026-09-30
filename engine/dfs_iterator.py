@@ -92,7 +92,8 @@ def sat_check_full_pc(
         if not _SAT_UNKNOWN_LOGGED:
             logger.warning(
                 "[sylq] Z3 returned unknown (timeout/incomplete); "
-                "treating as infeasible for feasibility checks (sound, may lose complete paths).")
+                "treating as infeasible for feasibility checks (sound, may lose complete paths)."
+            )
             _SAT_UNKNOWN_LOGGED = True
         return False
     # Fallback for older Z3 APIs
@@ -100,10 +101,12 @@ def sat_check_full_pc(
     if rs == "unknown":
         if not _SAT_UNKNOWN_LOGGED:
             logger.warning(
-                "[sylq] Z3 returned unknown; treating as infeasible for feasibility checks.")
+                "[sylq] Z3 returned unknown; treating as infeasible for feasibility checks."
+            )
             _SAT_UNKNOWN_LOGGED = True
         return False
     return False
+
 
 # Log individual SAT checks slower than this (seconds); 0 disables
 _SLOW_SAT_WARN_SEC = float(os.environ.get("SYLQ_SLOW_SAT_WARN_SEC", "5"))
@@ -122,33 +125,34 @@ def _timeout_requested(manager: Any) -> bool:
 @dataclass
 class DFSFrame:
     """A single frame in the DFS stack.
-    
+
     Represents the state at one level of the Cartesian product traversal.
     """
-    level: int                          # Which block/module level (0 = first block)
-    iterator: Iterator                  # Iterator over results at this level
-    current_result: dict | None      # Current result being processed
-    partial_pc: list[ExprRef]           # Accumulated path conditions up to this level
-    partial_store: dict[str, Any]       # Accumulated store up to this level
-    partial_vars: set                   # Set of variable names in partial_pc
-    is_feasible: bool = True            # Whether the partial merge is still SAT
+
+    level: int  # Which block/module level (0 = first block)
+    iterator: Iterator  # Iterator over results at this level
+    current_result: dict | None  # Current result being processed
+    partial_pc: list[ExprRef]  # Accumulated path conditions up to this level
+    partial_store: dict[str, Any]  # Accumulated store up to this level
+    partial_vars: set  # Set of variable names in partial_pc
+    is_feasible: bool = True  # Whether the partial merge is still SAT
     # Cross-module DFS only: RTL modules already present in partial_pc (for structural coupling).
     partial_modules: set = field(default_factory=set)
 
 
 class LRUCache:
     """Simple LRU cache for SAT results."""
-    
+
     def __init__(self, maxsize: int = 10000):
         self.maxsize = maxsize
         self.cache: OrderedDict = OrderedDict()
-    
+
     def get(self, key: str) -> str | None:
         if key in self.cache:
             self.cache.move_to_end(key)
             return self.cache[key]
         return None
-    
+
     def set(self, key: str, value: str) -> None:
         if key in self.cache:
             self.cache.move_to_end(key)
@@ -172,16 +176,16 @@ def _vars_in_pcs_static(pc_list: list) -> set:
 
 def partition_blocks(block_result_lists: list[list[dict]]) -> list[list[int]]:
     """Partition blocks into connected components based on shared symbolic variables.
-    
+
     Two blocks are in the same component if any of their path results share
     a symbolic variable. Uses union-find for efficiency.
-    
+
     Returns a list of groups, where each group is a list of block indices.
     """
     n = len(block_result_lists)
     if n == 0:
         return []
-    
+
     # Compute the set of variables used by each block (across all its results)
     block_vars: list[set] = []
     for block_results in block_result_lists:
@@ -189,17 +193,17 @@ def partition_blocks(block_result_lists: list[list[dict]]) -> list[list[int]]:
         for r in block_results:
             vars_in_block |= _vars_in_pcs_static(r["pc"])
         block_vars.append(vars_in_block)
-    
+
     # Union-find to group blocks that share variables
     parent = list(range(n))
     size = [1] * n
-    
+
     def find(x: int) -> int:
         while parent[x] != x:
             parent[x] = parent[parent[x]]
             x = parent[x]
         return x
-    
+
     def union(a: int, b: int) -> None:
         ra, rb = find(a), find(b)
         if ra == rb:
@@ -208,19 +212,19 @@ def partition_blocks(block_result_lists: list[list[dict]]) -> list[list[int]]:
             ra, rb = rb, ra
         parent[rb] = ra
         size[ra] += size[rb]
-    
+
     for i in range(n):
         vi = block_vars[i]
         for j in range(i + 1, n):
             vj = block_vars[j]
             if canonical_var_set(vi) & canonical_var_set(vj):
                 union(i, j)
-    
+
     # Group block indices by component
     groups: dict[int, list[int]] = defaultdict(list)
     for i in range(n):
         groups[find(i)].append(i)
-    
+
     return list(groups.values())
 
 
@@ -262,7 +266,7 @@ class LazyProduct:
     each combined ``pc`` is checked with Z3 on the **full** conjunction before yield
     when *manager* is set (drops jointly UNSAT combinations).
     """
-    
+
     def __init__(
         self,
         component_results: list,
@@ -298,7 +302,7 @@ class LazyProduct:
                 self._len = None
                 return
         self._len = reduce(mul, sizes, 1)
-    
+
     @property
     def logical_size(self) -> int | None:
         """Total Cartesian-product size if known; None if any axis is a lazy merge."""
@@ -313,13 +317,13 @@ class LazyProduct:
         if n > sys.maxsize:
             return sys.maxsize
         return n
-    
+
     def __iter__(self) -> Iterator[dict]:
         """Lazily produce merged results from Cartesian product of groups."""
         if not self.component_results:
             yield {"pc": [], "store": {}}
             return
-        
+
         if len(self.component_results) == 1:
             for result in self.component_results[0]:
                 if _timeout_requested(self.manager):
@@ -351,17 +355,17 @@ class LazyProduct:
                 yield from rec(i + 1, acc_pc + r["pc"], {**acc_store, **r["store"]})
 
         yield from rec(0, [], {})
-    
+
     def __bool__(self) -> bool:
         ls = self.logical_size
         if ls is not None:
             return ls > 0
         return bool(self.component_results)
-    
+
     @property
     def n_components(self) -> int:
         return len(self.component_results)
-    
+
     @property
     def component_sizes(self) -> list[str]:
         """Human-readable size per component; lazy merge axes show as 'lazy'."""
@@ -372,7 +376,7 @@ class LazyProduct:
             else:
                 out.append(str(len(g)))
         return out
-    
+
     def total_stored(self) -> int:
         """Sum of materialized list lengths; lazy merge groups contribute input block path counts."""
         total = 0
@@ -387,22 +391,22 @@ class LazyProduct:
 
 class DFSMergeIterator:
     """Stack-based DFS iterator for merging block results.
-    
+
     Instead of computing product(*block_results) and materializing all combinations,
     this iterator traverses the Cartesian product depth-first using an explicit stack.
-    
+
     Key benefits:
     1. Memory: O(num_blocks) stack frames instead of O(product_size)
     2. Early pruning: If partial merge (a1, b1) is UNSAT, skip all c paths
     3. Caching: Leaf results are cached and reused across sibling iterations
-    
+
     Usage:
         iterator = DFSMergeIterator(block_result_lists, sat_checker, cache)
         for merged_result in iterator:
             # merged_result is a feasible {pc: [...], store: {...}}
             process(merged_result)
     """
-    
+
     def __init__(
         self,
         block_result_lists: list[list[dict]],
@@ -414,7 +418,7 @@ class DFSMergeIterator:
         solver_timeout: int = 10000,
     ):
         """Initialize the DFS merge iterator.
-        
+
         Args:
             block_result_lists: List of per-block result lists. Each block's list
                 contains dicts with 'pc' (path conditions) and 'store' (symbolic store).
@@ -432,18 +436,18 @@ class DFSMergeIterator:
         self.enable_early_pruning = enable_early_pruning
         self.enable_caching = enable_caching
         self.solver_timeout = solver_timeout
-        
+
         self.num_levels = len(block_result_lists)
         self.stack: list[DFSFrame] = []
-        
+
         # Local cache for partial merge results (supplements Redis cache)
         self._local_cache = LRUCache(maxsize=10000)
-        
+
         # Statistics
         self.combos_checked = 0
         self.combos_pruned = 0
         self.cache_hits = 0
-        
+
     def _vars_in_pcs(self, pc_list: list[ExprRef]) -> set:
         """Extract variable names from a list of Z3 constraints."""
         out = set()
@@ -454,7 +458,7 @@ class DFSMergeIterator:
             except Exception:
                 pass
         return out
-    
+
     def _default_sat_check(self, constraints: list[ExprRef]) -> bool:
         """Full-PC SAT; *unknown* is not satisfiable for feasibility purposes."""
         if not constraints:
@@ -467,17 +471,19 @@ class DFSMergeIterator:
         if _SLOW_SAT_WARN_SEC > 0 and dt >= _SLOW_SAT_WARN_SEC:
             logger.warning(
                 f"    [merge-slow-sat] {self.module_name}: {dt:.1f}s for "
-                f"{len(constraints)} constraint(s), result={'sat' if out else 'unsat/unknown'}")
+                f"{len(constraints)} constraint(s), result={'sat' if out else 'unsat/unknown'}"
+            )
         return out
 
     def _get_cache_key(self, constraints: list[ExprRef]) -> str:
         """Generate a cache key for a set of constraints."""
         try:
             from .query_normalization import normalize_query_list
+
             return "dfs_merge:" + normalize_query_list(constraints)
         except Exception:
             return "dfs_merge:" + str(sorted(str(c) for c in constraints))
-    
+
     def _check_cached(self, cache_key: str) -> bool | None:
         """Check if result is in cache. Returns True/False for SAT/UNSAT, None if not cached."""
         # Check local cache first
@@ -485,7 +491,7 @@ class DFSMergeIterator:
         if local_result is not None:
             self.cache_hits += 1
             return local_result == "sat"
-        
+
         # Check Redis cache if available
         if self.manager and self.manager.cache:
             try:
@@ -498,18 +504,18 @@ class DFSMergeIterator:
             except Exception:
                 pass
         return None
-    
+
     def _store_cached(self, cache_key: str, is_sat: bool) -> None:
         """Store result in cache."""
         result_str = "sat" if is_sat else "unsat"
         self._local_cache.set(cache_key, result_str)
-        
+
         if self.manager and self.manager.cache:
             try:
                 self.manager.cache.set(cache_key, result_str)
             except Exception:
                 pass
-    
+
     def _check_partial_feasibility(
         self,
         partial_pc: list[ExprRef],
@@ -545,13 +551,13 @@ class DFSMergeIterator:
             self._store_cached(self._get_cache_key(combined_pc), is_sat)
 
         return (is_sat, combined_pc, combined_vars)
-    
+
     def __iter__(self) -> Iterator[dict]:
         """Iterate over all feasible merged results using DFS."""
         if not self.block_result_lists or self.num_levels == 0:
             yield {"pc": [], "store": {}}
             return
-        
+
         # Handle single-block case
         if self.num_levels == 1:
             for result in self.block_result_lists[0]:
@@ -559,15 +565,15 @@ class DFSMergeIterator:
                     return
                 yield result
             return
-        
+
         # Initialize stack with first level
         self._push_level(0, [], {}, set())
-        
+
         while self.stack:
             if _timeout_requested(self.manager):
                 return
             frame = self.stack[-1]
-            
+
             # Try to get next result at current level
             try:
                 result = next(frame.iterator)
@@ -576,9 +582,9 @@ class DFSMergeIterator:
                 # No more results at this level, backtrack
                 self.stack.pop()
                 continue
-            
+
             self.combos_checked += 1
-            
+
             # Full-conjunction feasibility for partial merges (sound default)
             if frame.level > 0:
                 is_feasible, new_pc, new_vars = self._check_partial_feasibility(
@@ -594,16 +600,16 @@ class DFSMergeIterator:
             else:
                 new_pc = frame.partial_pc + result["pc"]
                 new_vars = frame.partial_vars | self._vars_in_pcs(result["pc"])
-            
+
             new_store = {**frame.partial_store, **result["store"]}
-            
+
             # If at last level, yield the complete merged result
             if frame.level == self.num_levels - 1:
                 yield {"pc": new_pc, "store": new_store}
             else:
                 # Push next level onto stack
                 self._push_level(frame.level + 1, new_pc, new_store, new_vars)
-    
+
     def _push_level(
         self,
         level: int,
@@ -622,7 +628,7 @@ class DFSMergeIterator:
             partial_modules=set(),
         )
         self.stack.append(frame)
-    
+
     def get_stats(self) -> dict[str, int]:
         """Return iteration statistics."""
         return {
@@ -634,11 +640,11 @@ class DFSMergeIterator:
 
 class DFSCrossModuleIterator:
     """Stack-based DFS iterator for cross-module path combination.
-    
+
     Similar to DFSMergeIterator but operates at the cross-module level,
     combining per-module merged results across multiple cycles.
     """
-    
+
     def __init__(
         self,
         per_module_results: dict[str, list[Iterable[dict]]],
@@ -650,7 +656,7 @@ class DFSCrossModuleIterator:
         structural_module_graph: Any = None,
     ):
         """Initialize the cross-module DFS iterator.
-        
+
         Args:
             per_module_results: Dict mapping module_name -> per-cycle list of
                 iterable merged results (index = cycle).
@@ -671,25 +677,25 @@ class DFSCrossModuleIterator:
         self.enable_caching = enable_caching
         self.solver_timeout = solver_timeout
         self._structural_module_graph = structural_module_graph
-        
+
         # Build the list of (module, cycle) combinations to traverse
         # Each level in the DFS is one (module, cycle) pair
         self.levels: list[tuple[str, int]] = []
         for module_name in self.module_names:
             for cycle in range(num_cycles):
                 self.levels.append((module_name, cycle))
-        
+
         self.num_levels = len(self.levels)
         self.stack: list[DFSFrame] = []
-        
+
         self._local_cache = LRUCache(maxsize=10000)
-        
+
         # Statistics (cross-module DFS: combos_checked = each successful next() on a
         # per-module merged iterator — "outcome_pulls" in logs; includes work between full yields)
         self.combos_checked = 0
         self.combos_pruned = 0
         self.cache_hits = 0
-    
+
     def _vars_in_pcs(self, pc_list: list[ExprRef]) -> set:
         """Extract variable names from a list of Z3 constraints."""
         out = set()
@@ -700,28 +706,29 @@ class DFSCrossModuleIterator:
             except Exception:
                 pass
         return out
-    
+
     def _sat_check(self, constraints: list[ExprRef]) -> bool:
         """Full-conjunction SAT; unknown counts as not feasible."""
         return sat_check_full_pc(
             constraints, self.solver_timeout, self.manager, z3_kind="cross_module"
         )
-    
+
     def _get_cache_key(self, constraints: list[ExprRef]) -> str:
         """Generate a cache key for a set of constraints."""
         try:
             from .query_normalization import normalize_query_list
+
             return "dfs_xmod:" + normalize_query_list(constraints)
         except Exception:
             return "dfs_xmod:" + str(sorted(str(c) for c in constraints))
-    
+
     def _check_cached(self, cache_key: str) -> bool | None:
         """Check if result is in cache."""
         local_result = self._local_cache.get(cache_key)
         if local_result is not None:
             self.cache_hits += 1
             return local_result == "sat"
-        
+
         if self.manager and self.manager.cache:
             try:
                 cached = self.manager.cache.get(cache_key)
@@ -733,18 +740,18 @@ class DFSCrossModuleIterator:
             except Exception:
                 pass
         return None
-    
+
     def _store_cached(self, cache_key: str, is_sat: bool) -> None:
         """Store result in cache."""
         result_str = "sat" if is_sat else "unsat"
         self._local_cache.set(cache_key, result_str)
-        
+
         if self.manager and self.manager.cache:
             try:
                 self.manager.cache.set(cache_key, result_str)
             except Exception:
                 pass
-    
+
     def _check_partial_feasibility(
         self,
         partial_pc: list[ExprRef],
@@ -786,10 +793,12 @@ class DFSCrossModuleIterator:
             self._store_cached(self._get_cache_key(combined_pc), is_sat)
 
         return (is_sat, combined_pc, combined_vars)
-    
-    def __iter__(self) -> Iterator[tuple[dict[str, list[dict]], list[ExprRef], dict[str, Any]]]:
+
+    def __iter__(
+        self,
+    ) -> Iterator[tuple[dict[str, list[dict]], list[ExprRef], dict[str, Any]]]:
         """Iterate over all feasible cross-module combinations.
-        
+
         Yields:
             (path_combo, all_pcs, all_stores) where:
             - path_combo: Dict mapping module_name -> list of cycle results
@@ -799,13 +808,13 @@ class DFSCrossModuleIterator:
         if not self.levels:
             yield ({}, [], {})
             return
-        
+
         # Track the current combo being built: module_name -> [cycle_results]
         current_combo: dict[str, list[dict]] = {m: [] for m in self.module_names}
-        
+
         # Initialize stack with first level
         self._push_level(0, [], {}, set(), current_combo)
-        
+
         while self.stack:
             if _timeout_requested(self.manager):
                 return
@@ -821,9 +830,9 @@ class DFSCrossModuleIterator:
                     _prev_module, _prev_cycle = self.levels[frame.level - 1]
                     # Restore combo state (handled by stack frames)
                 continue
-            
+
             self.combos_checked += 1
-            
+
             if frame.level > 0:
                 is_feasible, new_pc, new_vars = self._check_partial_feasibility(
                     frame.partial_pc,
@@ -840,16 +849,16 @@ class DFSCrossModuleIterator:
             else:
                 new_pc = frame.partial_pc + result["pc"]
                 new_vars = frame.partial_vars | self._vars_in_pcs(result["pc"])
-            
+
             # Update store with module-qualified names
             new_store = dict(frame.partial_store)
             for sig, expr in result["store"].items():
                 new_store[f"{module_name}.{sig}"] = expr
-            
+
             # Build current combo
             new_combo = {m: list(frame.partial_combo[m]) for m in self.module_names}
             new_combo[module_name].append(result)
-            
+
             if frame.level == self.num_levels - 1:
                 # Yield complete combination
                 yield (new_combo, new_pc, new_store)
@@ -862,7 +871,7 @@ class DFSCrossModuleIterator:
                     new_vars,
                     new_combo,
                 )
-    
+
     def _push_level(
         self,
         level: int,
@@ -886,7 +895,7 @@ class DFSCrossModuleIterator:
         # Store combo state in frame (extend DFSFrame for this)
         frame.partial_combo = partial_combo  # type: ignore
         self.stack.append(frame)
-    
+
     def get_stats(self) -> dict[str, int]:
         """Return iteration statistics."""
         return {

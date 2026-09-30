@@ -24,6 +24,7 @@ except ImportError:
 # Quick-Union with weighted path compression
 # ---------------------------------------------------------------------------
 
+
 class QuickUnion:
     """Quick-Union (weighted, with path compression) over arbitrary hashable keys.
 
@@ -100,6 +101,7 @@ class QuickUnion:
 # ---------------------------------------------------------------------------
 # Query slicing
 # ---------------------------------------------------------------------------
+
 
 def get_vars_from_expr(expr) -> set[str]:
     """Return the set of symbolic variable name strings in a Z3 expression."""

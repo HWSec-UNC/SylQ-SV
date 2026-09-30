@@ -1,11 +1,11 @@
 """Helpers for working with Z3: semantic expression conversion and solving."""
 
-
 import pyslang.ast as ps_ast
 import z3
 from z3 import UGT, ULT, And, BitVec, BitVecRef, BitVecVal, BoolRef, If, Not, Or, Solver
 
 SOLVE_PC_TIMEOUT_MS = 10000
+
 
 def solve_pc(s: Solver) -> bool:
     """Solve path condition. Returns True iff sat; False for unsat or timeout (unknown)."""
@@ -29,6 +29,7 @@ def solve_pc(s: Solver) -> bool:
 # for any call site that has semantic nodes.
 # ---------------------------------------------------------------------------
 
+
 def _parse_svint(sv) -> int:
     """Convert a pyslang SVInt to a Python int."""
     s = str(sv).strip()
@@ -37,13 +38,13 @@ def _parse_svint(sv) -> int:
     if "'" not in s:
         return int(s)
     parts = s.split("'", 1)
-    base_char = parts[1][0].lower() if parts[1] else 'd'
-    digits = parts[1][1:] if len(parts[1]) > 1 else '0'
-    bases = {'b': 2, 'o': 8, 'd': 10, 'h': 16}
+    base_char = parts[1][0].lower() if parts[1] else "d"
+    digits = parts[1][1:] if len(parts[1]) > 1 else "0"
+    bases = {"b": 2, "o": 8, "d": 10, "h": 16}
     base = bases.get(base_char, 10)
-    clean = digits.replace('_', '').replace('?', '0')
-    clean = clean.replace('x', '0').replace('X', '0')
-    clean = clean.replace('z', '0').replace('Z', '0')
+    clean = digits.replace("_", "").replace("?", "0")
+    clean = clean.replace("x", "0").replace("X", "0")
+    clean = clean.replace("z", "0").replace("Z", "0")
     return int(clean, base) if clean else 0
 
 
@@ -104,7 +105,9 @@ def _wildcard_literal_mask_and_pat(sv, casex: bool) -> tuple[int, int, int] | No
     return None
 
 
-def _wildcard_mask_binary(digits: str, head: str, casex: bool) -> tuple[int, int, int] | None:
+def _wildcard_mask_binary(
+    digits: str, head: str, casex: bool
+) -> tuple[int, int, int] | None:
     if not head:
         width = len(digits)
     else:
@@ -134,7 +137,9 @@ def _wildcard_mask_binary(digits: str, head: str, casex: bool) -> tuple[int, int
     return care, pat, width
 
 
-def _wildcard_mask_hex(digits: str, head: str, casex: bool) -> tuple[int, int, int] | None:
+def _wildcard_mask_hex(
+    digits: str, head: str, casex: bool
+) -> tuple[int, int, int] | None:
     if not head:
         width = len(digits) * 4
     else:
@@ -172,7 +177,9 @@ def _wildcard_mask_hex(digits: str, head: str, casex: bool) -> tuple[int, int, i
     return care, pat, width
 
 
-def _wildcard_mask_oct(digits: str, head: str, casex: bool) -> tuple[int, int, int] | None:
+def _wildcard_mask_oct(
+    digits: str, head: str, casex: bool
+) -> tuple[int, int, int] | None:
     if not head:
         width = len(digits) * 3
     else:
@@ -298,45 +305,51 @@ def case_statement_arm_matches_z3(
 
 
 _BINOP_MAP = {
-    ps_ast.BinaryOperator.Add:                lambda a, b: a + b,
-    ps_ast.BinaryOperator.Subtract:           lambda a, b: a - b,
-    ps_ast.BinaryOperator.Multiply:           lambda a, b: a * b,
-    ps_ast.BinaryOperator.BinaryAnd:          lambda a, b: a & b,
-    ps_ast.BinaryOperator.BinaryOr:           lambda a, b: a | b,
-    ps_ast.BinaryOperator.BinaryXor:          lambda a, b: a ^ b,
-    ps_ast.BinaryOperator.BinaryXnor:         lambda a, b: ~(a ^ b),
-    ps_ast.BinaryOperator.Equality:           lambda a, b: a == b,
-    ps_ast.BinaryOperator.Inequality:         lambda a, b: a != b,
-    ps_ast.BinaryOperator.CaseEquality:       lambda a, b: a == b,
-    ps_ast.BinaryOperator.CaseInequality:     lambda a, b: a != b,
-    ps_ast.BinaryOperator.WildcardEquality:   lambda a, b: a == b,
+    ps_ast.BinaryOperator.Add: lambda a, b: a + b,
+    ps_ast.BinaryOperator.Subtract: lambda a, b: a - b,
+    ps_ast.BinaryOperator.Multiply: lambda a, b: a * b,
+    ps_ast.BinaryOperator.BinaryAnd: lambda a, b: a & b,
+    ps_ast.BinaryOperator.BinaryOr: lambda a, b: a | b,
+    ps_ast.BinaryOperator.BinaryXor: lambda a, b: a ^ b,
+    ps_ast.BinaryOperator.BinaryXnor: lambda a, b: ~(a ^ b),
+    ps_ast.BinaryOperator.Equality: lambda a, b: a == b,
+    ps_ast.BinaryOperator.Inequality: lambda a, b: a != b,
+    ps_ast.BinaryOperator.CaseEquality: lambda a, b: a == b,
+    ps_ast.BinaryOperator.CaseInequality: lambda a, b: a != b,
+    ps_ast.BinaryOperator.WildcardEquality: lambda a, b: a == b,
     ps_ast.BinaryOperator.WildcardInequality: lambda a, b: a != b,
-    ps_ast.BinaryOperator.LessThan:           lambda a, b: ULT(a, b),
-    ps_ast.BinaryOperator.LessThanEqual:      lambda a, b: z3.ULE(a, b),
-    ps_ast.BinaryOperator.GreaterThan:        lambda a, b: UGT(a, b),
-    ps_ast.BinaryOperator.GreaterThanEqual:   lambda a, b: z3.UGE(a, b),
-    ps_ast.BinaryOperator.LogicalAnd:         lambda a, b: And(a != 0, b != 0)
-                                                        if not isinstance(a, BoolRef)
-                                                        else And(a, b if isinstance(b, BoolRef) else b != 0),
-    ps_ast.BinaryOperator.LogicalOr:          lambda a, b: Or(a != 0, b != 0)
-                                                        if not isinstance(a, BoolRef)
-                                                        else Or(a, b if isinstance(b, BoolRef) else b != 0),
-    ps_ast.BinaryOperator.LogicalShiftLeft:   lambda a, b: a << b,
-    ps_ast.BinaryOperator.LogicalShiftRight:  lambda a, b: z3.LShR(a, b),
-    ps_ast.BinaryOperator.ArithmeticShiftLeft:  lambda a, b: a << b,
+    ps_ast.BinaryOperator.LessThan: lambda a, b: ULT(a, b),
+    ps_ast.BinaryOperator.LessThanEqual: lambda a, b: z3.ULE(a, b),
+    ps_ast.BinaryOperator.GreaterThan: lambda a, b: UGT(a, b),
+    ps_ast.BinaryOperator.GreaterThanEqual: lambda a, b: z3.UGE(a, b),
+    ps_ast.BinaryOperator.LogicalAnd: lambda a, b: (
+        And(a != 0, b != 0)
+        if not isinstance(a, BoolRef)
+        else And(a, b if isinstance(b, BoolRef) else b != 0)
+    ),
+    ps_ast.BinaryOperator.LogicalOr: lambda a, b: (
+        Or(a != 0, b != 0)
+        if not isinstance(a, BoolRef)
+        else Or(a, b if isinstance(b, BoolRef) else b != 0)
+    ),
+    ps_ast.BinaryOperator.LogicalShiftLeft: lambda a, b: a << b,
+    ps_ast.BinaryOperator.LogicalShiftRight: lambda a, b: z3.LShR(a, b),
+    ps_ast.BinaryOperator.ArithmeticShiftLeft: lambda a, b: a << b,
     ps_ast.BinaryOperator.ArithmeticShiftRight: lambda a, b: a >> b,
 }
 
 _UNOP_MAP = {
-    ps_ast.UnaryOperator.LogicalNot:  lambda a: a == BitVecVal(0, a.size()) if isinstance(a, BitVecRef) else Not(a),
-    ps_ast.UnaryOperator.BitwiseNot:  lambda a: ~a,
-    ps_ast.UnaryOperator.Plus:        lambda a: a,
-    ps_ast.UnaryOperator.Minus:       lambda a: -a,
-    ps_ast.UnaryOperator.BitwiseAnd:  lambda a: z3.BVRedAnd(a),
-    ps_ast.UnaryOperator.BitwiseOr:   lambda a: z3.BVRedOr(a),
-    ps_ast.UnaryOperator.BitwiseXor:  None,  # no single Z3 call
+    ps_ast.UnaryOperator.LogicalNot: lambda a: (
+        a == BitVecVal(0, a.size()) if isinstance(a, BitVecRef) else Not(a)
+    ),
+    ps_ast.UnaryOperator.BitwiseNot: lambda a: ~a,
+    ps_ast.UnaryOperator.Plus: lambda a: a,
+    ps_ast.UnaryOperator.Minus: lambda a: -a,
+    ps_ast.UnaryOperator.BitwiseAnd: lambda a: z3.BVRedAnd(a),
+    ps_ast.UnaryOperator.BitwiseOr: lambda a: z3.BVRedOr(a),
+    ps_ast.UnaryOperator.BitwiseXor: None,  # no single Z3 call
     ps_ast.UnaryOperator.BitwiseNand: lambda a: ~z3.BVRedAnd(a),
-    ps_ast.UnaryOperator.BitwiseNor:  lambda a: ~z3.BVRedOr(a),
+    ps_ast.UnaryOperator.BitwiseNor: lambda a: ~z3.BVRedOr(a),
 }
 
 
@@ -353,7 +366,7 @@ def semantic_expr_to_z3(expr, store: dict, module: str, width_hint: int = 32):
         return None
 
     kind = expr.kind
-    w = getattr(expr, 'effectiveWidth', None) or width_hint
+    w = getattr(expr, "effectiveWidth", None) or width_hint
 
     # --- Leaf nodes --------------------------------------------------------
     if kind == ps_ast.ExpressionKind.NamedValue:
@@ -362,7 +375,7 @@ def semantic_expr_to_z3(expr, store: dict, module: str, width_hint: int = 32):
         if isinstance(sym, (BitVecRef, BoolRef, z3.ArithRef)):
             return sym
         sym_str = str(sym)
-        if sym_str.lstrip('-').isdigit():
+        if sym_str.lstrip("-").isdigit():
             return BitVecVal(int(sym_str), w)
         return BitVec(sym_str, w)
 
@@ -398,7 +411,11 @@ def semantic_expr_to_z3(expr, store: dict, module: str, width_hint: int = 32):
             lhs = If(lhs, BitVecVal(1, w), BitVecVal(0, w))
         if isinstance(rhs, BoolRef):
             rhs = If(rhs, BitVecVal(1, w), BitVecVal(0, w))
-        if isinstance(lhs, BitVecRef) and isinstance(rhs, BitVecRef) and lhs.size() != rhs.size():
+        if (
+            isinstance(lhs, BitVecRef)
+            and isinstance(rhs, BitVecRef)
+            and lhs.size() != rhs.size()
+        ):
             target = max(lhs.size(), rhs.size())
             if lhs.size() < target:
                 lhs = z3.ZeroExt(target - lhs.size(), lhs)
@@ -427,8 +444,16 @@ def semantic_expr_to_z3(expr, store: dict, module: str, width_hint: int = 32):
         left_expr = expr.left
         right_expr = expr.right
         try:
-            hi = _parse_svint(left_expr.value) if hasattr(left_expr, 'value') else int(str(left_expr.constant))
-            lo = _parse_svint(right_expr.value) if hasattr(right_expr, 'value') else int(str(right_expr.constant))
+            hi = (
+                _parse_svint(left_expr.value)
+                if hasattr(left_expr, "value")
+                else int(str(left_expr.constant))
+            )
+            lo = (
+                _parse_svint(right_expr.value)
+                if hasattr(right_expr, "value")
+                else int(str(right_expr.constant))
+            )
         except Exception:
             return None
         if isinstance(base, BoolRef):
@@ -488,7 +513,7 @@ def semantic_expr_to_z3(expr, store: dict, module: str, width_hint: int = 32):
         if inner is None:
             return None
         try:
-            n = _parse_svint(count_expr.value) if hasattr(count_expr, 'value') else 1
+            n = _parse_svint(count_expr.value) if hasattr(count_expr, "value") else 1
         except Exception:
             n = 1
         if n <= 1:
@@ -498,10 +523,9 @@ def semantic_expr_to_z3(expr, store: dict, module: str, width_hint: int = 32):
     # --- Fallback: try to evaluate via constant property --------------------
     try:
         cv = expr.constant
-        sv = cv.integer() if hasattr(cv, 'integer') else cv
+        sv = cv.integer() if hasattr(cv, "integer") else cv
         return BitVecVal(_parse_svint(sv), w)
     except Exception:
         pass
 
     return None
-

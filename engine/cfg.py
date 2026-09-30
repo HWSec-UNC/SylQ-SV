@@ -1,4 +1,5 @@
 """Converts PySlang AST (representing SystemVerilog) into executable CFG structure that enables path exploration"""
+
 import os
 from operator import indexOf
 
@@ -14,6 +15,7 @@ from .basic_block_visitor import BasicBlockVisitor
 
 class CFG:
     """Represents the control flow graph of a module/always block"""
+
     def __init__(self):
         # basic blocks. A list made up of slices of all_nodes determined by partition_points.
         self.basic_block_list = []
@@ -37,7 +39,7 @@ class CFG:
         # indices of basic blocks that need to connect to dummy exit node
         self.leaves = set()
 
-        #paths... list of paths with start and end being the dummy nodes
+        # paths... list of paths with start and end being the dummy nodes
         self.paths = []
 
         # name corresponding to the module. there could be multiple always blocks (or CFGS) per module
@@ -70,7 +72,7 @@ class CFG:
         # how many nested block statements we've seen so far
         self.block_stmt_depth = 0
 
-        #submodules defined
+        # submodules defined
         self.submodules = []
 
         # InstanceBodySymbol for the module being analyzed; set by get_always_sv
@@ -91,7 +93,10 @@ class CFG:
         """
         self._instance_body = ast
         visitor = AlwaysBlockVisitor(
-            self.always_blocks, self.always_comb_blocks, self.decls, self.comb,
+            self.always_blocks,
+            self.always_comb_blocks,
+            self.decls,
+            self.comb,
         )
         ast.visit(lookup_table=visitor.lookup_table)
 
@@ -119,7 +124,9 @@ class CFG:
         G.add_node(-2, data="Dummy End")
 
         for block1, block2, condition, guard_node_idx in self.cfg_edges:
-            G.add_edge(block1, block2, condition=condition, guard_node_idx=guard_node_idx)
+            G.add_edge(
+                block1, block2, condition=condition, guard_node_idx=guard_node_idx
+            )
 
         G.add_edge(-1, 0)
 
@@ -127,7 +134,7 @@ class CFG:
         # branches) to the exit node BEFORE computing leaves so _find_leaves
         # won't duplicate them.
         exit_connected = set()
-        for (node_idx, condition) in self.basic_block_visitor.edge_stack:
+        for node_idx, condition in self.basic_block_visitor.edge_stack:
             bb = self._find_basic_block(node_idx)
             G.add_edge(bb, -2, condition=condition)
             exit_connected.add(bb)
@@ -155,7 +162,7 @@ class CFG:
 
         for i in range(len(sorted_points) - 1):
             start_idx = sorted_points[i]
-            end_idx = sorted_points[i+1]
+            end_idx = sorted_points[i + 1]
 
             # Slice from this leader to the next leader
             basic_block = self.all_nodes[start_idx:end_idx]
@@ -165,7 +172,7 @@ class CFG:
 
     def _make_paths(self):
         """Map the edge between AST nodes to a path between basic blocks."""
-        for (node1, node2, condition) in self.edgelist:
+        for node1, node2, condition in self.edgelist:
             block1 = self._find_basic_block(node1)
             block2 = self._find_basic_block(node2)
 
@@ -178,7 +185,7 @@ class CFG:
         if node_idx < len(self.all_nodes):
             node = self.all_nodes[node_idx]
         else:
-            node = self.all_nodes[len(self.all_nodes)-1]
+            node = self.all_nodes[len(self.all_nodes) - 1]
 
         for block in self.basic_block_list:
             if node in block:
@@ -224,10 +231,10 @@ class CFG:
             if i > 0:
                 edge_data = self.graph.get_edge_data(path[i - 1], path[i])
                 if edge_data:
-                    cond = edge_data.get('condition')
-                    if cond == 'true':
+                    cond = edge_data.get("condition")
+                    if cond == "true":
                         directions.append(1)
-                    elif cond == 'false':
+                    elif cond == "false":
                         directions.append(0)
                     elif cond is None:
                         directions.append(1)
@@ -245,7 +252,7 @@ class CFG:
             path_str = ""
 
             for j in range(len(path) - 1):
-                u, v = path[j], path[j+1]
+                u, v = path[j], path[j + 1]
 
                 edge_data = G.get_edge_data(u, v)
                 condition = edge_data.get("condition", "sequential")
@@ -256,7 +263,7 @@ class CFG:
                     label = "[TRUE] -> "
                 elif condition == "false":
                     label = "[FALSE] -> "
-                elif condition == 'sequential':
+                elif condition == "sequential":
                     label = "-> "
                 else:
                     label = f"[CASE: {condition}] -> "
@@ -275,12 +282,12 @@ class CFG:
         try:
             levels = nx.shortest_path_length(G, source=-1)
             for node, dist in levels.items():
-                G.nodes[node]['layer'] = dist
+                G.nodes[node]["layer"] = dist
 
             max_level = max(levels.values()) if levels else 0
-            G.nodes[-2]['layer'] = max_level + 1
+            G.nodes[-2]["layer"] = max_level + 1
 
-            pos = nx.multipartite_layout(G, subset_key="layer", align='vertical')
+            pos = nx.multipartite_layout(G, subset_key="layer", align="vertical")
 
             pos = {node: (coords[1], -coords[0]) for node, coords in pos.items()}
 
@@ -289,37 +296,46 @@ class CFG:
 
         color_map = []
         for node in G.nodes():
-            if node == -1: color_map.append('limegreen')
-            elif node == -2: color_map.append('tomato')
-            else: color_map.append('skyblue')
+            if node == -1:
+                color_map.append("limegreen")
+            elif node == -2:
+                color_map.append("tomato")
+            else:
+                color_map.append("skyblue")
 
-        nx.draw_networkx_nodes(G, pos, node_size=1200, node_color=color_map, edgecolors='black')
-        nx.draw_networkx_labels(G, pos, font_size=10, font_weight='bold')
+        nx.draw_networkx_nodes(
+            G, pos, node_size=1200, node_color=color_map, edgecolors="black"
+        )
+        nx.draw_networkx_labels(G, pos, font_size=10, font_weight="bold")
 
         nx.draw_networkx_edges(
-            G, pos,
-            arrowstyle='->',
+            G,
+            pos,
+            arrowstyle="->",
             arrowsize=20,
-            edge_color='gray',
+            edge_color="gray",
             width=1.5,
-            connectionstyle="arc3,rad=0.1"
+            connectionstyle="arc3,rad=0.1",
         )
 
         edge_labels = {}
         for u, v, data in G.edges(data=True):
-            cond = data.get('condition')
+            cond = data.get("condition")
             if cond is not None:
                 edge_labels[(u, v)] = str(cond)
 
-        nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_color='darkred', font_size=9)
+        nx.draw_networkx_edge_labels(
+            G, pos, edge_labels=edge_labels, font_color="darkred", font_size=9
+        )
 
         plt.title(f"Multipartite CFG: {filename}", pad=20)
-        plt.axis('off')
+        plt.axis("off")
 
         file_ext = os.path.splitext(filename)[1][1:]
-        plt.savefig(filename, format=file_ext, bbox_inches='tight', dpi=300)
+        plt.savefig(filename, format=file_ext, bbox_inches="tight", dpi=300)
         logger.info(f"CFG saved successfully to {os.path.abspath(filename)}")
         plt.close()
+
 
 class AlwaysBlockVisitor:
     """
@@ -327,14 +343,18 @@ class AlwaysBlockVisitor:
     Variable/Net, and ContinuousAssign symbols from the symbol tree.
     """
 
-    _COMB_KINDS = frozenset({
-        ps_ast.ProceduralBlockKind.AlwaysComb,
-        ps_ast.ProceduralBlockKind.AlwaysLatch,
-    })
-    _SKIP_KINDS = frozenset({
-        ps_ast.ProceduralBlockKind.Initial,
-        ps_ast.ProceduralBlockKind.Final,
-    })
+    _COMB_KINDS = frozenset(
+        {
+            ps_ast.ProceduralBlockKind.AlwaysComb,
+            ps_ast.ProceduralBlockKind.AlwaysLatch,
+        }
+    )
+    _SKIP_KINDS = frozenset(
+        {
+            ps_ast.ProceduralBlockKind.Initial,
+            ps_ast.ProceduralBlockKind.Final,
+        }
+    )
 
     def __init__(self, always_blocks, always_comb_blocks, decls, comb):
         self.always_blocks = always_blocks
