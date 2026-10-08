@@ -1,4 +1,6 @@
 """This file is the entrypoint of the execution."""
+from redis.retry import Retry
+from redis.backoff import NoBackoff
 
 import gc
 import logging
@@ -218,7 +220,16 @@ def main():
         showVersion()
 
     if options.use_cache:
-        engine.cache = redis.Redis(host="localhost", port=6379, db=0)
+        rs = redis.Redis(host="localhost", port=6379, db=0)
+        retry = rs.get_retry()
+        rs.set_retry(Retry(NoBackoff(), 0))
+        try:
+            rs.ping()
+        except redis.RedisError as e:
+            print(f"Redis not responding: {e}", file=sys.stderr)
+            sys.exit(1)
+        rs.set_retry(retry)  # ty: ignore[invalid-argument-type]
+        engine.cache = rs
 
     timer = None
     if options.explore_time:

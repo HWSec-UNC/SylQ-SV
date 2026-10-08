@@ -2,6 +2,7 @@
 
 import gc
 import time
+import redis
 
 import pyslang.ast as ps_ast
 import pyslang.syntax as ps_stx
@@ -38,6 +39,7 @@ class ExecutionEngine:
     module_depth: int = 0  # Tracks current module nesting depth during execution
     debug: bool = False  # Boolean flag to enable debug output
     done: bool = False  # Boolean flag indicating if execution is complete
+    cache: redis.Redis | None = None
     timeout: bool = (
         False  # Set to True by main.py timeout handler to request early stop
     )
@@ -1029,7 +1031,7 @@ class ExecutionEngine:
             num_cycles=int(num_cycles),
             manager=manager,
             enable_early_pruning=True,
-            enable_caching=True,
+            enable_caching=manager.cache is not None,
             structural_module_graph=getattr(manager, "structural_module_graph", None),
         )
 
