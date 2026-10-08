@@ -2,48 +2,49 @@
 
 Three phases are applied to each Z3 constraint before cache lookup:
 
-  1. Propositional term normalization:
+  1. Variable renaming:
+     - Rename symbolic variables as T1, T2, ... in order of first occurrence
+       (constraint list order, then left-to-right DFS within a constraint).
+     - Allows cache hits across different runs with different variable names.
+     - Runs first: symbol names are random per run, so nothing that orders terms
+       may see them.
+
+  2. Propositional term normalization:
      - Concatenation normal form  (standardize bitvector ops)
      - Arithmetic normal form     (simplify arithmetic)
      Both are polynomial-time transformations.
 
-  2. Lexicographic ordering:
+  3. Lexicographic ordering:
      - Sort terms in conjunctions/disjunctions by canonical string ordering.
-
-  3. Variable renaming:
-     - Rename symbolic variables left-to-right as T1, T2, ...
-     - Allows cache hits across different runs with different variable names.
 
 Usage:
     key = normalize_query(z3_expr)      # single constraint
     key = normalize_query_list(z3_list) # list of constraints
+
+    # Incremental, for DFS over growing path conditions:
+    q = NormalizedQuery().extend(pc_a)
+    q2 = q.extend(pc_b)                 # only pc_b is normalized
+    key = q2.key()
 """
 
 from __future__ import annotations
 
+import hashlib
+
 try:
     from z3 import (
         And,
-        ArithRef,
-        BitVec,
-        BitVecRef,
-        BitVecSort,
-        BitVecVal,
-        BoolRef,
-        BoolVal,
+        Const,
         ExprRef,
-        Not,
         Or,
+        Z3_OP_UNINTERPRETED,
         is_and,
+        is_app,
         is_bool,
-        is_const,
-        is_false,
-        is_not,
+        is_bv,
         is_or,
-        is_true,
         simplify,
         substitute,
-        z3util,
     )
 
     Z3_AVAILABLE = True
@@ -52,7 +53,49 @@ except ImportError:
 
 
 # ---------------------------------------------------------------------------
-# Phase 1: Propositional term normalization (concatenation + arithmetic NF)
+# Phase 1: Variable renaming
+# ---------------------------------------------------------------------------
+
+
+def _collect_vars_ordered(expr: ExprRef) -> list[ExprRef]:
+    """Collect symbolic variables from *expr* in left-to-right (DFS) order,
+    preserving first-occurrence order. Shared sub-terms are visited once."""
+    seen: set[int] = set()
+    ordered: list[ExprRef] = []
+    stack = [expr]
+    while stack:
+        e = stack.pop()
+        eid = e.get_id()
+        if eid in seen:
+            continue
+        seen.add(eid)
+        if is_app(e) and e.num_args() == 0:
+            # Numerals and True/False have their own decl kinds
+            if e.decl().kind() == Z3_OP_UNINTERPRETED:
+                ordered.append(e)
+        else:
+            stack.extend(reversed(e.children()))
+    return ordered
+
+
+def _canonical_var(index: int, var: ExprRef) -> tuple[str, ExprRef]:
+    """Return (name, variable) for the *index*-th symbol, with the sort of *var*.
+
+    The sort is part of the name: two queries that differ only in a variable's
+    width are different queries and must not share a key.
+    """
+    if is_bool(var):
+        tag = "b"
+    elif is_bv(var):
+        tag = f"bv{var.size()}"
+    else:
+        tag = "".join(ch if ch.isalnum() else "_" for ch in str(var.sort()))
+    name = f"T{index}_{tag}"
+    return name, Const(name, var.sort())
+
+
+# ---------------------------------------------------------------------------
+# Phase 2: Propositional term normalization (concatenation + arithmetic NF)
 # ---------------------------------------------------------------------------
 
 
@@ -66,8 +109,6 @@ def _simplify_expr(expr: ExprRef) -> ExprRef:
     This provides a polynomial-time approximation of concatenation normal
     form and arithmetic normal form as described in the paper.
     """
-    if not Z3_AVAILABLE:
-        return expr
     try:
         # Z3's simplify with specific options for better normalization
         return simplify(
@@ -83,149 +124,44 @@ def _simplify_expr(expr: ExprRef) -> ExprRef:
 
 
 # ---------------------------------------------------------------------------
-# Phase 2: Lexicographic ordering
+# Phase 3: Lexicographic ordering
 # ---------------------------------------------------------------------------
 
 
-def _sort_children(expr: ExprRef) -> ExprRef:
-    """If *expr* is a conjunction (And) or disjunction (Or), sort its
-    children by their string representation to produce a canonical order.
+def _sort_key(expr: ExprRef) -> str:
+    # sexpr() is native and complete; str() goes through the Python
+    # pretty-printer, which is slow and elides large terms with "...".
+    return expr.sexpr()
+
+
+def _lexicographic_normalize(expr: ExprRef, memo: dict | None = None) -> ExprRef:
+    """Recursively sort the children of all And/Or sub-expressions.
 
     Paper §4.2.3: "terms in a constraint are put in lexicographic order."
     """
-    if not Z3_AVAILABLE:
-        return expr
-    try:
-        if is_and(expr):
-            children = sorted(expr.children(), key=lambda c: str(c))
-            return And(*children) if len(children) > 1 else children[0]
-        if is_or(expr):
-            children = sorted(expr.children(), key=lambda c: str(c))
-            return Or(*children) if len(children) > 1 else children[0]
-    except Exception:
-        pass
-    return expr
-
-
-def _lexicographic_normalize(expr: ExprRef) -> ExprRef:
-    """Recursively apply lexicographic ordering to all And/Or sub-expressions."""
-    if not Z3_AVAILABLE:
-        return expr
-    try:
+    if memo is None:
+        memo = {}
+    eid = expr.get_id()
+    done = memo.get(eid)
+    if done is not None:
+        return done
+    out = expr
+    if is_app(expr) and expr.num_args() > 0:
         # Process children first (bottom-up)
-        n = expr.num_args()
-        if n == 0:
-            return expr
-        new_children = [_lexicographic_normalize(expr.arg(i)) for i in range(n)]
-        # Rebuild with normalized children
-        new_expr = expr.decl()(*new_children) if n > 0 else expr
-        return _sort_children(new_expr)
-    except Exception:
-        return expr
-
-
-# ---------------------------------------------------------------------------
-# Phase 3: Variable renaming
-# ---------------------------------------------------------------------------
-
-
-def _collect_vars_ordered(expr: ExprRef) -> list[str]:
-    """Collect symbolic variable names from *expr* in left-to-right (DFS) order,
-    preserving first-occurrence order."""
-    if not Z3_AVAILABLE:
-        return []
-    seen: set[str] = set()
-    ordered: list[str] = []
-
-    def _walk(e):
-        try:
-            if is_const(e) and e.decl().arity() == 0:
-                name = str(e)
-                # Skip numeric constants and True/False
-                if name not in seen and not _is_literal(name):
-                    seen.add(name)
-                    ordered.append(name)
+        children = [_lexicographic_normalize(c, memo) for c in expr.children()]
+        if is_and(expr) or is_or(expr):
+            children.sort(key=_sort_key)
+            if len(children) == 1:
+                out = children[0]
             else:
-                for i in range(e.num_args()):
-                    _walk(e.arg(i))
-        except Exception:
-            pass
-
-    _walk(expr)
-    return ordered
-
-
-def _is_literal(name: str) -> bool:
-    """Check if a name looks like a Z3 numeric/boolean literal."""
-    if name in ("True", "False"):
-        return True
-    try:
-        int(name)
-        return True
-    except ValueError:
-        pass
-    # Hex-like
-    return bool(name.startswith(("#", "0x")))
-
-
-def _rename_variables(
-    expr: ExprRef, rename_map: dict[str, ExprRef] | None = None
-) -> tuple:
-    """Rename all symbolic variables in *expr* to T1, T2, ... in order of
-    first occurrence (left-to-right DFS).
-
-    Paper §4.2.3: "symbolic values appearing in the constraints are renamed.
-    SylQ-SV uses fresh symbolic values each time it runs, and variable
-    renaming allows equivalent queries across runs."
-
-    Returns (renamed_expr, rename_map_used).
-    """
-    if not Z3_AVAILABLE:
-        return expr, {}
-
-    var_names = _collect_vars_ordered(expr)
-    if not var_names:
-        return expr, rename_map or {}
-
-    if rename_map is None:
-        rename_map = {}
-
-    # Build substitution list
-    subs_from = []
-    subs_to = []
-    counter = len(rename_map)
-
-    for vname in var_names:
-        if vname in rename_map:
-            continue
-        counter += 1
-        # We need the original Z3 variable to substitute
-        try:
-            orig_vars = z3util.get_vars(expr)
-            for v in orig_vars:
-                if str(v) == vname:
-                    new_name = f"T{counter}"
-                    if isinstance(v, BitVecRef):
-                        new_var = BitVec(new_name, v.sort().size())
-                    else:
-                        # Boolean variable
-                        from z3 import Bool
-
-                        new_var = Bool(new_name)
-                    rename_map[vname] = new_var
-                    subs_from.append(v)
-                    subs_to.append(new_var)
-                    break
-        except Exception:
-            pass
-
-    if subs_from:
-        try:
-            expr = substitute(expr, list(zip(subs_from, subs_to)))
-        except Exception:
-            pass
-
-    return expr, rename_map
+                out = And(*children) if is_and(expr) else Or(*children)
+        else:
+            try:
+                out = expr.decl()(*children)
+            except Exception:
+                out = expr
+    memo[eid] = out
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -233,33 +169,94 @@ def _rename_variables(
 # ---------------------------------------------------------------------------
 
 
-def normalize_constraint(expr: ExprRef, rename_map: dict | None = None) -> tuple:
-    """Apply all three normalization phases to a single Z3 constraint.
+class QueryMemo:
+    """Normalization results shared by every NormalizedQuery built from it.
 
-    Returns (normalized_expr, rename_map) where rename_map is updated
-    with any new variable->T_i mappings.
+    Holds references to the constraints it has seen (AST ids are only stable
+    while the AST is alive), so its lifetime should match that of the search
+    that produces those constraints.
     """
-    if not Z3_AVAILABLE or expr is None:
-        return expr, rename_map or {}
 
-    # Phase 1: Simplify (concatenation NF + arithmetic NF)
-    expr = _simplify_expr(expr)
+    __slots__ = ("norm", "vars")
 
-    # Phase 2: Lexicographic ordering
-    expr = _lexicographic_normalize(expr)
+    def __init__(self):
+        # constraint AST id -> (constraint, its variables in first-occurrence order)
+        self.vars: dict[int, tuple[ExprRef, list[ExprRef]]] = {}
+        # (constraint AST id, canonical names of its variables) -> normalized text
+        self.norm: dict[tuple[int, tuple[str, ...]], str] = {}
 
-    # Phase 3: Variable renaming
-    expr, rename_map = _rename_variables(expr, rename_map)
 
-    return expr, rename_map
+class NormalizedQuery:
+    """An immutable, normalized conjunction that can be extended cheaply.
+
+    ``extend`` normalizes only the constraints it is given: the canonical names
+    of the existing constraints do not change when more are appended, so a DFS
+    can carry one of these per stack frame instead of re-normalizing the whole
+    path condition at every level.
+    """
+
+    __slots__ = ("_memo", "_parts", "_rename")
+
+    def __init__(self, memo: QueryMemo | None = None):
+        self._memo = memo if memo is not None else QueryMemo()
+        # original variable AST id -> (canonical name, canonical variable)
+        self._rename: dict[int, tuple[str, ExprRef]] = {}
+        self._parts: tuple[str, ...] = ()
+
+    def extend(self, constraints: list) -> NormalizedQuery:
+        """Return a new query with *constraints* appended."""
+        if not constraints:
+            return self
+        memo = self._memo
+        rename = self._rename
+        owned = False
+        parts = list(self._parts)
+        for c in constraints:
+            cid = c.get_id()
+            entry = memo.vars.get(cid)
+            if entry is None:
+                entry = (c, _collect_vars_ordered(c))
+                memo.vars[cid] = entry
+            variables = entry[1]
+            for v in variables:
+                vid = v.get_id()
+                if vid not in rename:
+                    if not owned:
+                        rename = dict(rename)
+                        owned = True
+                    rename[vid] = _canonical_var(len(rename) + 1, v)
+            targets = [rename[v.get_id()] for v in variables]
+            norm_key = (cid, tuple(name for name, _ in targets))
+            part = memo.norm.get(norm_key)
+            if part is None:
+                expr = c
+                if variables:
+                    expr = substitute(
+                        expr, [(v, t) for v, (_, t) in zip(variables, targets)]
+                    )
+                expr = _lexicographic_normalize(_simplify_expr(expr))
+                part = expr.sexpr()
+                memo.norm[norm_key] = part
+            parts.append(part)
+        out = NormalizedQuery(memo)
+        out._rename = rename
+        out._parts = tuple(parts)
+        return out
+
+    def text(self) -> str:
+        """Canonical text of the conjunction (order of constraints does not matter)."""
+        return " AND ".join(sorted(self._parts))
+
+    def key(self) -> str:
+        """Fixed-size cache key for the conjunction."""
+        return hashlib.sha256(self.text().encode()).hexdigest()
 
 
 def normalize_query(expr: ExprRef) -> str:
     """Normalize a single Z3 constraint and return its string cache key."""
     if not Z3_AVAILABLE or expr is None:
         return str(expr)
-    normalized, _ = normalize_constraint(expr)
-    return str(normalized)
+    return NormalizedQuery().extend([expr]).text()
 
 
 def normalize_query_list(constraints: list) -> str:
@@ -270,13 +267,4 @@ def normalize_query_list(constraints: list) -> str:
     """
     if not Z3_AVAILABLE or not constraints:
         return str(constraints)
-
-    rename_map: dict = {}
-    normalized_parts = []
-    for c in constraints:
-        nc, rename_map = normalize_constraint(c, rename_map)
-        normalized_parts.append(str(nc))
-
-    # Sort the normalized constraint strings for canonical ordering
-    normalized_parts.sort()
-    return " AND ".join(normalized_parts)
+    return NormalizedQuery().extend(constraints).text()
