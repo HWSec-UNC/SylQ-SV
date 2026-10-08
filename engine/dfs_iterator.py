@@ -546,6 +546,7 @@ class DFSMergeIterator(_SatCacheMixin):
                 self.manager.feasibility_disjoint_skip_merge += 1
             return (True, combined_pc, combined_vars)
 
+        cache_key = None
         if self.enable_caching:
             cache_key = self._get_cache_key(combined_pc)
             cached_result = self._check_cached(cache_key)
@@ -554,8 +555,8 @@ class DFSMergeIterator(_SatCacheMixin):
 
         is_sat = self.check_sat_callback(combined_pc)
 
-        if self.enable_caching:
-            self._store_cached(self._get_cache_key(combined_pc), is_sat)
+        if cache_key is not None:
+            self._store_cached(cache_key, is_sat)
 
         return (is_sat, combined_pc, combined_vars)
 
@@ -758,6 +759,7 @@ class DFSCrossModuleIterator(_SatCacheMixin):
                 self.manager.feasibility_disjoint_skip_cross += 1
             return (True, combined_pc, combined_vars)
 
+        cache_key = None
         if self.enable_caching:
             cache_key = self._get_cache_key(combined_pc)
             cached_result = self._check_cached(cache_key)
@@ -766,8 +768,8 @@ class DFSCrossModuleIterator(_SatCacheMixin):
 
         is_sat = self._sat_check(combined_pc)
 
-        if self.enable_caching:
-            self._store_cached(self._get_cache_key(combined_pc), is_sat)
+        if cache_key is not None:
+            self._store_cached(cache_key, is_sat)
 
         return (is_sat, combined_pc, combined_vars)
 
