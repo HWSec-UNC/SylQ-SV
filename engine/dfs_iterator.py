@@ -39,6 +39,7 @@ from .feasibility_independence import (
     may_disjoint_skip_cross_module,
     may_disjoint_skip_merge,
 )
+from .query_normalization import NormalizedQuery, QueryMemo
 
 # Soundness: clock/reset (and all other names) count toward overlap. Excluding them
 # caused false "disjoint" merges when rst/clk were the only shared symbols.
@@ -138,6 +139,8 @@ class DFSFrame:
     is_feasible: bool = True  # Whether the partial merge is still SAT
     # Cross-module DFS only: RTL modules already present in partial_pc (for structural coupling).
     partial_modules: set = field(default_factory=set)
+    # Normalized form of partial_pc for cache keys (None when caching is off).
+    partial_query: NormalizedQuery | None = None
 
 
 class LRUCache:
@@ -165,8 +168,26 @@ class LRUCache:
 class _SatCacheMixin:
     """SAT-result cache shared by the DFS iterators: local LRU in front of Redis.
 
-    Expects ``manager``, ``cache_hits`` and ``_local_cache`` on the instance.
+    Expects ``manager``, ``enable_caching``, ``cache_hits``, ``_local_cache`` and
+    ``_key_memo`` on the instance.
     """
+
+    _cache_prefix = ""
+
+    def _root_query(self) -> NormalizedQuery | None:
+        """Normalized empty path condition, or None when caching is off."""
+        return NormalizedQuery(self._key_memo) if self.enable_caching else None
+
+    def _extend_query(
+        self, query: NormalizedQuery | None, new_pc: list[ExprRef]
+    ) -> NormalizedQuery | None:
+        """Normalize *new_pc* onto *query*; None disables caching below this point."""
+        if query is None:
+            return None
+        try:
+            return query.extend(new_pc)
+        except Exception:
+            return None
 
     def _check_cached(self, cache_key: str) -> bool | None:
         """Check if result is in cache. Returns True/False for SAT/UNSAT, None if not cached."""
@@ -446,6 +467,8 @@ class DFSMergeIterator(_SatCacheMixin):
             process(merged_result)
     """
 
+    _cache_prefix = "v2:dfs_merge:"
+
     def __init__(
         self,
         block_result_lists: list[list[dict]],
@@ -481,6 +504,7 @@ class DFSMergeIterator(_SatCacheMixin):
 
         # Local cache for partial merge results (supplements Redis cache)
         self._local_cache = LRUCache(maxsize=10000)
+        self._key_memo = QueryMemo()
 
         # Statistics
         self.combos_checked = 0
@@ -514,21 +538,13 @@ class DFSMergeIterator(_SatCacheMixin):
             )
         return out
 
-    def _get_cache_key(self, constraints: list[ExprRef]) -> str:
-        """Generate a cache key for a set of constraints."""
-        try:
-            from .query_normalization import normalize_query_list
-
-            return "dfs_merge:" + normalize_query_list(constraints)
-        except Exception:
-            return "dfs_merge:" + str(sorted(str(c) for c in constraints))
-
     def _check_partial_feasibility(
         self,
         partial_pc: list[ExprRef],
         partial_vars: set,
         new_pc: list[ExprRef],
-    ) -> tuple[bool, list[ExprRef], set]:
+        partial_query: NormalizedQuery | None = None,
+    ) -> tuple[bool, list[ExprRef], set, NormalizedQuery | None]:
         """Merge feasibility: full conjunction SAT on *combined_pc* when vars overlap.
 
         If variable sets are disjoint, satisfiability of the conjunction follows from
@@ -537,28 +553,29 @@ class DFSMergeIterator(_SatCacheMixin):
         new_vars = self._vars_in_pcs(new_pc)
         combined_pc = partial_pc + new_pc
         combined_vars = partial_vars | new_vars
+        combined_query = self._extend_query(partial_query, new_pc)
 
         if not combined_pc:
-            return (True, combined_pc, combined_vars)
+            return (True, combined_pc, combined_vars, combined_query)
 
         if may_disjoint_skip_merge(partial_vars, new_vars, partial_pc, new_pc):
             if self.manager is not None:
                 self.manager.feasibility_disjoint_skip_merge += 1
-            return (True, combined_pc, combined_vars)
+            return (True, combined_pc, combined_vars, combined_query)
 
         cache_key = None
-        if self.enable_caching:
-            cache_key = self._get_cache_key(combined_pc)
+        if combined_query is not None:
+            cache_key = self._cache_prefix + combined_query.key()
             cached_result = self._check_cached(cache_key)
             if cached_result is not None:
-                return (cached_result, combined_pc, combined_vars)
+                return (cached_result, combined_pc, combined_vars, combined_query)
 
         is_sat = self.check_sat_callback(combined_pc)
 
         if cache_key is not None:
             self._store_cached(cache_key, is_sat)
 
-        return (is_sat, combined_pc, combined_vars)
+        return (is_sat, combined_pc, combined_vars, combined_query)
 
     def __iter__(self) -> Iterator[dict]:
         """Iterate over all feasible merged results using DFS."""
@@ -575,7 +592,7 @@ class DFSMergeIterator(_SatCacheMixin):
             return
 
         # Initialize stack with first level
-        self._push_level(0, [], {}, set())
+        self._push_level(0, [], {}, set(), self._root_query())
 
         while self.stack:
             if _timeout_requested(self.manager):
@@ -595,10 +612,13 @@ class DFSMergeIterator(_SatCacheMixin):
 
             # Full-conjunction feasibility for partial merges (sound default)
             if frame.level > 0:
-                is_feasible, new_pc, new_vars = self._check_partial_feasibility(
-                    frame.partial_pc,
-                    frame.partial_vars,
-                    result["pc"],
+                is_feasible, new_pc, new_vars, new_query = (
+                    self._check_partial_feasibility(
+                        frame.partial_pc,
+                        frame.partial_vars,
+                        result["pc"],
+                        frame.partial_query,
+                    )
                 )
                 if not is_feasible:
                     self.combos_pruned += 1
@@ -608,6 +628,7 @@ class DFSMergeIterator(_SatCacheMixin):
             else:
                 new_pc = frame.partial_pc + result["pc"]
                 new_vars = frame.partial_vars | self._vars_in_pcs(result["pc"])
+                new_query = self._extend_query(frame.partial_query, result["pc"])
 
             new_store = {**frame.partial_store, **result["store"]}
 
@@ -616,7 +637,9 @@ class DFSMergeIterator(_SatCacheMixin):
                 yield {"pc": new_pc, "store": new_store}
             else:
                 # Push next level onto stack
-                self._push_level(frame.level + 1, new_pc, new_store, new_vars)
+                self._push_level(
+                    frame.level + 1, new_pc, new_store, new_vars, new_query
+                )
 
     def _push_level(
         self,
@@ -624,6 +647,7 @@ class DFSMergeIterator(_SatCacheMixin):
         partial_pc: list[ExprRef],
         partial_store: dict[str, Any],
         partial_vars: set,
+        partial_query: NormalizedQuery | None = None,
     ) -> None:
         """Push a new level onto the DFS stack."""
         frame = DFSFrame(
@@ -634,6 +658,7 @@ class DFSMergeIterator(_SatCacheMixin):
             partial_store=partial_store,
             partial_vars=partial_vars,
             partial_modules=set(),
+            partial_query=partial_query,
         )
         self.stack.append(frame)
 
@@ -652,6 +677,8 @@ class DFSCrossModuleIterator(_SatCacheMixin):
     Similar to DFSMergeIterator but operates at the cross-module level,
     combining per-module merged results across multiple cycles.
     """
+
+    _cache_prefix = "v2:dfs_xmod:"
 
     def __init__(
         self,
@@ -697,6 +724,7 @@ class DFSCrossModuleIterator(_SatCacheMixin):
         self.stack: list[DFSFrame] = []
 
         self._local_cache = LRUCache(maxsize=10000)
+        self._key_memo = QueryMemo()
 
         # Statistics (cross-module DFS: combos_checked = each successful next() on a
         # per-module merged iterator — "outcome_pulls" in logs; includes work between full yields)
@@ -721,15 +749,6 @@ class DFSCrossModuleIterator(_SatCacheMixin):
             constraints, self.solver_timeout, self.manager, z3_kind="cross_module"
         )
 
-    def _get_cache_key(self, constraints: list[ExprRef]) -> str:
-        """Generate a cache key for a set of constraints."""
-        try:
-            from .query_normalization import normalize_query_list
-
-            return "dfs_xmod:" + normalize_query_list(constraints)
-        except Exception:
-            return "dfs_xmod:" + str(sorted(str(c) for c in constraints))
-
     def _check_partial_feasibility(
         self,
         partial_pc: list[ExprRef],
@@ -737,14 +756,16 @@ class DFSCrossModuleIterator(_SatCacheMixin):
         new_pc: list[ExprRef],
         partial_modules: set,
         next_module: str,
-    ) -> tuple[bool, list[ExprRef], set]:
+        partial_query: NormalizedQuery | None = None,
+    ) -> tuple[bool, list[ExprRef], set, NormalizedQuery | None]:
         """Cross-module partial merge: full *combined_pc* SAT when variable sets overlap."""
         new_vars = self._vars_in_pcs(new_pc)
         combined_pc = partial_pc + new_pc
         combined_vars = partial_vars | new_vars
+        combined_query = self._extend_query(partial_query, new_pc)
 
         if not combined_pc:
-            return (True, combined_pc, combined_vars)
+            return (True, combined_pc, combined_vars, combined_query)
 
         if may_disjoint_skip_cross_module(
             partial_vars,
@@ -757,21 +778,21 @@ class DFSCrossModuleIterator(_SatCacheMixin):
         ):
             if self.manager is not None:
                 self.manager.feasibility_disjoint_skip_cross += 1
-            return (True, combined_pc, combined_vars)
+            return (True, combined_pc, combined_vars, combined_query)
 
         cache_key = None
-        if self.enable_caching:
-            cache_key = self._get_cache_key(combined_pc)
+        if combined_query is not None:
+            cache_key = self._cache_prefix + combined_query.key()
             cached_result = self._check_cached(cache_key)
             if cached_result is not None:
-                return (cached_result, combined_pc, combined_vars)
+                return (cached_result, combined_pc, combined_vars, combined_query)
 
         is_sat = self._sat_check(combined_pc)
 
         if cache_key is not None:
             self._store_cached(cache_key, is_sat)
 
-        return (is_sat, combined_pc, combined_vars)
+        return (is_sat, combined_pc, combined_vars, combined_query)
 
     def __iter__(
         self,
@@ -792,7 +813,7 @@ class DFSCrossModuleIterator(_SatCacheMixin):
         current_combo: dict[str, list[dict]] = {m: [] for m in self.module_names}
 
         # Initialize stack with first level
-        self._push_level(0, [], {}, set(), current_combo)
+        self._push_level(0, [], {}, set(), current_combo, self._root_query())
 
         while self.stack:
             if _timeout_requested(self.manager):
@@ -813,12 +834,15 @@ class DFSCrossModuleIterator(_SatCacheMixin):
             self.combos_checked += 1
 
             if frame.level > 0:
-                is_feasible, new_pc, new_vars = self._check_partial_feasibility(
-                    frame.partial_pc,
-                    frame.partial_vars,
-                    result["pc"],
-                    frame.partial_modules,
-                    module_name,
+                is_feasible, new_pc, new_vars, new_query = (
+                    self._check_partial_feasibility(
+                        frame.partial_pc,
+                        frame.partial_vars,
+                        result["pc"],
+                        frame.partial_modules,
+                        module_name,
+                        frame.partial_query,
+                    )
                 )
                 if not is_feasible:
                     self.combos_pruned += 1
@@ -828,6 +852,7 @@ class DFSCrossModuleIterator(_SatCacheMixin):
             else:
                 new_pc = frame.partial_pc + result["pc"]
                 new_vars = frame.partial_vars | self._vars_in_pcs(result["pc"])
+                new_query = self._extend_query(frame.partial_query, result["pc"])
 
             # Update store with module-qualified names
             new_store = dict(frame.partial_store)
@@ -849,6 +874,7 @@ class DFSCrossModuleIterator(_SatCacheMixin):
                     new_store,
                     new_vars,
                     new_combo,
+                    new_query,
                 )
 
     def _push_level(
@@ -858,6 +884,7 @@ class DFSCrossModuleIterator(_SatCacheMixin):
         partial_store: dict[str, Any],
         partial_vars: set,
         partial_combo: dict[str, list[dict]],
+        partial_query: NormalizedQuery | None = None,
     ) -> None:
         """Push a new level onto the DFS stack."""
         module_name, cycle = self.levels[level]
@@ -870,6 +897,7 @@ class DFSCrossModuleIterator(_SatCacheMixin):
             partial_store=partial_store,
             partial_vars=partial_vars,
             partial_modules=partial_modules,
+            partial_query=partial_query,
         )
         # Store combo state in frame (extend DFSFrame for this)
         frame.partial_combo = partial_combo  # type: ignore
