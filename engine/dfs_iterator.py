@@ -305,6 +305,7 @@ class ReplayableMergeResults:
         self._block_result_lists = block_result_lists
         self._module_name = module_name
         self._manager = manager
+        self._key_memo = QueryMemo()
 
     def __iter__(self) -> Iterator[dict]:
         return iter(
@@ -313,7 +314,8 @@ class ReplayableMergeResults:
                 module_name=self._module_name,
                 manager=self._manager,
                 enable_early_pruning=True,
-                enable_caching=True,
+                enable_caching=getattr(self._manager, "cache", None) is not None,
+                key_memo=self._key_memo,
             )
         )
 
@@ -478,6 +480,7 @@ class DFSMergeIterator(_SatCacheMixin):
         enable_early_pruning: bool = True,
         enable_caching: bool = True,
         solver_timeout: int = 10000,
+        key_memo: QueryMemo | None = None,
     ):
         """Initialize the DFS merge iterator.
 
@@ -490,6 +493,8 @@ class DFSMergeIterator(_SatCacheMixin):
             enable_early_pruning: If True, prune when partial merge is UNSAT.
             enable_caching: If True, cache SAT results.
             solver_timeout: Timeout for Z3 solver in milliseconds.
+            key_memo: Cache-key normalization memo to reuse (e.g. across replays
+                of the same block lists). A fresh one is used if None.
         """
         self.block_result_lists = block_result_lists
         self.module_name = module_name
@@ -504,7 +509,7 @@ class DFSMergeIterator(_SatCacheMixin):
 
         # Local cache for partial merge results (supplements Redis cache)
         self._local_cache = LRUCache(maxsize=10000)
-        self._key_memo = QueryMemo()
+        self._key_memo = key_memo if key_memo is not None else QueryMemo()
 
         # Statistics
         self.combos_checked = 0
