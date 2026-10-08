@@ -162,6 +162,45 @@ class LRUCache:
             self.cache[key] = value
 
 
+class _SatCacheMixin:
+    """SAT-result cache shared by the DFS iterators: local LRU in front of Redis.
+
+    Expects ``manager``, ``cache_hits`` and ``_local_cache`` on the instance.
+    """
+
+    def _check_cached(self, cache_key: str) -> bool | None:
+        """Check if result is in cache. Returns True/False for SAT/UNSAT, None if not cached."""
+        # Check local cache first
+        local_result = self._local_cache.get(cache_key)
+        if local_result is not None:
+            self.cache_hits += 1
+            return local_result == "sat"
+
+        # Check Redis cache if available
+        if self.manager and self.manager.cache:
+            try:
+                cached = self.manager.cache.get(cache_key)
+                if cached is not None:
+                    self.cache_hits += 1
+                    result = cached.decode() == "sat"
+                    self._local_cache.set(cache_key, cached.decode())
+                    return result
+            except Exception:
+                pass
+        return None
+
+    def _store_cached(self, cache_key: str, is_sat: bool) -> None:
+        """Store result in cache."""
+        result_str = "sat" if is_sat else "unsat"
+        self._local_cache.set(cache_key, result_str)
+
+        if self.manager and self.manager.cache:
+            try:
+                self.manager.cache.set(cache_key, result_str)
+            except Exception:
+                pass
+
+
 def _vars_in_pcs_static(pc_list: list) -> set:
     """Extract variable names from a list of Z3 constraints (module-level helper)."""
     out = set()
@@ -389,7 +428,7 @@ class LazyProduct:
         return total
 
 
-class DFSMergeIterator:
+class DFSMergeIterator(_SatCacheMixin):
     """Stack-based DFS iterator for merging block results.
 
     Instead of computing product(*block_results) and materializing all combinations,
@@ -483,38 +522,6 @@ class DFSMergeIterator:
             return "dfs_merge:" + normalize_query_list(constraints)
         except Exception:
             return "dfs_merge:" + str(sorted(str(c) for c in constraints))
-
-    def _check_cached(self, cache_key: str) -> bool | None:
-        """Check if result is in cache. Returns True/False for SAT/UNSAT, None if not cached."""
-        # Check local cache first
-        local_result = self._local_cache.get(cache_key)
-        if local_result is not None:
-            self.cache_hits += 1
-            return local_result == "sat"
-
-        # Check Redis cache if available
-        if self.manager and self.manager.cache:
-            try:
-                cached = self.manager.cache.get(cache_key)
-                if cached is not None:
-                    self.cache_hits += 1
-                    result = cached.decode() == "sat"
-                    self._local_cache.set(cache_key, cached.decode())
-                    return result
-            except Exception:
-                pass
-        return None
-
-    def _store_cached(self, cache_key: str, is_sat: bool) -> None:
-        """Store result in cache."""
-        result_str = "sat" if is_sat else "unsat"
-        self._local_cache.set(cache_key, result_str)
-
-        if self.manager and self.manager.cache:
-            try:
-                self.manager.cache.set(cache_key, result_str)
-            except Exception:
-                pass
 
     def _check_partial_feasibility(
         self,
@@ -638,7 +645,7 @@ class DFSMergeIterator:
         }
 
 
-class DFSCrossModuleIterator:
+class DFSCrossModuleIterator(_SatCacheMixin):
     """Stack-based DFS iterator for cross-module path combination.
 
     Similar to DFSMergeIterator but operates at the cross-module level,
@@ -721,36 +728,6 @@ class DFSCrossModuleIterator:
             return "dfs_xmod:" + normalize_query_list(constraints)
         except Exception:
             return "dfs_xmod:" + str(sorted(str(c) for c in constraints))
-
-    def _check_cached(self, cache_key: str) -> bool | None:
-        """Check if result is in cache."""
-        local_result = self._local_cache.get(cache_key)
-        if local_result is not None:
-            self.cache_hits += 1
-            return local_result == "sat"
-
-        if self.manager and self.manager.cache:
-            try:
-                cached = self.manager.cache.get(cache_key)
-                if cached is not None:
-                    self.cache_hits += 1
-                    result = cached.decode() == "sat"
-                    self._local_cache.set(cache_key, cached.decode())
-                    return result
-            except Exception:
-                pass
-        return None
-
-    def _store_cached(self, cache_key: str, is_sat: bool) -> None:
-        """Store result in cache."""
-        result_str = "sat" if is_sat else "unsat"
-        self._local_cache.set(cache_key, result_str)
-
-        if self.manager and self.manager.cache:
-            try:
-                self.manager.cache.set(cache_key, result_str)
-            except Exception:
-                pass
 
     def _check_partial_feasibility(
         self,
